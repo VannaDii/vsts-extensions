@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+  "id": "AC004DC7-1E95-49B1-9A37-90A2EF0C14A2",
+  "name": "CreateTestVariables",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 1,
+    "Minor": 9,
+    "Patch": 0
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.116.0",
+  "inputs": [
+    {
+      "name": "Username",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.Username",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.Username"
+    },
+    {
+      "name": "Password",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.Password",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.Password"
+    },
+    {
+      "name": "VariablePrefix",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.VariablePrefix",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.VariablePrefix"
+    }
+  ],
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "execution": {
+    "Node": {
+      "target": "createTestVariables.js"
+    }
+  },
+  "messages": {
+    "NoUsernameProvided": "ms-resource:loc.messages.NoUsernameProvided",
+    "NoPasswordProvided": "ms-resource:loc.messages.NoPasswordProvided"
+  }
+}

@@ -1,0 +1,55 @@
+{
+    "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+    "id": "AC004DC7-1E95-49B1-9A37-90A2EF0C14A2",
+    "name": "CreateTestVariables",
+    "friendlyName": "Create Test Variables",
+    "description": "Creates variables from a test run associated with this build and release.",
+    "helpMarkDown": "Creates variables from a test run associated with this build and release. Variables created are: TestRunId, TestRunName, TestRunUrl, TestRunColor (good, warning, danger), and <Outcome(Passed|Failed)>Count.",
+    "category": "Utility",
+    "visibility": [ "Build", "Release" ],
+    "runsOn": [ "Agent" ],
+    "author": "Gio Palacino",
+    "version": {
+        "Major": 1,
+        "Minor": 9,
+        "Patch": 0
+    },
+    "demands": [],
+    "minimumAgentVersion": "2.116.0",
+    "inputs": [
+        {
+            "name": "Username",
+            "type": "string",
+            "label": "Username",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The username used to authenticate to test management."
+        },
+        {
+            "name": "Password",
+            "type": "string",
+            "label": "Personal Access Token",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "A personal access token used to authenticate to test management"
+        },
+        {
+            "name": "VariablePrefix",
+            "type": "string",
+            "label": "Variable Prefix",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "A prefix to use when creating variables. Example: $([Prefix]TestRunId)"
+        }
+    ],
+    "instanceNameFormat": "Create Test Variables for $(VariablePrefix)",
+    "execution": {
+        "Node": {
+            "target": "createTestVariables.js"
+        }
+    },
+    "messages": {
+        "NoUsernameProvided": "No username was provided.",
+        "NoPasswordProvided": "No password was provided."
+    }
+}

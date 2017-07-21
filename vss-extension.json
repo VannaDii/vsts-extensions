@@ -1,0 +1,89 @@
+{
+    "manifestVersion": 1,
+    "id": "tigerpistol-gio-build-tasks",
+    "name": "Tiger Pistol Build Tasks",
+    "version": "0.2.61",
+    "publisher": "tigerpistol-gio",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "description": "Tools for building with Tiger Pistol.",
+    "categories": [
+        "Build and release"
+    ],
+    "icons": {
+        "default": "icon.png"
+    },
+    "files": [
+        { "path": "BitBucketPullRequest" },
+        { "path": "CompareBranches" },
+        { "path": "CreateTestVariables" },
+        { "path": "PostToSlackWebHook" },
+        { "path": "VersionFromBranch" },
+        { "path": "VstsPullRequest" }
+    ],
+    "contributions": [
+        {
+            "id": "versionfrombranch-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "VersionFromBranch"
+            }
+        },
+        {
+            "id": "bitbucketpullrequest-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "BitBucketPullRequest"
+            }
+        },
+        {
+            "id": "posttoslackwebhook-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "PostToSlackWebHook"
+            }
+        },
+        {
+            "id": "createtestvariables-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "CreateTestVariables"
+            }
+        },
+        {
+            "id": "comparebranches-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "CompareBranches"
+            }
+        },
+        {
+            "id": "vstspullrequest-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "VstsPullRequest"
+            }
+        }
+    ]
+}

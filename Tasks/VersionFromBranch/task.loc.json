@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+  "id": "46C54F0D-30E0-4684-AC8D-0029C500ED17",
+  "name": "VersionFromBranch",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Utility",
+  "visibility": [
+    "Build"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 1,
+    "Minor": 2,
+    "Patch": 0
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.116.0",
+  "inputs": [
+    {
+      "name": "BranchName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.BranchName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.BranchName"
+    },
+    {
+      "name": "VersionPattern",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.VersionPattern",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.VersionPattern"
+    },
+    {
+      "name": "IsBuildRenameEnabled",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.IsBuildRenameEnabled",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.IsBuildRenameEnabled"
+    }
+  ],
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "execution": {
+    "Node": {
+      "target": "versionFromBranch.js"
+    }
+  },
+  "messages": {
+    "NoBranchName": "ms-resource:loc.messages.NoBranchName",
+    "NoPattern": "ms-resource:loc.messages.NoPattern",
+    "NoCapture": "ms-resource:loc.messages.NoCapture",
+    "NoRevision": "ms-resource:loc.messages.NoRevision"
+  }
+}

@@ -1,0 +1,114 @@
+{
+    "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+    "id": "60151C97-BD7E-4AC3-9A58-1282676B61BF",
+    "name": "BitBucketPullRequest",
+    "friendlyName": "BitBucket Pull Request",
+    "description": "Creates a pull request for two branches.",
+    "helpMarkDown": "Creates a pull request on [BitBucket](https://bitbucket.org) for two branches.",
+    "category": "Utility",
+    "visibility": [ "Build", "Release" ],
+    "runsOn": [ "Agent" ],
+    "author": "Gio Palacino",
+    "version": {
+        "Major": 1,
+        "Minor": 7,
+        "Patch": 0
+    },
+    "demands": [],
+    "minimumAgentVersion": "2.116.0",
+    "inputs": [
+        {
+            "name": "BitBucketUsername",
+            "type": "string",
+            "label": "BitBucket Username",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The username of the BitBucket repository authorized user."
+        },
+        {
+            "name": "BitBucketPassword",
+            "type": "string",
+            "label": "BitBucket Password",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The password for the username of the BitBucket repository authorized user."
+        },
+        {
+            "name": "RepositoryOwner",
+            "type": "string",
+            "label": "Repository Owner",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The username of the BitBucket repository owner."
+        },
+        {
+            "name": "RepositoryName",
+            "type": "string",
+            "label": "Repository Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The name of the repository hosted in BitBucket."
+        },
+        {
+            "name": "SourceBranchName",
+            "type": "string",
+            "label": "Source Branch Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The name of the branch to be merged into the target branch."
+        },
+        {
+            "name": "TargetBranchName",
+            "type": "string",
+            "label": "Target Branch Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The name of the branch into which the souce branch will be merged."
+        },
+        {
+            "name": "PullRequestTitle",
+            "type": "string",
+            "label": "Pull Request Title",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The title of the pull request to be created."
+        },
+        {
+            "name": "ReviewerNames",
+            "type": "string",
+            "label": "Reviewers",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "A comma separated list of reviewer usernames."
+        },
+        {
+            "name": "IsCloseSourceBranchEnabled",
+            "type": "boolean",
+            "label": "Close Source Branch",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Check this to have the source branch closed after it is merged to the target branch."
+        },
+        {
+            "name": "IsShowRawResponseEnabled",
+            "type": "boolean",
+            "label": "Show Raw Response",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Check this to have the raw HTTP response from BitBucket written to the output."
+        }
+    ],
+    "instanceNameFormat": "Create Pull Request",
+    "execution": {
+        "Node": {
+            "target": "bitBucketPullRequest.js"
+        }
+    },
+    "messages": {
+        "NoUsername": "No BitBucket username was provided for the pull request.",
+        "NoRepoName": "No repository name was provided for the pull request.",
+        "NoSourceBranch": "No source branch was provided for the pull request.",
+        "NoTargetBranch": "No target branch was provided for the pull request.",
+        "NoPullRequestTitle": "No title was provided for the pull request.."
+    }
+}

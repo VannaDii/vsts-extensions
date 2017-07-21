@@ -1,0 +1,14 @@
+{
+  "name": "bitbucket-pull-request",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "os": "^0.1.1",
+    "path": "^0.12.7",
+    "http": "^0.0.0",
+    "request": "^2.81.0",
+    "vsts-task-lib": "^2.0.6"
+  }
+}

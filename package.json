@@ -1,0 +1,37 @@
+{
+  "name": "vsts-extensions",
+  "version": "0.5.0",
+  "description": "Tasks for the Team Services build system",
+  "main": "gulpfile.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "node make.js build",
+    "test": "node make.js test",
+    "testLegacy": "node make.js testLegacy"
+  },
+  "keywords": [
+    "VSTS",
+    "build",
+    "tasks"
+  ],
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "devDependencies": {
+    "adm-zip": "0.4.7",
+    "gulp": "3.9.1",
+    "gulp-util": "3.0.8",
+    "minimatch": "3.0.4",
+    "minimist": "1.2.0",
+    "mocha": "3.3.0",
+    "q": "1.5.0",
+    "semver": "5.3.0",
+    "shelljs": "0.7.7",
+    "sync-request": "4.0.3",
+    "typescript": "2.3.2",
+    "validator": "7.0.0",
+    "uuid": "3.0.1",
+    "tfx-cli": "0.4.5"
+  }
+}

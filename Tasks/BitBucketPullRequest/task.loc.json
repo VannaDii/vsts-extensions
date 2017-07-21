@@ -1,0 +1,119 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+  "id": "60151C97-BD7E-4AC3-9A58-1282676B61BF",
+  "name": "BitBucketPullRequest",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 1,
+    "Minor": 7,
+    "Patch": 0
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.116.0",
+  "inputs": [
+    {
+      "name": "BitBucketUsername",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.BitBucketUsername",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.BitBucketUsername"
+    },
+    {
+      "name": "BitBucketPassword",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.BitBucketPassword",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.BitBucketPassword"
+    },
+    {
+      "name": "RepositoryOwner",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.RepositoryOwner",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.RepositoryOwner"
+    },
+    {
+      "name": "RepositoryName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.RepositoryName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.RepositoryName"
+    },
+    {
+      "name": "SourceBranchName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.SourceBranchName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.SourceBranchName"
+    },
+    {
+      "name": "TargetBranchName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.TargetBranchName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.TargetBranchName"
+    },
+    {
+      "name": "PullRequestTitle",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.PullRequestTitle",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.PullRequestTitle"
+    },
+    {
+      "name": "ReviewerNames",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.ReviewerNames",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.ReviewerNames"
+    },
+    {
+      "name": "IsCloseSourceBranchEnabled",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.IsCloseSourceBranchEnabled",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.IsCloseSourceBranchEnabled"
+    },
+    {
+      "name": "IsShowRawResponseEnabled",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.IsShowRawResponseEnabled",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.IsShowRawResponseEnabled"
+    }
+  ],
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "execution": {
+    "Node": {
+      "target": "bitBucketPullRequest.js"
+    }
+  },
+  "messages": {
+    "NoUsername": "ms-resource:loc.messages.NoUsername",
+    "NoRepoName": "ms-resource:loc.messages.NoRepoName",
+    "NoSourceBranch": "ms-resource:loc.messages.NoSourceBranch",
+    "NoTargetBranch": "ms-resource:loc.messages.NoTargetBranch",
+    "NoPullRequestTitle": "ms-resource:loc.messages.NoPullRequestTitle"
+  }
+}
