@@ -192,8 +192,13 @@ function makePullRequest(baseUri: string, tpName: string, projectRepo: string, a
         return;
     } else { tl.debug(`Using provided project repo: '${projectRepo}'`); }
 
-    const sourceRefName = tl.getVariable('Build.SourceBranch');
     const accessToken = tl.getVariable('System.AccessToken');
+    if (!accessToken || accessToken.length === 0) {
+        tl.setResult(tl.TaskResult.Failed, tl.loc('NoAccessToken'));
+        return;
+    }
+
+    const sourceRefName = tl.getVariable('Build.SourceBranch');
     const tpName = tl.getVariable('System.TeamProject');
     const baseUri = tl.getVariable('System.TeamFoundationCollectionUri');
 

@@ -11,7 +11,7 @@
     "author": "Gio Palacino",
     "version": {
         "Major": 2,
-        "Minor": 10,
+        "Minor": 11,
         "Patch": 0
     },
     "demands": [],
@@ -115,6 +115,7 @@
         "NoPullRequestTitle": "No pull request title provided.",
         "NoProjectRepo": "No project repository was provided.",
         "InvalidTargetBranchType": "Invalid target branch type selected.",
-        "NoMatchingRefs": "No refs found in the repository which match the pattern."
+        "NoMatchingRefs": "No refs found in the repository which match the pattern.",
+        "NoAccessToken": "No access token is available for API calls. Did you forget to turn on the \"Allow scripts to access OAuth token\" option under Build -> Options, or Release -> Environment -> Run On Agent?"
     }
 }

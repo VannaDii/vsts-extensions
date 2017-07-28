@@ -16,7 +16,7 @@
   "author": "Gio Palacino",
   "version": {
     "Major": 2,
-    "Minor": 10,
+    "Minor": 11,
     "Patch": 0
   },
   "demands": [],
@@ -120,6 +120,7 @@
     "NoPullRequestTitle": "ms-resource:loc.messages.NoPullRequestTitle",
     "NoProjectRepo": "ms-resource:loc.messages.NoProjectRepo",
     "InvalidTargetBranchType": "ms-resource:loc.messages.InvalidTargetBranchType",
-    "NoMatchingRefs": "ms-resource:loc.messages.NoMatchingRefs"
+    "NoMatchingRefs": "ms-resource:loc.messages.NoMatchingRefs",
+    "NoAccessToken": "ms-resource:loc.messages.NoAccessToken"
   }
 }
