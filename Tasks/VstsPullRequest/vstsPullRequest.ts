@@ -110,6 +110,7 @@ function getTargetBranch(baseUri: string, tpName: string, projectRepo: string, a
                     if (!versions || versions.length === 0) {
                         throw tl.loc('NoMatchingRefs');
                     } else {
+                        tl.debug(`Checking discovered branches: ${JSON.stringify(versions)}`);
                         tl.debug(`Using discovered target branch: ${versions[0].name}`);
                         return versions[0].name;
                     }
