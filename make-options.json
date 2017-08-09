@@ -1,4 +1,12 @@
 {
+    "widgets": [
+        "CodeCoverage"
+    ],
+    "widgetResources": [
+        "images/*.png",
+        "*.html",
+        "*.js"
+    ],
     "tasks": [
         "VersionFromBranch",
         "BitBucketPullRequest",
@@ -24,6 +32,10 @@
         "Tests"
     ],
     "files": [
+        {
+            "source": "Widgets/CodeCoverage/node_modules/vss-web-extension-sdk/lib/*",
+            "target": "CodeCoverage/lib"
+        },
         {
             "source": "vss-extension.json",
             "target": "vss-extension.json"

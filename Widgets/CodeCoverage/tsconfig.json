@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "module": "amd",
+        "moduleResolution": "node",
+        "types": [
+            "vss-web-extension-sdk"
+        ]	
+    }
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="lib/VSS.SDK.min.js"></script>
+    <script type="text/javascript">
+        VSS.init({
+            explicitNotifyLoaded: true,
+            usePlatformScripts: true,
+            usePlatformStyles: true
+        });
+        VSS.require(["TFS/Dashboards/WidgetHelpers", "TFS/Build/RestClient", "TFS/TestManagement/RestClient", "CodeCoverage/app"],
+            function (helpers, buildClient, testClient, app) { });
+    </script>
+</head>
+<body>
+    <div class="widget">
+        <h2 class="title"></h2>
+        <label id="init-label" hidden>No build definition selected</label>
+        <div id="code-coverage-history" class="histogram" hidden></div>
+        <label id="percent-label" hidden><span id="last-percent-label"></span>%<span id="measurement-label"></span> covered<span id="last-build-anchor-prefix"> as of </span><a id="last-build-anchor" target="_blank"></a></label>
+    </div>
+</body>
+</html>

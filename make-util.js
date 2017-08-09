@@ -177,6 +177,29 @@ var copyTaskResources = function (taskMake, srcPath, destPath) {
 }
 exports.copyTaskResources = copyTaskResources;
 
+var copyWidgetResources = function (srcPath, destPath) {
+    assert(srcPath, 'srcPath');
+    assert(destPath, 'destPath');
+
+    // copy the globally defined set of default widget resources
+    var toCopy = makeOptions['widgetResources'];
+    toCopy.forEach(function (item) {
+        var realItem = item;
+        var realSrcPath = srcPath;
+        var realDstPath = destPath;
+        var parts = item.split('/');
+        if (parts.length > 1) {
+            var extra = '/' + parts.slice(0, parts.length - 1).join('/');
+            realSrcPath = realSrcPath + extra
+            realDstPath = realDstPath + extra
+            realItem = parts.pop();
+        }
+        info('Copying \'' + realItem + '\' from \'' + realSrcPath + '\' to \'' + realDstPath + '\'');
+        matchCopy(realItem, realSrcPath, realDstPath, { noRecurse: true, matchBase: true });
+    });
+}
+exports.copyWidgetResources = copyWidgetResources;
+
 var matchFind = function (pattern, root, options) {
     assert(pattern, 'pattern');
     assert(root, 'root');

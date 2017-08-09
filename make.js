@@ -39,6 +39,7 @@ var pathExists = util.pathExists;
 var buildNodeTask = util.buildNodeTask;
 var addPath = util.addPath;
 var copyTaskResources = util.copyTaskResources;
+var copyWidgetResources = util.copyWidgetResources;
 var matchFind = util.matchFind;
 var matchCopy = util.matchCopy;
 var ensureTool = util.ensureTool;
@@ -70,7 +71,7 @@ if (!test('-d', binPath)) {
 addPath(binPath);
 
 // resolve list of tasks
-var taskList, sharedFiles;
+var taskList, widgetList, sharedFiles;
 if (options.task) {
     // find using --task parameter
     taskList = matchFind(options.task, path.join(__dirname), { noRecurse: true, matchBase: true })
@@ -85,6 +86,7 @@ else {
     // load the default list
     var makeOpts = JSON.parse(fs.readFileSync(path.join(__dirname, 'make-options.json')));
     taskList = makeOpts.tasks;
+    widgetList = makeOpts.widgets;
     sharedFiles = makeOpts.files;
 }
 
@@ -119,11 +121,36 @@ target.build = function() {
         var srcPath = path.join(__dirname, copySpec.source);
         var dstPath = path.join(buildPath, copySpec.target);
         info('Copying ' + srcPath + ' -> ' + dstPath);
+        if(test('-d', srcPath.replace('*', '')) && !pathExists(dstPath)) {
+            mkdir('-p', dstPath);
+        }
         cp({}, srcPath, dstPath);
     });
 
+    widgetList.forEach(function(widgetName){
+        banner('Building Widget: ' + widgetName);
+        var widgetPath = path.join(__dirname, 'Widgets', widgetName);
+        ensureExists(widgetPath);
+
+        // load the task.json
+        var shouldBuildNode = test('-f', path.join(widgetPath, 'tsconfig.json'));
+        var outDir = path.join(buildPath, path.basename(widgetPath));
+
+        mkdir('-p', outDir);
+
+        // build Node task
+        if (shouldBuildNode) {
+            buildNodeTask(widgetPath, outDir);
+        }
+
+        // copy default resources
+        console.log();
+        console.log('> copying widget resources');
+        copyWidgetResources(widgetPath, outDir);
+    });
+
     taskList.forEach(function(taskName) {
-        banner('Building: ' + taskName);
+        banner('Building Task: ' + taskName);
         var taskPath = path.join(__dirname, 'Tasks', taskName);
         ensureExists(taskPath);
 
