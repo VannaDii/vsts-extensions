@@ -88,7 +88,7 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
                         });
 
                         if (failedCount > passedCount) {
-                            tl.setVariable(`${varPrefix}TestRunColor`, 'failed');
+                            tl.setVariable(`${varPrefix}TestRunColor`, 'danger');
                         } else if (failedCount > 0 || passedCount === 0) {
                             tl.setVariable(`${varPrefix}TestRunColor`, 'warning');
                         } else {
