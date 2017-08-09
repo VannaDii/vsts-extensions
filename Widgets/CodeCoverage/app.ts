@@ -136,11 +136,12 @@ async function loadWithSettings(widgetSettings: any): Promise<WidgetContracts.Wi
             $('#last-percent-label').text(lastStat.values.percent.toFixed(decimalPlaces));
 
             if (showMeasurementName) {
-                $('#measurement-label').text(' of ' + measurementName.toLocaleLowerCase());
+                $('#measurement-label').show().text(' of ' + measurementName.toLocaleLowerCase());
             } else { $('#measurement-label').hide(); }
 
             if (showBuildName) {
-                $('#last-build-anchor').text(lastStat.number).attr('href', lastStat.url);
+                $('#last-build-anchor-prefix').show();
+                $('#last-build-anchor').show().text(lastStat.number).attr('href', lastStat.url);
             } else {
                 $('#last-build-anchor').hide();
                 $('#last-build-anchor-prefix').hide();
