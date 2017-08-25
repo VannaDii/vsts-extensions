@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "tigerpistol-gio-build-tasks",
     "name": "Tiger Pistol Build Tasks",
-    "version": "0.2.92",
+    "version": "0.2.94",
     "publisher": "tigerpistol-gio",
     "targets": [
         {
@@ -25,6 +25,10 @@
         { "path": "VstsPullRequest" },
         {
             "path": "CodeCoverage/app.js",
+            "addressable": true
+        },
+        {
+            "path": "CodeCoverage/LocalStorage.js",
             "addressable": true
         },
         {

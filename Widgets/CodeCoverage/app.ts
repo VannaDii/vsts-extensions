@@ -4,7 +4,10 @@ import test = require('TFS/TestManagement/RestClient');
 import BuildContracts = require('TFS/Build/Contracts');
 import TestContracts = require('TFS/TestManagement/Contracts');
 import WidgetContracts = require('TFS/Dashboards/WidgetContracts');
+import LocalStorage = require('./LocalStorage');
 import $ = require('jquery');
+
+const localStorage = new LocalStorage.LocalStorageManager();
 
 interface IBuildCodeCoverageValues {
     total: number;
@@ -23,33 +26,39 @@ interface IBuildCodeCoverageStats {
 }
 
 async function getCodeCoverageSummary(projectId: string, buildId: number, type: string = 'Lines'): Promise<IBuildCodeCoverageValues> {
-    const result = await test.getClient().getCodeCoverageSummary(projectId, buildId)
-        .then(summary => {
-            let coverageData: TestContracts.CodeCoverageData = null;
-            if (summary && summary.coverageData) { coverageData = summary.coverageData.shift(); }
-            if (!coverageData || !coverageData.coverageStats) {
-                return { total: 1, covered: 0, percent: 0 } as IBuildCodeCoverageValues;
-            }
+    const cacheKey = `${projectId}_${buildId}`;
+    let result = localStorage.getValue<IBuildCodeCoverageValues>(cacheKey);
+    if (!result) {
+        result = await test.getClient().getCodeCoverageSummary(projectId, buildId)
+            .then(summary => {
+                let coverageData: TestContracts.CodeCoverageData = null;
+                if (summary && summary.coverageData) { coverageData = summary.coverageData.shift(); }
+                if (!coverageData || !coverageData.coverageStats) {
+                    return { total: 1, covered: 0, percent: 0 } as IBuildCodeCoverageValues;
+                }
 
-            return coverageData.coverageStats.filter(stats => {
-                return stats.label.toUpperCase() === type.toUpperCase();
-            }).map(stats => {
-                return {
-                    total: stats.total,
-                    covered: stats.covered,
-                    percent: (stats.covered / stats.total) * 100.0
-                } as IBuildCodeCoverageValues;
-            }).reduce((prev, curr) => {
-                const newTotal = Math.max(prev.total + curr.total, 1);
-                const newCovered = prev.covered + curr.covered;
-                const values = {
-                    total: newTotal,
-                    covered: newCovered,
-                    percent: (newCovered / newTotal) * 100.0
-                } as IBuildCodeCoverageValues;
-                return values;
+                return coverageData.coverageStats.filter(stats => {
+                    return stats.label.toUpperCase() === type.toUpperCase();
+                }).map(stats => {
+                    return {
+                        total: stats.total,
+                        covered: stats.covered,
+                        percent: (stats.covered / stats.total) * 100.0
+                    } as IBuildCodeCoverageValues;
+                }).reduce((prev, curr) => {
+                    const newTotal = Math.max(prev.total + curr.total, 1);
+                    const newCovered = prev.covered + curr.covered;
+                    const values = {
+                        total: newTotal,
+                        covered: newCovered,
+                        percent: (newCovered / newTotal) * 100.0
+                    } as IBuildCodeCoverageValues;
+                    return values;
+                });
             });
-        });
+
+        localStorage.addValue(cacheKey, result);
+    }
     return result;
 }
 
@@ -151,10 +160,11 @@ async function loadWithSettings(widgetSettings: any): Promise<WidgetContracts.Wi
             stats.forEach((stat, index) => {
                 const bar = $(document.createElement('div'));
                 const barHeight = ((stat.values.percent > 0 ? stat.values.percent : avgPercent) / maxPercent) * 100;
+                const coverageResult = stat.values.percent > 0 ? stat.result : BuildContracts.BuildResult.None;
                 bar.css('position', 'absolute').css('bottom', 0)
                     .css('cursor', 'pointer')
                     .css('left', index > 0 ? (barWidth + barOffset) * index : 0)
-                    .css('background-color', getBuildStatusColor(stat.result))
+                    .css('background-color', getBuildStatusColor(coverageResult))
                     .width(barWidth).height(barHeight + '%')
                     .attr('title', stat.definitionName + ' ' + stat.number + ' @ ' +
                     stat.values.percent.toFixed(decimalPlaces) + '% of ' + measurementName)

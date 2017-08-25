@@ -68,24 +68,27 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
                         const buildRunStats = json as { run: { id: number, name: string, url: string },
                                                         runStatistics: { state: string, outcome: string, count: number}[] };
 
-                        let passedCount = 0;
-                        let failedCount = 0;
+                        // Initialize for all known possible outcomes
+                        const outcomeKeyPassed = 'Passed';
+                        const outcomeKeyFailed = 'Failed';
+                        const testOutcomeCounts: { [key: string]: number; } = {};
+                        const testOutcomes = ['None', outcomeKeyPassed, outcomeKeyFailed, 'Inconclusive', 'Timeout', 'Aborted', 'Blocked',
+                                              'NotExecuted', 'Warning', 'Error', 'NotApplicable', 'Paused', 'InProgress'];
+                        testOutcomes.forEach(outcome => {
+                            tl.setVariable(`${varPrefix}${outcome}Count`, '0');
+                        });
 
                         tl.setVariable(`${varPrefix}TestRunId`, buildRunStats.run.id.toString());
                         tl.setVariable(`${varPrefix}TestRunName`, buildRunStats.run.name);
                         tl.setVariable(`${varPrefix}TestRunUrl`, buildRunStats.run.url);
-                        tl.setVariable(`${varPrefix}PassedCount`, '0');
-                        tl.setVariable(`${varPrefix}FailedCount`, '0');
 
                         buildRunStats.runStatistics.forEach(stat => {
-                            if (stat.outcome === 'Passed') {
-                                passedCount += stat.count;
-                                tl.setVariable(`${varPrefix}${stat.outcome}Count`, passedCount.toString());
-                            } else if (stat.outcome === 'Failed') {
-                                failedCount += stat.count;
-                                tl.setVariable(`${varPrefix}${stat.outcome}Count`, failedCount.toString());
-                            }
+                            testOutcomeCounts[stat.outcome] += stat.count;
+                            tl.setVariable(`${varPrefix}${stat.outcome}Count`, testOutcomeCounts[stat.outcome].toString());
                         });
+
+                        const passedCount = testOutcomeCounts[outcomeKeyPassed];
+                        const failedCount = testOutcomeCounts[outcomeKeyFailed];
 
                         if (failedCount > passedCount) {
                             tl.setVariable(`${varPrefix}TestRunColor`, 'danger');
