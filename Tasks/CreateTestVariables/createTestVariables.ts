@@ -75,6 +75,7 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
                         const testOutcomes = ['None', outcomeKeyPassed, outcomeKeyFailed, 'Inconclusive', 'Timeout', 'Aborted', 'Blocked',
                                               'NotExecuted', 'Warning', 'Error', 'NotApplicable', 'Paused', 'InProgress'];
                         testOutcomes.forEach(outcome => {
+                            testOutcomeCounts[outcome] = 0;
                             tl.setVariable(`${varPrefix}${outcome}Count`, '0');
                         });
 
