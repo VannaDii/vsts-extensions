@@ -31,11 +31,11 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
     };
 
     request(options, function (error: any, response: http.IncomingMessage, body: any) {
+        tl.debug(JSON.stringify(body));
         if (error) {
             tl.setResult(tl.TaskResult.Failed, response.statusMessage);
         } else if (body && body.type && body.type === 'error' && body.error && body.error.message) {
             tl.setResult(tl.TaskResult.Failed, `Failed to post slack message: ${body.error.message}`);
         }
-        tl.debug(JSON.stringify(body));
     });
 })();

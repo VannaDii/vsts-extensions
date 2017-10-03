@@ -5,6 +5,6 @@
         "moduleResolution": "node",
         "types": [
             "vss-web-extension-sdk"
-        ]	
+        ]
     }
 }

@@ -10,29 +10,13 @@
     "runsOn": [ "Agent" ],
     "author": "Gio Palacino",
     "version": {
-        "Major": 1,
-        "Minor": 13,
+        "Major": 2,
+        "Minor": 2,
         "Patch": 0
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",
     "inputs": [
-        {
-            "name": "Username",
-            "type": "string",
-            "label": "Username",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "The username used to authenticate to test management."
-        },
-        {
-            "name": "Password",
-            "type": "string",
-            "label": "Personal Access Token",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "A personal access token used to authenticate to test management"
-        },
         {
             "name": "VariablePrefix",
             "type": "string",
@@ -40,6 +24,14 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "A prefix to use when creating variables. Example: $([Prefix]TestRunId)"
+        },
+        {
+            "name": "TestTitle",
+            "type": "string",
+            "label": "Test Title",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "A string which is in the title of the desired test run."
         }
     ],
     "instanceNameFormat": "Create Test Variables for $(VariablePrefix)",
@@ -49,7 +41,7 @@
         }
     },
     "messages": {
-        "NoUsernameProvided": "No username was provided.",
-        "NoPasswordProvided": "No password was provided."
+        "NoTestTitle": "No test title was provided, this is a wide-open match against test runs.",
+        "NoAccessToken": "No access token is available for API calls. Did you forget to turn on the \"Allow scripts to access OAuth token\" option under Build -> Options, or Release -> Environment -> Run On Agent?"
     }
 }

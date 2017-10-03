@@ -6,42 +6,35 @@ import tl = require('vsts-task-lib/task');
 
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 (() => {
-    // Init variables
-    const userName = tl.getInput('Username', true);
-    if (!userName || userName.length === 0) {
-        tl.setResult(tl.TaskResult.Failed, tl.loc('NoUsernameProvided'));
+    const accessToken = tl.getVariable('System.AccessToken');
+    if (!accessToken || accessToken.length === 0) {
+        tl.setResult(tl.TaskResult.Failed, tl.loc('NoAccessToken'));
         return;
-    } else {
-        tl.debug(`Using provided username: '${userName}'`);
     }
 
-    const password = tl.getInput('Password', true);
-    if (!password || password.length === 0) {
-        tl.setResult(tl.TaskResult.Failed, tl.loc('NoPasswordProvided'));
-        return;
-    } else {
-        tl.debug(`Using provided password: '********'`);
+    const testTitle = tl.getInput('TestTitle');
+    if (!testTitle || testTitle.length === 0) {
+        tl.warning(tl.loc('NoTestTitle'));
     }
 
     const varPrefix = tl.getInput('VariablePrefix', true);
-    if (!password || password.length === 0) {
-        tl.debug(`No variable prefix was provided.`);
+    if (!varPrefix || varPrefix.length === 0) {
+        tl.warning(`No variable prefix was provided.`);
     } else {
         tl.debug(`Using provided variable prefix: '${varPrefix}'`);
     }
 
-    const basicAuthToken = new Buffer(`${userName}:${password}`).toString('base64');
     const collectionUri = tl.getVariable('System.TeamFoundationCollectionUri');
     const projectName = tl.getVariable('System.TeamProject');
     const releaseUri = tl.getVariable('Release.ReleaseUri');
     const buildUri = tl.getVariable('Build.BuildURI');
 
     const testRunQueryUri = `${collectionUri}${projectName}/_apis/test/runs?api-version=1.0&automated=true&includeRunDetails=true` +
-                            `&buildUri=${buildUri}`;
+        `&buildUri=${buildUri}`;
 
     const queryOptions = {
         method: 'GET',
-        headers: { 'Authorization': `Basic ${basicAuthToken}` },
+        headers: { authorization: `Bearer ${accessToken}` },
         url: testRunQueryUri
     };
     request(queryOptions, function (error: any, response: http.IncomingMessage, body: any) {
@@ -49,15 +42,18 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
             tl.setResult(tl.TaskResult.Failed, `${response.statusMessage} : ${JSON.stringify(body)}`);
         } else {
             const json = JSON.parse(body);
-            const buildRuns = json.value as { id: number, releaseUri: string }[];
-            const releaseRuns = buildRuns.filter((e) => { return e.releaseUri === releaseUri; });
+            const buildRuns = json.value as { id: number, name: string, releaseUri: string }[];
+            const releaseRuns = buildRuns.filter((e) => {
+                return e.releaseUri === releaseUri && // It's for the right release
+                       e.name.toLowerCase().indexOf(testTitle.toLowerCase()) >= 0; // It matches the test run title
+            });
             if (releaseRuns && releaseRuns.length > 0) {
                 tl.debug(JSON.stringify(releaseRuns));
                 const testRunId = releaseRuns[releaseRuns.length - 1].id;
                 const testRunStatsUri = `${collectionUri}${projectName}/_apis/test/runs/${testRunId}/statistics?api-version=1.0`;
                 const queryOptions = {
                     method: 'GET',
-                    headers: { 'Authorization': `Basic ${basicAuthToken}` },
+                    headers: { authorization: `Bearer ${accessToken}` },
                     url: testRunStatsUri
                 };
                 request(queryOptions, function (error: any, response: http.IncomingMessage, body: any) {
@@ -65,15 +61,17 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
                         tl.setResult(tl.TaskResult.Failed, `${response.statusMessage} : ${JSON.stringify(body)}`);
                     } else {
                         const json = JSON.parse(body);
-                        const buildRunStats = json as { run: { id: number, name: string, url: string },
-                                                        runStatistics: { state: string, outcome: string, count: number}[] };
+                        const buildRunStats = json as {
+                            run: { id: number, name: string, url: string },
+                            runStatistics: { state: string, outcome: string, count: number }[]
+                        };
 
                         // Initialize for all known possible outcomes
                         const outcomeKeyPassed = 'Passed';
                         const outcomeKeyFailed = 'Failed';
                         const testOutcomeCounts: { [key: string]: number; } = {};
                         const testOutcomes = ['None', outcomeKeyPassed, outcomeKeyFailed, 'Inconclusive', 'Timeout', 'Aborted', 'Blocked',
-                                              'NotExecuted', 'Warning', 'Error', 'NotApplicable', 'Paused', 'InProgress'];
+                            'NotExecuted', 'Warning', 'Error', 'NotApplicable', 'Paused', 'InProgress'];
                         testOutcomes.forEach(outcome => {
                             testOutcomeCounts[outcome] = 0;
                             tl.setVariable(`${varPrefix}${outcome}Count`, '0');
@@ -101,6 +99,8 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
                     }
                     tl.debug(JSON.stringify(body));
                 });
+            } else {
+                tl.warning(`Failed to find a matching test run for this release (${releaseUri}) with '${testTitle}' in the title.`);
             }
         }
         tl.debug(JSON.stringify(body));

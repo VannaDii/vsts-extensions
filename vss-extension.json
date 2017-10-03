@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "tigerpistol-gio-build-tasks",
     "name": "Tiger Pistol Build Tasks",
-    "version": "0.2.95",
+    "version": "0.2.99",
     "publisher": "tigerpistol-gio",
     "targets": [
         {

@@ -15,29 +15,13 @@
   ],
   "author": "Gio Palacino",
   "version": {
-    "Major": 1,
-    "Minor": 13,
+    "Major": 2,
+    "Minor": 2,
     "Patch": 0
   },
   "demands": [],
   "minimumAgentVersion": "2.116.0",
   "inputs": [
-    {
-      "name": "Username",
-      "type": "string",
-      "label": "ms-resource:loc.input.label.Username",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "ms-resource:loc.input.help.Username"
-    },
-    {
-      "name": "Password",
-      "type": "string",
-      "label": "ms-resource:loc.input.label.Password",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "ms-resource:loc.input.help.Password"
-    },
     {
       "name": "VariablePrefix",
       "type": "string",
@@ -45,6 +29,14 @@
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "ms-resource:loc.input.help.VariablePrefix"
+    },
+    {
+      "name": "TestTitle",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.TestTitle",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.TestTitle"
     }
   ],
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
@@ -54,7 +46,7 @@
     }
   },
   "messages": {
-    "NoUsernameProvided": "ms-resource:loc.messages.NoUsernameProvided",
-    "NoPasswordProvided": "ms-resource:loc.messages.NoPasswordProvided"
+    "NoTestTitle": "ms-resource:loc.messages.NoTestTitle",
+    "NoAccessToken": "ms-resource:loc.messages.NoAccessToken"
   }
 }
