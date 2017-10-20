@@ -1,0 +1,15 @@
+{
+  "name": "vsts-git-push",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "os": "^0.1.1",
+    "path": "^0.12.7",
+    "http": "^0.0.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
+    "vsts-task-lib": "^2.0.6"
+  }
+}

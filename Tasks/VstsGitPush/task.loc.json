@@ -1,0 +1,123 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+  "id": "53F8CA5A-7E6D-44C4-9F75-C7646518E65D",
+  "name": "VstsGitPush",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 0,
+    "Minor": 14,
+    "Patch": 0
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.116.0",
+  "inputs": [
+    {
+      "name": "ProjectRepo",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.ProjectRepo",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.ProjectRepo",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "TargetBranch",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.TargetBranch",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.TargetBranch",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "TargetPath",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.TargetPath",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.TargetPath",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "CommitMessage",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.CommitMessage",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.CommitMessage"
+    },
+    {
+      "name": "SourcePath",
+      "type": "filePath",
+      "label": "ms-resource:loc.input.label.SourcePath",
+      "defaultValue": "$(System.DefaultWorkingDirectory)",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.SourcePath",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "FileMatchPattern",
+      "type": "multiLine",
+      "label": "ms-resource:loc.input.label.FileMatchPattern",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.FileMatchPattern"
+    }
+  ],
+  "sourceDefinitions": [
+    {
+      "target": "ProjectTeam",
+      "endpoint": "/_apis/projects/$(system.teamProject)/teams?api-version=3.0-preview.1",
+      "selector": "jsonpath:$.value[*].name",
+      "keySelector": "jsonpath:$.value[*].id",
+      "authKey": "tfs:teamfoundation"
+    },
+    {
+      "target": "ProjectRepo",
+      "endpoint": "/$(system.teamProject)/_apis/git/repositories?api-version=3.0-preview.1",
+      "selector": "jsonpath:$.value[*].name",
+      "keySelector": "jsonpath:$.value[*].id",
+      "authKey": "tfs:teamfoundation"
+    },
+    {
+      "target": "TargetBranch",
+      "endpoint": "/$(system.teamProject)/_apis/git/repositories/$(ProjectRepo)/refs/heads?api-version=1.0",
+      "selector": "jsonpath:$.value[*].name",
+      "authKey": "tfs:teamfoundation"
+    }
+  ],
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "execution": {
+    "Node": {
+      "target": "vstsGitPush.js"
+    }
+  },
+  "messages": {
+    "NoProjectRepo": "ms-resource:loc.messages.NoProjectRepo",
+    "NoTargetBranch": "ms-resource:loc.messages.NoTargetBranch",
+    "NoCommitMessage": "ms-resource:loc.messages.NoCommitMessage",
+    "NoFileMatchPattern": "ms-resource:loc.messages.NoFileMatchPattern",
+    "NoAccessToken": "ms-resource:loc.messages.NoAccessToken",
+    "NoTargetPath": "ms-resource:loc.messages.NoTargetPath",
+    "NoSourcePath": "ms-resource:loc.messages.NoSourcePath"
+  }
+}

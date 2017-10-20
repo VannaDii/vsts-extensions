@@ -13,7 +13,8 @@
         "PostToSlackWebHook",
         "CreateTestVariables",
         "CompareBranches",
-        "VstsPullRequest"
+        "VstsPullRequest",
+        "VstsGitPush"
     ],
     "taskResources": [
         "*.ps1",

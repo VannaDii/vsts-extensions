@@ -7,6 +7,8 @@ import tl = require('vsts-task-lib/task');
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 (() => {
     // Init variables
+    const timeStamp = Math.round(Date.now() / 1000);
+
     const slackWebHookUrl = tl.getInput('SlackWebHookUrl', true);
     if (!slackWebHookUrl || slackWebHookUrl.length === 0) {
         tl.setResult(tl.TaskResult.Failed, tl.loc('NoWebHookUrl'));
@@ -20,6 +22,7 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
     } else {
         tl.debug(`Using provided custom message: '${slackCustomMessage}'`);
         slackCustomMessage = slackCustomMessage.replace(/\s{2,}/g, '').replace(/\r|\n/g, '');
+        slackCustomMessage = slackCustomMessage.replace(/\$\(SlackTimeStamp\)/gi, timeStamp.toString());
     }
 
     // Make HTTP POST request to create pull request.

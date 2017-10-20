@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "tigerpistol-gio-build-tasks",
     "name": "Tiger Pistol Build Tasks",
-    "version": "0.2.99",
+    "version": "0.2.114",
     "publisher": "tigerpistol-gio",
     "targets": [
         {
@@ -23,6 +23,7 @@
         { "path": "PostToSlackWebHook" },
         { "path": "VersionFromBranch" },
         { "path": "VstsPullRequest" },
+        { "path": "VstsGitPush" },
         {
             "path": "CodeCoverage/app.js",
             "addressable": true
@@ -146,10 +147,21 @@
             "properties": {
                 "name": "VstsPullRequest"
             }
+        },
+        {
+            "id": "vstsgitpush-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "VstsGitPush"
+            }
         }
     ],
     "scopes": [
         "vso.build",
-        "vso.test"
+        "vso.test",
+        "vso.code_write"
     ]
 }

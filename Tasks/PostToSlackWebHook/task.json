@@ -11,7 +11,7 @@
     "author": "Gio Palacino",
     "version": {
         "Major": 1,
-        "Minor": 11,
+        "Minor": 14,
         "Patch": 0
     },
     "demands": [],
@@ -31,7 +31,7 @@
             "label": "Custom Message",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The [formatted custom message](https://api.slack.com/docs/messages/builder) to post to this web hook."
+            "helpMarkDown": "The [formatted custom message](https://api.slack.com/docs/messages/builder) to post to this web hook. An appropriate timestamp value is available in the variable $(SlackTimeStamp)."
         }
     ],
     "instanceNameFormat": "Post a Message to Slack",
