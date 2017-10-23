@@ -97,14 +97,10 @@ function makePushRequest(targetBranch: string, message: string, filesToPush: str
             }
 
             const files = filesToPush.map(filePath => {
-                let cleanItemPath = filePath.replace(baseLocalPath, '');
-                while (cleanItemPath.indexOf('\\') > 0) {
-                    cleanItemPath = cleanItemPath.replace('\\\\', '/').replace('\\', '/');
-                    cleanItemPath = cleanItemPath.replace('//', '/');
-                }
-
-                const remotePath = `${baseRemotePath}/${cleanItemPath}`.replace('\\', '/');
+                const cleanItemPath = filePath.replace(baseLocalPath, '');
+                const remotePath = `${baseRemotePath}${cleanItemPath}`.replace(/\/{2,}|\\{1,}/ig, '/');
                 const remoteFile = remoteFiles.filter(rp => rp.path.toLowerCase() === remotePath.toLowerCase())[0];
+                tl.debug(`Looking for remote path match '${remotePath}' yielded ${remoteFile ? JSON.stringify(remoteFile) : 'null'}`);
                 return {
                     path: remotePath,
                     method: remoteFile ? 'edit' : 'add',
