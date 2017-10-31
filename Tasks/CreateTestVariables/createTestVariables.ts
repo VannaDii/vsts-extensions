@@ -44,8 +44,7 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
             const json = JSON.parse(body);
             const buildRuns = json.value as { id: number, name: string, releaseUri: string }[];
             const releaseRuns = buildRuns.filter((e) => {
-                return e.releaseUri === releaseUri && // It's for the right release
-                       e.name.toLowerCase().indexOf(testTitle.toLowerCase()) >= 0; // It matches the test run title
+                return e.name.toLowerCase().indexOf(testTitle.toLowerCase()) >= 0; // It matches the test run title
             });
             if (releaseRuns && releaseRuns.length > 0) {
                 tl.debug(JSON.stringify(releaseRuns));
