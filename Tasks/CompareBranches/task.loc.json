@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
-  "id": "8C43699B-8295-4786-A2E8-76BF26C38B31",
+  "id": "8F524E18-054A-4D38-A255-E46A79D17CC5",
   "name": "CompareBranches",
   "friendlyName": "ms-resource:loc.friendlyName",
   "description": "ms-resource:loc.description",

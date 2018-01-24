@@ -1,0 +1,69 @@
+{
+    "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+    "id": "6792CD4E-D555-4F6D-8AC3-CFFB00FE2CCE",
+    "name": "UnityCloudBuild",
+    "friendlyName": "Unity Cloud Build",
+    "description": "Interacts with Unity Cloud Build.",
+    "helpMarkDown": "For more information visit [Unity Cloud Build](https://unity3d.com/services/cloud-build).",
+    "category": "Utility",
+    "visibility": [ "Build", "Release" ],
+    "runsOn": [ "Agent" ],
+    "author": "Gio Palacino",
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 0
+    },
+    "demands": [],
+    "minimumAgentVersion": "2.116.0",
+    "inputs": [
+        {
+            "name": "ApiKey",
+            "type": "string",
+            "label": "API Key",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "A valid API key for accessing Unity Cloud Build."
+        },
+        {
+            "name": "OrgName",
+            "type": "string",
+            "label": "Organization Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The organization name in Unity Cloud Build."
+        },
+        {
+            "name": "ProjName",
+            "type": "string",
+            "label": "Project Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The project name in Unity Cloud Build."
+        },
+        {
+            "name": "TargetName",
+            "type": "pickList",
+            "label": "Target Name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The target name in Unity Cloud Build.",
+            "options": {
+                "Win32": "win32",
+                "All": "_all"
+            }
+        }
+    ],
+    "instanceNameFormat": "Unity Cloud Build $(ProjName)",
+    "execution": {
+        "Node": {
+            "target": "unityCloudBuild.js"
+        }
+    },
+    "messages": {
+        "NoApiKey": "No API key was provided.",
+        "NoOrgName": "No organization name was provided.",
+        "NoProjName": "No project name was provided.",
+        "NoTargetName": "No target name was provided."
+    }
+}

@@ -13,6 +13,7 @@
         "PostToSlackWebHook",
         "CreateTestVariables",
         "CompareBranches",
+        "UnityCloudBuild",
         "VstsPullRequest",
         "VstsGitPush"
     ],

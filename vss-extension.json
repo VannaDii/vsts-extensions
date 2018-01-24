@@ -1,15 +1,15 @@
 {
     "manifestVersion": 1,
-    "id": "tigerpistol-gio-build-tasks",
-    "name": "Tiger Pistol Build Tasks",
-    "version": "0.2.119",
-    "publisher": "tigerpistol-gio",
+    "id": "gio-build-tasks",
+    "name": "Gio's Build Tasks",
+    "version": "0.1.2",
+    "publisher": "palacino-gio",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
         }
     ],
-    "description": "Tools for building with Tiger Pistol.",
+    "description": "Gio's tools for building all the things.",
     "categories": [
         "Build and release"
     ],
@@ -21,6 +21,7 @@
         { "path": "CompareBranches" },
         { "path": "CreateTestVariables" },
         { "path": "PostToSlackWebHook" },
+        { "path": "UnityCloudBuild" },
         { "path": "VersionFromBranch" },
         { "path": "VstsPullRequest" },
         { "path": "VstsGitPush" },
@@ -56,7 +57,7 @@
             "type": "ms.vss-dashboards-web.widget",
             "targets": [
                 "ms.vss-dashboards-web.widget-catalog",
-                "tigerpistol-gio.tigerpistol-gio-build-tasks.CodeCoverageChartWidget.Configuration"
+                "palacino-gio.gio-build-tasks.CodeCoverageChartWidget.Configuration"
             ],
             "properties": {
                 "name": "Code Coverage Chart",
@@ -86,6 +87,16 @@
                 "name": "Code Coverage Chart Configuration",
                 "description": "Configures the code coverage chart.",
                 "uri": "CodeCoverage/config.html"
+            }
+        },
+        {
+            "id": "unitycloudbuild-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "UnityCloudBuilld"
             }
         },
         {

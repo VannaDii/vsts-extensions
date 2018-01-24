@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
-  "id": "AC004DC7-1E95-49B1-9A37-90A2EF0C14A2",
+  "id": "B12FB9BE-A8D4-401D-92D3-BD5CD437E5F7",
   "name": "CreateTestVariables",
   "friendlyName": "ms-resource:loc.friendlyName",
   "description": "ms-resource:loc.description",

@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
-    "id": "FC5AD784-9B42-4362-A2F5-A61B47271A78",
+    "id": "1C5932D9-9774-4657-B51E-628013401F4B",
     "name": "PostToSlackWebHook",
     "friendlyName": "Post To Slack Web Hook",
     "description": "Posts a custom message to a slack web hook.",

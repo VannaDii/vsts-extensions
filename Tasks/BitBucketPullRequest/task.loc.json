@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
-  "id": "60151C97-BD7E-4AC3-9A58-1282676B61BF",
+  "id": "D8DE3747-80F0-453C-8150-0747B94DCEF8",
   "name": "BitBucketPullRequest",
   "friendlyName": "ms-resource:loc.friendlyName",
   "description": "ms-resource:loc.description",

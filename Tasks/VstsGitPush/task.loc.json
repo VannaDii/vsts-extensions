@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
-  "id": "53F8CA5A-7E6D-44C4-9F75-C7646518E65D",
+  "id": "D5139737-5C2D-4D78-B0BF-AE61C70EC07F",
   "name": "VstsGitPush",
   "friendlyName": "ms-resource:loc.friendlyName",
   "description": "ms-resource:loc.description",

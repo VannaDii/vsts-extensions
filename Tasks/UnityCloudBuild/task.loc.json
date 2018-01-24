@@ -1,0 +1,74 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+  "id": "6792CD4E-D555-4F6D-8AC3-CFFB00FE2CCE",
+  "name": "UnityCloudBuild",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 0,
+    "Minor": 1,
+    "Patch": 0
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.116.0",
+  "inputs": [
+    {
+      "name": "ApiKey",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.ApiKey",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.ApiKey"
+    },
+    {
+      "name": "OrgName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.OrgName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.OrgName"
+    },
+    {
+      "name": "ProjName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.ProjName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.ProjName"
+    },
+    {
+      "name": "TargetName",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.TargetName",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.TargetName",
+      "options": {
+        "Win32": "win32",
+        "All": "_all"
+      }
+    }
+  ],
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "execution": {
+    "Node": {
+      "target": "unityCloudBuild.js"
+    }
+  },
+  "messages": {
+    "NoApiKey": "ms-resource:loc.messages.NoApiKey",
+    "NoOrgName": "ms-resource:loc.messages.NoOrgName",
+    "NoProjName": "ms-resource:loc.messages.NoProjName",
+    "NoTargetName": "ms-resource:loc.messages.NoTargetName"
+  }
+}
