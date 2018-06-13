@@ -12,7 +12,7 @@
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 0
+        "Patch": 50
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",
@@ -43,15 +43,50 @@
         },
         {
             "name": "TargetName",
-            "type": "pickList",
+            "type": "string",
             "label": "Target Name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The target name in Unity Cloud Build.",
+            "helpMarkDown": "The target name in Unity Cloud Build."
+        },
+        {
+            "name": "PollingDelaySeconds",
+            "type": "pickList",
+            "label": "Polling Delay",
+            "defaultValue": "60",
+            "required": true,
+            "helpMarkDown": "The number of seconds to wait between polling Unity Cloud Build for status.",
             "options": {
-                "Win32": "win32",
-                "All": "_all"
+                "60": "1 minute",
+                "120": "2 minutes",
+                "300": "5 minutes"
             }
+        },
+        {
+            "name": "MaxBuildMinutes",
+            "type": "pickList",
+            "label": "Maximum Build Minutes",
+            "defaultValue": "30",
+            "required": true,
+            "helpMarkDown": "The maximum number of minutes this task should run for.",
+            "options": {
+                "5": "5 minute",
+                "10": "10 minutes",
+                "20": "20 minutes",
+                "30": "30 minutes",
+                "60": "60 minutes",
+                "90": "90 minutes",
+                "120": "120 minutes",
+                "180": "180 minutes"
+            }
+        },
+        {
+            "name": "CleanBuild",
+            "type": "boolean",
+            "label": "Clean Build",
+            "defaultValue": false,
+            "required": true,
+            "helpMarkDown": "Turn on to have Unity Cloud Build perform a clean build."
         }
     ],
     "instanceNameFormat": "Unity Cloud Build $(ProjName)",

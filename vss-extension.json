@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gio-build-tasks",
     "name": "Gio's Build Tasks",
-    "version": "0.1.2",
+    "version": "0.1.50",
     "publisher": "palacino-gio",
     "targets": [
         {
@@ -96,7 +96,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "UnityCloudBuilld"
+                "name": "UnityCloudBuild"
             }
         },
         {

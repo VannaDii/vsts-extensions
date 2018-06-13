@@ -17,7 +17,7 @@
   "version": {
     "Major": 0,
     "Minor": 1,
-    "Patch": 0
+    "Patch": 48
   },
   "demands": [],
   "minimumAgentVersion": "2.116.0",
@@ -48,15 +48,50 @@
     },
     {
       "name": "TargetName",
-      "type": "pickList",
+      "type": "string",
       "label": "ms-resource:loc.input.label.TargetName",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "ms-resource:loc.input.help.TargetName",
+      "helpMarkDown": "ms-resource:loc.input.help.TargetName"
+    },
+    {
+      "name": "PollingDelaySeconds",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.PollingDelaySeconds",
+      "defaultValue": "60",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.PollingDelaySeconds",
       "options": {
-        "Win32": "win32",
-        "All": "_all"
+        "60": "1 minute",
+        "120": "2 minutes",
+        "300": "5 minutes"
       }
+    },
+    {
+      "name": "MaxBuildMinutes",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.MaxBuildMinutes",
+      "defaultValue": "30",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.MaxBuildMinutes",
+      "options": {
+        "5": "5 minute",
+        "10": "10 minutes",
+        "20": "20 minutes",
+        "30": "30 minutes",
+        "60": "60 minutes",
+        "90": "90 minutes",
+        "120": "120 minutes",
+        "180": "180 minutes"
+      }
+    },
+    {
+      "name": "CleanBuild",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.CleanBuild",
+      "defaultValue": false,
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.CleanBuild"
     }
   ],
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
