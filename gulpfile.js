@@ -3,7 +3,7 @@ var gutil = require('gulp-util');
 var child_process = require('child_process');
 var process = require('process');
 
-function make (target, cb) {
+function make(target, cb) {
     var cl = ('node make.js ' + target + ' ' + process.argv.slice(3).join(' ')).trim();
     console.log('------------------------------------------------------------');
     console.log('> ' + cl);
@@ -21,6 +21,10 @@ function make (target, cb) {
     return true;
 }
 
+gulp.task('clean', function (cb) {
+    make('clean', cb);
+});
+
 gulp.task('build', function (cb) {
     make('build', cb);
 });
@@ -33,16 +37,17 @@ gulp.task('test', function (cb) {
 });
 
 gulp.task('package', function (cb) {
-    make('build', cb) &&
-    make('package', cb);
+    make('bump', cb) &&
+        make('build', cb) &&
+            make('package', cb);
 });
 
 gulp.task('publish', function (cb) {
     var publish = process.argv.filter(function (arg) { return arg == '--server' }).length > 0;
     make('build', cb) &&
-    make('package', cb) &&
-    make('test', cb) &&
-    make('testLegacy', cb) &&
-    publish &&
-    make('publish', cb);
+        make('package', cb) &&
+        make('test', cb) &&
+        make('testLegacy', cb) &&
+        publish &&
+        make('publish', cb);
 });

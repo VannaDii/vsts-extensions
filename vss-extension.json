@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gio-build-tasks",
     "name": "Gio's Build Tasks",
-    "version": "0.1.50",
+    "version": "0.1.66",
     "publisher": "palacino-gio",
     "targets": [
         {
@@ -17,14 +17,33 @@
         "default": "icon.png"
     },
     "files": [
-        { "path": "BitBucketPullRequest" },
-        { "path": "CompareBranches" },
-        { "path": "CreateTestVariables" },
-        { "path": "PostToSlackWebHook" },
-        { "path": "UnityCloudBuild" },
-        { "path": "VersionFromBranch" },
-        { "path": "VstsPullRequest" },
-        { "path": "VstsGitPush" },
+        {
+            "path": "AwsCliPlus"
+        },
+        {
+            "path": "BitBucketPullRequest"
+        },
+        {
+            "path": "CompareBranches"
+        },
+        {
+            "path": "CreateTestVariables"
+        },
+        {
+            "path": "PostToSlackWebHook"
+        },
+        {
+            "path": "UnityCloudBuild"
+        },
+        {
+            "path": "VersionFromBranch"
+        },
+        {
+            "path": "VstsPullRequest"
+        },
+        {
+            "path": "VstsGitPush"
+        },
         {
             "path": "CodeCoverage/app.js",
             "addressable": true
@@ -87,6 +106,16 @@
                 "name": "Code Coverage Chart Configuration",
                 "description": "Configures the code coverage chart.",
                 "uri": "CodeCoverage/config.html"
+            }
+        },
+        {
+            "id": "awscliplus-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "AwsCliPlus"
             }
         },
         {

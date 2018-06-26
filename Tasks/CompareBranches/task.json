@@ -16,7 +16,7 @@
     "version": {
         "Major": 2,
         "Minor": 10,
-        "Patch": 0
+        "Patch": 7
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",
@@ -68,7 +68,10 @@
             "defaultValue": "Warn",
             "required": true,
             "helpMarkDown": "Select the action to take when differences are present.",
-            "options": { "Fail":"Fail", "Warn":"Warn" }
+            "options": {
+                "Fail": "Fail",
+                "Warn": "Warn"
+            }
         }
     ],
     "instanceNameFormat": "Compare $(PrimaryBranch) and $(SecondaryBranch)",

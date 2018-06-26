@@ -1,0 +1,182 @@
+{
+    "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+    "id": "4f0b86a9-56eb-4b40-976f-271ed1830738",
+    "name": "AwsCliPlus",
+    "friendlyName": "AWS CLI Plus",
+    "description": "Run an AWS CLI command and interact with output",
+    "author": "Gio Palacino",
+    "helpMarkDown": "The AWS Command Line Interface (CLI) is a unified tool to manage your AWS services. With just one tool to download and configure, you can control multiple AWS services from the command line and automate them through scripts. You must have the AWS CLI installed to use this task. See http://docs.aws.amazon.com/cli/latest/userguide/installing.html for more details.",
+    "category": "Deploy",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 15
+    },
+    "minimumAgentVersion": "2.116.0",
+    "instanceNameFormat": "AWS: $(awsCommand) $(awsSubCommand)",
+    "groups": [
+        {
+            "name": "polling",
+            "displayName": "Polling",
+            "isExpanded": false
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "awsCredentials",
+            "type": "connectedService:AWS",
+            "label": "AWS Credentials",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Select the AWS credentials to use when it executes on a build host. If needed, click on 'Manage', and add a new Service Endpoint of type 'AWS'."
+        },
+        {
+            "name": "regionName",
+            "label": "AWS Region",
+            "type": "string",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "The AWS region code (us-east-1, us-west-2 etc) of the region containing the AWS resource(s) the task will use or create. For more information see [AWS Regions and Endpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html)."
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory",
+            "defaultValue": "$(System.DefaultWorkingDirectory)",
+            "required": true,
+            "helpMarkDown": "The working directory within which to execute the commands."
+        },
+        {
+            "name": "awsCommand",
+            "type": "string",
+            "label": "Command",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The AWS CLI command to run. Run `aws help` to get complete list of commands or refer to: https://docs.aws.amazon.com/cli/latest/userguide/command-structure.html."
+        },
+        {
+            "name": "awsSubCommand",
+            "type": "string",
+            "label": "Subcommand",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The AWS CLI command to run. Run `aws help` to get complete list of commands or refer to: https://docs.aws.amazon.com/cli/latest/userguide/command-structure.html."
+        },
+        {
+            "name": "awsArguments",
+            "type": "string",
+            "label": "Options and parameters",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The arguments to pass to the AWS CLI command. Run `aws <command> --help` to get complete list of arguments supported by the command."
+        },
+        {
+            "name": "variableName",
+            "type": "string",
+            "label": "Output Variable Name",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The name of a variable to be created with the value parsed by the regex from the command output."
+        },
+        {
+            "name": "regularExpression",
+            "type": "string",
+            "label": "Output Regular Expression",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The regular expression to use for parsing the output into the named variable."
+        },
+        {
+            "name": "regExMatchIndex",
+            "type": "pickList",
+            "label": "Value Match Index",
+            "defaultValue": "0",
+            "required": false,
+            "helpMarkDown": "The regular expression match index to use for the value.",
+            "options": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9"
+            }
+        },
+        {
+            "name": "pollingRegularExpression",
+            "type": "string",
+            "label": "Test Regular Expression",
+            "groupName": "polling",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The regular expression to use for testing the output while polling."
+        },
+        {
+            "name": "pollingIntervalMinutes",
+            "type": "pickList",
+            "label": "Interval In Minutes",
+            "groupName": "polling",
+            "defaultValue": "2",
+            "required": false,
+            "helpMarkDown": "The number of minutes to wait before running the command again.",
+            "options": {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "5": "5",
+                "8": "8",
+                "13": "13",
+                "21": "21"
+            }
+        },
+        {
+            "name": "pollingMaxAttempts",
+            "type": "pickList",
+            "label": "Maximum Attempts",
+            "groupName": "polling",
+            "defaultValue": "5",
+            "required": false,
+            "helpMarkDown": "The maximum number of times to poll and test before failing.",
+            "options": {
+                "2": "2",
+                "3": "3",
+                "5": "5",
+                "8": "8",
+                "13": "13",
+                "21": "21"
+            }
+        },
+        {
+            "name": "failOnStandardError",
+            "type": "boolean",
+            "label": "Fail on Standard Error",
+            "groupName": "advanced",
+            "required": false,
+            "helpMarkDown": "If this is true, this task will fail if any errors are written to the StandardError stream."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "awsCliPlus.js",
+            "argumentFormat": ""
+        }
+    },
+    "messages": {
+        "AWSCLINotInstalled": "AWS CLI is not installed on this machine.",
+        "AwsReturnCode": "%s exited with return code: %d"
+    }
+}

@@ -6,13 +6,17 @@
     "description": "Extracts a version number from the branch name.",
     "helpMarkDown": "",
     "category": "Utility",
-    "visibility": [ "Build" ],
-    "runsOn": [ "Agent" ],
+    "visibility": [
+        "Build"
+    ],
+    "runsOn": [
+        "Agent"
+    ],
     "author": "Gio Palacino",
     "version": {
         "Major": 1,
         "Minor": 10,
-        "Patch": 0
+        "Patch": 7
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",

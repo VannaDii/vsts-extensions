@@ -6,13 +6,18 @@
     "description": "Interacts with Unity Cloud Build.",
     "helpMarkDown": "For more information visit [Unity Cloud Build](https://unity3d.com/services/cloud-build).",
     "category": "Utility",
-    "visibility": [ "Build", "Release" ],
-    "runsOn": [ "Agent" ],
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "runsOn": [
+        "Agent"
+    ],
     "author": "Gio Palacino",
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 50
+        "Patch": 57
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",

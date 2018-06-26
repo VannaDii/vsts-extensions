@@ -71,10 +71,13 @@ if (!test('-d', binPath)) {
 addPath(binPath);
 
 // resolve list of tasks
-var taskList, widgetList, sharedFiles;
+var taskList, widgetList;
+var makeOpts = JSON.parse(fs.readFileSync(path.join(__dirname, 'make-options.json')));
+var sharedFiles = makeOpts.files;
 if (options.task) {
+    widgetList = [];
     // find using --task parameter
-    taskList = matchFind(options.task, path.join(__dirname), { noRecurse: true, matchBase: true })
+    taskList = matchFind(options.task, path.join(__dirname, 'Tasks'), { noRecurse: true, matchBase: true })
         .map(function (item) {
             return path.basename(item);
         });
@@ -84,10 +87,8 @@ if (options.task) {
 }
 else {
     // load the default list
-    var makeOpts = JSON.parse(fs.readFileSync(path.join(__dirname, 'make-options.json')));
     taskList = makeOpts.tasks;
     widgetList = makeOpts.widgets;
-    sharedFiles = makeOpts.files;
 }
 
 // set the runner options. should either be empty or a comma delimited list of test runners.
@@ -100,6 +101,23 @@ target.clean = function () {
     rm('-Rf', path.join(__dirname, '_build'));
     mkdir('-p', buildPath);
     rm('-Rf', path.join(__dirname, '_test'));
+
+    
+    taskList.forEach(function(taskName) {
+        console.log('Cleaning Task: ' + taskName);
+        var taskPath = path.join(__dirname, 'Tasks', taskName);
+        ensureExists(taskPath);
+
+        // load the task.json
+        var outDir;
+        var shouldBuildNode = test('-f', path.join(taskPath, 'tsconfig.json'));
+        if (shouldBuildNode) {
+            var curDir = pwd();
+            cd(taskPath);
+            run('npm prune', false, true);
+            cd(curDir);
+        }
+    });
 };
 
 //
@@ -107,14 +125,14 @@ target.clean = function () {
 // ex: node make.js build --task ShellScript
 //
 target.build = function() {
-    target.clean();
-
-    ensureTool('tsc', '--version', 'Version 2.3.2');
     ensureTool('npm', '--version', function (output) {
         if (semver.lt(output, '3.0.0')) {
             fail('expected 3.0.0 or higher');
         }
     });
+    target.clean();
+
+    ensureTool('tsc', '--version', 'Version 2.3.2');
 
     banner('Copying Shared Files');
     sharedFiles.forEach(function(copySpec) {
@@ -544,8 +562,15 @@ target.publish = function() {
 
 // used to bump the patch version in task.json files
 target.bump = function() {
+    var extJsonPath = path.join(__dirname, 'vss-extension.json');
+    var extJson = JSON.parse(fs.readFileSync(extJsonPath));
+    var extVersion = extJson.version.split('.');
+    extVersion[2] = (parseInt(extVersion[2]) + 1).toString();
+    extJson.version = extVersion.join('.');
+    fs.writeFileSync(extJsonPath, JSON.stringify(extJson, null, 4));
+
     taskList.forEach(function (taskName) {
-        var taskJsonPath = path.join(__dirname, taskName, 'task.json');
+        var taskJsonPath = path.join(__dirname, 'Tasks', taskName, 'task.json');
         var taskJson = JSON.parse(fs.readFileSync(taskJsonPath));
         if (typeof taskJson.version.Patch != 'number') {
             fail(`Error processing '${taskName}'. version.Patch should be a number.`);

@@ -1,0 +1,182 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
+  "id": "4f0b86a9-56eb-4b40-976f-271ed1830738",
+  "name": "AwsCliPlus",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "author": "Gio Palacino",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Deploy",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": 0,
+    "Minor": 1,
+    "Patch": 15
+  },
+  "minimumAgentVersion": "2.116.0",
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "groups": [
+    {
+      "name": "polling",
+      "displayName": "ms-resource:loc.group.displayName.polling",
+      "isExpanded": false
+    },
+    {
+      "name": "advanced",
+      "displayName": "ms-resource:loc.group.displayName.advanced",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "awsCredentials",
+      "type": "connectedService:AWS",
+      "label": "ms-resource:loc.input.label.awsCredentials",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.awsCredentials"
+    },
+    {
+      "name": "regionName",
+      "label": "ms-resource:loc.input.label.regionName",
+      "type": "string",
+      "required": true,
+      "defaultValue": "",
+      "helpMarkDown": "ms-resource:loc.input.help.regionName"
+    },
+    {
+      "name": "workingDirectory",
+      "type": "filePath",
+      "label": "ms-resource:loc.input.label.workingDirectory",
+      "defaultValue": "$(System.DefaultWorkingDirectory)",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.workingDirectory"
+    },
+    {
+      "name": "awsCommand",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.awsCommand",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.awsCommand"
+    },
+    {
+      "name": "awsSubCommand",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.awsSubCommand",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.awsSubCommand"
+    },
+    {
+      "name": "awsArguments",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.awsArguments",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.awsArguments"
+    },
+    {
+      "name": "variableName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.variableName",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.variableName"
+    },
+    {
+      "name": "regularExpression",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.regularExpression",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.regularExpression"
+    },
+    {
+      "name": "regExMatchIndex",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.regExMatchIndex",
+      "defaultValue": "0",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.regExMatchIndex",
+      "options": {
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9"
+      }
+    },
+    {
+      "name": "pollingRegularExpression",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.pollingRegularExpression",
+      "groupName": "polling",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.pollingRegularExpression"
+    },
+    {
+      "name": "pollingIntervalMinutes",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.pollingIntervalMinutes",
+      "groupName": "polling",
+      "defaultValue": "2",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.pollingIntervalMinutes",
+      "options": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "5": "5",
+        "8": "8",
+        "13": "13",
+        "21": "21"
+      }
+    },
+    {
+      "name": "pollingMaxAttempts",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.pollingMaxAttempts",
+      "groupName": "polling",
+      "defaultValue": "5",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.pollingMaxAttempts",
+      "options": {
+        "2": "2",
+        "3": "3",
+        "5": "5",
+        "8": "8",
+        "13": "13",
+        "21": "21"
+      }
+    },
+    {
+      "name": "failOnStandardError",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.failOnStandardError",
+      "groupName": "advanced",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.failOnStandardError"
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "awsCliPlus.js",
+      "argumentFormat": ""
+    }
+  },
+  "messages": {
+    "AWSCLINotInstalled": "ms-resource:loc.messages.AWSCLINotInstalled",
+    "AwsReturnCode": "ms-resource:loc.messages.AwsReturnCode"
+  }
+}

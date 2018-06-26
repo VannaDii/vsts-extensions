@@ -6,13 +6,18 @@
     "description": "Creates a pull request for two branches.",
     "helpMarkDown": "Creates a pull request on [Visual Studio](https://www.visualstudio.com) for two branches.",
     "category": "Utility",
-    "visibility": [ "Build", "Release" ],
-    "runsOn": [ "Agent" ],
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "runsOn": [
+        "Agent"
+    ],
     "author": "Gio Palacino",
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 0
+        "Patch": 7
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",

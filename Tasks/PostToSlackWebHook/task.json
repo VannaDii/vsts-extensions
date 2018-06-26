@@ -6,13 +6,18 @@
     "description": "Posts a custom message to a slack web hook.",
     "helpMarkDown": "Posts a custom message to a [slack](https://www.slack.com) web hook.",
     "category": "Utility",
-    "visibility": [ "Build", "Release" ],
-    "runsOn": [ "Agent" ],
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "runsOn": [
+        "Agent"
+    ],
     "author": "Gio Palacino",
     "version": {
         "Major": 1,
         "Minor": 14,
-        "Patch": 0
+        "Patch": 7
     },
     "demands": [],
     "minimumAgentVersion": "2.116.0",

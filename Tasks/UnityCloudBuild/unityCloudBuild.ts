@@ -238,7 +238,7 @@ function getDurationString(date: Date): string {
     tl.setVariable('UnityDownloadUrl', `https://developer.cloud.unity3d.com/build/orgs/${orgName}/projects/${projName}/?page=1`, false);
     tl.setVariable('UnityBuildDuration', '00:00:00', false);
 
-    const binariesDir = path.join(tl.getVariable('Build.BinariesDirectory'), 'UnityCouldBuild');
+    const binariesDir = path.join(tl.getVariable('Build.BinariesDirectory'), 'UnityCloudBuild');
     fs.exists(binariesDir, (exists) => {
         if (exists === false) {
             fs.mkdir(binariesDir, (err) => {

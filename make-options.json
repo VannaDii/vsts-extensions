@@ -8,6 +8,7 @@
         "*.js"
     ],
     "tasks": [
+        "AwsCliPlus",
         "VersionFromBranch",
         "BitBucketPullRequest",
         "PostToSlackWebHook",
