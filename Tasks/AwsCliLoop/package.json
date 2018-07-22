@@ -1,0 +1,14 @@
+{
+  "name": "aws-cli-loop",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "os": "^0.1.1",
+    "path": "^0.12.7",
+    "vsts-task-lib": "^2.0.6",
+    "aws-sdk": "2.188.0",
+    "https-proxy-agent": "^2.2.1"
+  }
+}

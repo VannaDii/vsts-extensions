@@ -8,6 +8,7 @@
         "*.js"
     ],
     "tasks": [
+        "AwsCliLoop",
         "AwsCliPlus",
         "VersionFromBranch",
         "BitBucketPullRequest",

@@ -1,9 +1,9 @@
 {
     "$schema": "https://raw.githubusercontent.com/AArnott/vso-agent-tasks/9b41d803a/tasks.schema.json",
-    "id": "4f0b86a9-56eb-4b40-976f-271ed1830738",
-    "name": "AwsCliPlus",
-    "friendlyName": "AWS CLI Plus",
-    "description": "Run an AWS CLI command and interacts with output",
+    "id": "f008be69-7165-4b97-976d-3bc5469282f3",
+    "name": "AwsCliLoop",
+    "friendlyName": "AWS CLI Loop",
+    "description": "Run an AWS CLI command in a loop, controlled by a separate command, and interacts with output",
     "author": "Gio Palacino",
     "helpMarkDown": "The AWS Command Line Interface (CLI) is a unified tool to manage your AWS services. With just one tool to download and configure, you can control multiple AWS services from the command line and automate them through scripts. You must have the AWS CLI installed to use this task. See http://docs.aws.amazon.com/cli/latest/userguide/installing.html for more details.",
     "category": "Deploy",
@@ -15,15 +15,15 @@
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 18
+        "Patch": 2
     },
     "minimumAgentVersion": "2.116.0",
-    "instanceNameFormat": "AWS: $(awsCommand) $(awsSubCommand)",
+    "instanceNameFormat": "AWS: foreach $(awsSubCommand) > $(awsLoopSubCommand)",
     "groups": [
         {
-            "name": "polling",
-            "displayName": "Polling",
-            "isExpanded": false
+            "name": "loop",
+            "displayName": "Loop Command",
+            "isExpanded": true
         },
         {
             "name": "advanced",
@@ -81,19 +81,11 @@
             "helpMarkDown": "The arguments to pass to the AWS CLI command. Run `aws <command> --help` to get complete list of arguments supported by the command."
         },
         {
-            "name": "variableName",
-            "type": "string",
-            "label": "Output Variable Name",
-            "defaultValue": "",
-            "required": false,
-            "helpMarkDown": "The name of a variable to be created with the value parsed by the regex from the command output."
-        },
-        {
             "name": "regularExpression",
             "type": "string",
             "label": "Output Regular Expression",
             "defaultValue": "",
-            "required": false,
+            "required": true,
             "helpMarkDown": "The regular expression to use for parsing the output into the named variable."
         },
         {
@@ -101,8 +93,8 @@
             "type": "pickList",
             "label": "Value Match Index",
             "defaultValue": "0",
-            "required": false,
-            "helpMarkDown": "The regular expression match index to use for the value.",
+            "required": true,
+            "helpMarkDown": "The regular expression matches starting index to use for the value.",
             "options": {
                 "0": "0",
                 "1": "1",
@@ -117,48 +109,31 @@
             }
         },
         {
-            "name": "pollingRegularExpression",
+            "name": "awsLoopCommand",
             "type": "string",
-            "label": "Test Regular Expression",
-            "groupName": "polling",
+            "label": "Command",
+            "groupName": "loop",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The AWS CLI command to run. Run `aws help` to get complete list of commands or refer to: https://docs.aws.amazon.com/cli/latest/userguide/command-structure.html."
+        },
+        {
+            "name": "awsLoopSubCommand",
+            "type": "string",
+            "label": "Subcommand",
+            "groupName": "loop",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "The regular expression to use for testing the output while polling."
+            "helpMarkDown": "The AWS CLI command to run. Run `aws help` to get complete list of commands or refer to: https://docs.aws.amazon.com/cli/latest/userguide/command-structure.html."
         },
         {
-            "name": "pollingIntervalMinutes",
-            "type": "pickList",
-            "label": "Interval In Minutes",
-            "groupName": "polling",
-            "defaultValue": "2",
+            "name": "awsLoopArguments",
+            "type": "string",
+            "label": "Options and parameters",
+            "groupName": "loop",
+            "defaultValue": "",
             "required": false,
-            "helpMarkDown": "The number of minutes to wait before running the command again.",
-            "options": {
-                "1": "1",
-                "2": "2",
-                "3": "3",
-                "5": "5",
-                "8": "8",
-                "13": "13",
-                "21": "21"
-            }
-        },
-        {
-            "name": "pollingMaxAttempts",
-            "type": "pickList",
-            "label": "Maximum Attempts",
-            "groupName": "polling",
-            "defaultValue": "5",
-            "required": false,
-            "helpMarkDown": "The maximum number of times to poll and test before failing.",
-            "options": {
-                "2": "2",
-                "3": "3",
-                "5": "5",
-                "8": "8",
-                "13": "13",
-                "21": "21"
-            }
+            "helpMarkDown": "The arguments to pass to the AWS CLI command. Captured values from the primary command will be appended. Example: '--fleet-id' become '--fleet-id <captured_value>'"
         },
         {
             "name": "failOnStandardError",
@@ -171,7 +146,7 @@
     ],
     "execution": {
         "Node": {
-            "target": "awsCliPlus.js",
+            "target": "awsCliLoop.js",
             "argumentFormat": ""
         }
     },

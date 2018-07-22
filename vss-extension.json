@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gio-build-tasks",
     "name": "Gio's Build Tasks",
-    "version": "0.1.66",
+    "version": "0.1.69",
     "publisher": "palacino-gio",
     "targets": [
         {
@@ -17,6 +17,9 @@
         "default": "icon.png"
     },
     "files": [
+        {
+            "path": "AwsCliLoop"
+        },
         {
             "path": "AwsCliPlus"
         },
@@ -106,6 +109,16 @@
                 "name": "Code Coverage Chart Configuration",
                 "description": "Configures the code coverage chart.",
                 "uri": "CodeCoverage/config.html"
+            }
+        },
+        {
+            "id": "awscliloop-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "AwsCliLoop"
             }
         },
         {
