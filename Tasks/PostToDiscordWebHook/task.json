@@ -17,10 +17,10 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 1
+        "Patch": 10
     },
     "demands": [],
-    "minimumAgentVersion": "2.116.0",
+    "minimumAgentVersion": "2.173.0",
     "inputs": [
         {
             "name": "DiscordChannelId",
@@ -57,6 +57,6 @@
         "NoChannelId": "No channel ID to Discord was provided.",
         "NoWebhookKey": "No webhook key to Discord was provided.",
         "NoCustomMessage": "No custom message was provided.",
-        "CustomMessageNotJson": "No custom message was provided."
+        "CustomMessageNotJson": "The custom message was not JSON."
     }
 }
