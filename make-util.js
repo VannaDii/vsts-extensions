@@ -140,16 +140,16 @@ var buildNodeTask = function (taskPath, outDir) {
             fail('The package.json should not contain dev dependencies. Move the dev dependencies into a package.json file under the Tests sub-folder. Offending package.json: ' + packageJsonPath);
         }
 
-        run('npm install');
+        run('yarn install');
     }
 
     if (test('-f', rp(path.join('Tests', 'package.json')))) {
         cd(rp('Tests'));
-        run('npm install');
+        run('yarn install');
         cd(taskPath);
     }
 
-    run('tsc --outDir ' + outDir + ' --rootDir ' + taskPath);
+    run(`tsc --skipLibCheck --baseUrl "${taskPath}" --rootDir "${taskPath}" --outDir "${outDir}"`);
     cd(originalDir);
 }
 exports.buildNodeTask = buildNodeTask;
@@ -291,13 +291,13 @@ var ensureTool = function (name, versionArgs, validate) {
     console.log(name + ' tool:');
     var toolPath = which(name);
     if (!toolPath) {
-        fail(name + ' not found.  might need to run npm install');
+        fail(name + ' not found.  might need to run yarn install');
     }
 
     if (versionArgs) {
         var result = exec(name + ' ' + versionArgs);
         if (typeof validate == 'string') {
-            if (result.trim() != validate) {
+            if (!result.trim().startsWith(validate)) {
                 fail('expected version: ' + validate);
             }
         }

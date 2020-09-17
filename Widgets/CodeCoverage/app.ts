@@ -1,3 +1,4 @@
+/// <reference types="vss-web-extension-sdk" />
 import dash = require('TFS/Dashboards/WidgetHelpers');
 import build = require('TFS/Build/RestClient');
 import test = require('TFS/TestManagement/RestClient');

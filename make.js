@@ -58,7 +58,7 @@ var legacyTestPath = path.join(__dirname, '_test', 'Tests-Legacy');
 var legacyTestTasksPath = path.join(__dirname, '_test');
 
 // node min version
-var minNodeVer = '4.0.0';
+var minNodeVer = '12.0.0';
 if (semver.lt(process.versions.node, minNodeVer)) {
     fail('requires node >= ' + minNodeVer + '.  installed: ' + process.versions.node);
 }
@@ -102,7 +102,7 @@ target.clean = function () {
     mkdir('-p', buildPath);
     rm('-Rf', path.join(__dirname, '_test'));
 
-    
+
     taskList.forEach(function(taskName) {
         console.log('Cleaning Task: ' + taskName);
         var taskPath = path.join(__dirname, 'Tasks', taskName);
@@ -132,18 +132,8 @@ target.build = function() {
     });
     target.clean();
 
-    ensureTool('tsc', '--version', 'Version 2.3.2');
-
-    banner('Copying Shared Files');
-    sharedFiles.forEach(function(copySpec) {
-        var srcPath = path.join(__dirname, copySpec.source);
-        var dstPath = path.join(buildPath, copySpec.target);
-        info('Copying ' + srcPath + ' -> ' + dstPath);
-        if(test('-d', srcPath.replace('*', '')) && !pathExists(dstPath)) {
-            mkdir('-p', dstPath);
-        }
-        cp({}, srcPath, dstPath);
-    });
+    ensureTool('yarn', '--version', '1.22');
+    ensureTool('tsc', '--version', 'Version 3.9');
 
     widgetList.forEach(function(widgetName){
         banner('Building Widget: ' + widgetName);
@@ -205,7 +195,7 @@ target.build = function() {
         }
 
         //--------------------------------
-        // Common: build, copy, install 
+        // Common: build, copy, install
         //--------------------------------
         if (taskMake.hasOwnProperty('common')) {
             var common = taskMake['common'];
@@ -282,6 +272,17 @@ target.build = function() {
         copyTaskResources(taskMake, taskPath, outDir);
     });
 
+    banner('Copying Shared Files');
+    sharedFiles.forEach(function(copySpec) {
+        var srcPath = path.join(__dirname, copySpec.source);
+        var dstPath = path.join(buildPath, copySpec.target);
+        info('Copying ' + srcPath + ' -> ' + dstPath);
+        if(test('-d', srcPath.replace('*', '')) && !pathExists(dstPath)) {
+            mkdir('-p', dstPath);
+        }
+        cp({}, srcPath, dstPath);
+    });
+
     banner('Build successful', true);
 }
 
@@ -338,7 +339,7 @@ target.test = function() {
 
 target.testLegacy = function() {
     return; // Test will be added later
-    
+
     ensureTool('tsc', '--version', 'Version 1.8.7');
     ensureTool('mocha', '--version', '2.3.3');
 

@@ -13,6 +13,7 @@
         "VersionFromBranch",
         "BitBucketPullRequest",
         "PostToSlackWebHook",
+        "PostToDiscordWebHook",
         "CreateTestVariables",
         "CompareBranches",
         "UnityCloudBuild",

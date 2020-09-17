@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "Displays code coverage results over time for a build",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "code",
     "coverage;test;build;vso;widget"
