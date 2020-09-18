@@ -22,7 +22,7 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
   const gitPath = tl.which('git');
   const git: tr.ToolRunner = tl.tool(gitPath).arg(['rev-parse', 'HEAD']);
   const result = git.execSync();
-  if (!result || !!result.error || !!result.stdout) {
+  if (!result || !!result.error || !result.stdout) {
     const error = result.error || new Error('Unknown error');
     tl.setResult(tl.TaskResult.Failed, `Git rev-parse failed!\n${error.name}: ${error.message}\n${error.stack}`);
   }
