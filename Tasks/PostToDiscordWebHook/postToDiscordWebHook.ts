@@ -1,4 +1,3 @@
-import os = require('os');
 import path = require('path');
 import http = require('http');
 import request = require('request');
@@ -19,15 +18,15 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
     const gitShaShort = tl.getVariable('Build.SourceVersion').slice(0, 8);
     const releaseStatus = tl.getVariable(`Release.Environments.${releaseEnv}.status`);
     const usableStatus = coalesce(releaseStatus, agentStatus, 'unknown').toLowerCase();
+    const defaultStatus = { color: 10181046, status: usableStatus };
     const colorStatuses: { [key: string]: { color: number; status: string } } = {
       canceled: { color: 9807270, status: 'was canceled' },
       failed: { color: 15158332, status: 'failed' },
       succeeded: { color: 3066993, status: 'succeeded' },
       succeededwithissues: { color: 15105570, status: 'succeeded with issues' },
       unknown: { color: 3447003, status: 'was weird' },
-      inprogress: { color: 3066993, status: 'succeeded' },
     };
-    const { color, status } = colorStatuses[usableStatus] || colorStatuses.unknown;
+    const { color, status } = colorStatuses[usableStatus] || defaultStatus;
 
     const channelId = tl.getInput('DiscordChannelId', true);
     if (!channelId || channelId.length === 0) {

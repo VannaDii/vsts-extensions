@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gio-build-tasks",
     "name": "Gio's Build Tasks",
-    "version": "0.1.81",
+    "version": "0.1.85",
     "publisher": "palacino-gio",
     "targets": [
         {
@@ -49,6 +49,9 @@
         },
         {
             "path": "VstsGitPush"
+        },
+        {
+            "path": "GitHash"
         },
         {
             "path": "CodeCoverage/app.js",

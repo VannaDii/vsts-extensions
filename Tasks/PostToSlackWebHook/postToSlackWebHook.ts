@@ -1,4 +1,3 @@
-import os = require('os');
 import path = require('path');
 import http = require('http');
 import request = require('request');

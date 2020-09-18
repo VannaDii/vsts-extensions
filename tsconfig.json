@@ -8,6 +8,11 @@
         "module": "CommonJS",
         "rootDir": "./",
         "skipLibCheck": true,
-        "skipDefaultLibCheck": true
+        "skipDefaultLibCheck": true,
+        "esModuleInterop": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
     },
 }

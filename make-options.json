@@ -18,7 +18,8 @@
         "CompareBranches",
         "UnityCloudBuild",
         "VstsPullRequest",
-        "VstsGitPush"
+        "VstsGitPush",
+        "GitHash"
     ],
     "taskResources": [
         "*.ps1",

@@ -1,4 +1,3 @@
-import os = require('os');
 import fs = require('fs');
 import path = require('path');
 import request = require('request-promise');
@@ -310,7 +309,7 @@ function getDurationString(date: Date): string {
                     method: 'GET',
                     encoding: 'binary'
                 };
-                request(downloadOptions).then((body, data) => {
+                request(downloadOptions).then((body) => {
                     const writeStream = fs.createWriteStream(fullFilePath);
                     writeStream.write(body, 'binary');
                     writeStream.end();
