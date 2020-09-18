@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gio-build-tasks",
     "name": "Gio's Build Tasks",
-    "version": "0.1.85",
+    "version": "0.1.88",
     "publisher": "palacino-gio",
     "targets": [
         {
@@ -39,9 +39,6 @@
             "path": "PostToDiscordWebHook"
         },
         {
-            "path": "UnityCloudBuild"
-        },
-        {
             "path": "VersionFromBranch"
         },
         {
@@ -52,71 +49,9 @@
         },
         {
             "path": "GitHash"
-        },
-        {
-            "path": "CodeCoverage/app.js",
-            "addressable": true
-        },
-        {
-            "path": "CodeCoverage/LocalStorage.js",
-            "addressable": true
-        },
-        {
-            "path": "CodeCoverage/chart.html",
-            "addressable": true
-        },
-        {
-            "path": "CodeCoverage/config.html",
-            "addressable": true
-        },
-        {
-            "path": "CodeCoverage/images",
-            "addressable": true
-        },
-        {
-            "path": "CodeCoverage/lib",
-            "addressable": true,
-            "packagePath": "CodeCoverage/lib"
         }
     ],
     "contributions": [
-        {
-            "id": "CodeCoverageChartWidget",
-            "type": "ms.vss-dashboards-web.widget",
-            "targets": [
-                "ms.vss-dashboards-web.widget-catalog",
-                "palacino-gio.gio-build-tasks.CodeCoverageChartWidget.Configuration"
-            ],
-            "properties": {
-                "name": "Code Coverage Chart",
-                "description": "Displays the code coverage for a build definition over time.",
-                "catalogIconUrl": "CodeCoverage/images/CatalogIcon.png",
-                "previewImageUrl": "CodeCoverage/images/preview.png",
-                "uri": "CodeCoverage/chart.html",
-                "isNameConfigurable": true,
-                "supportedSizes": [
-                    {
-                        "rowSpan": 1,
-                        "columnSpan": 2
-                    }
-                ],
-                "supportedScopes": [
-                    "project_team"
-                ]
-            }
-        },
-        {
-            "id": "CodeCoverageChartWidget.Configuration",
-            "type": "ms.vss-dashboards-web.widget-configuration",
-            "targets": [
-                "ms.vss-dashboards-web.widget-configuration"
-            ],
-            "properties": {
-                "name": "Code Coverage Chart Configuration",
-                "description": "Configures the code coverage chart.",
-                "uri": "CodeCoverage/config.html"
-            }
-        },
         {
             "id": "awscliloop-task",
             "type": "ms.vss-distributed-task.task",
@@ -135,16 +70,6 @@
             ],
             "properties": {
                 "name": "AwsCliPlus"
-            }
-        },
-        {
-            "id": "unitycloudbuild-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "UnityCloudBuild"
             }
         },
         {
@@ -225,6 +150,16 @@
             ],
             "properties": {
                 "name": "VstsGitPush"
+            }
+        },
+        {
+            "id": "githash-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "GitHash"
             }
         }
     ],

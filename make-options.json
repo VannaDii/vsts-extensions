@@ -1,54 +1,43 @@
 {
-    "widgets": [
-        "CodeCoverage"
-    ],
-    "widgetResources": [
-        "images/*.png",
-        "*.html",
-        "*.js"
-    ],
-    "tasks": [
-        "AwsCliLoop",
-        "AwsCliPlus",
-        "VersionFromBranch",
-        "BitBucketPullRequest",
-        "PostToSlackWebHook",
-        "PostToDiscordWebHook",
-        "CreateTestVariables",
-        "CompareBranches",
-        "UnityCloudBuild",
-        "VstsPullRequest",
-        "VstsGitPush",
-        "GitHash"
-    ],
-    "taskResources": [
-        "*.ps1",
-        "*.psd1",
-        "*.psm1",
-        "*.sh",
-        "*.txt",
-        "icon.png",
-        "icon.svg",
-        "module.json",
-        "node_modules",
-        "package.json",
-        "Strings",
-        "task.json",
-        "task.loc.json",
-        "Tests"
-    ],
-    "files": [
-        {
-            "source": "Widgets/CodeCoverage/node_modules/vss-web-extension-sdk/lib/*",
-            "target": "CodeCoverage/lib"
-        },
-        {
-            "source": "vss-extension.json",
-            "target": "vss-extension.json"
-        },
-        {
-            "source": "icon.png",
-            "target": "icon.png"
-        }
-    ]
+  "widgets": [],
+  "widgetResources": [],
+  "tasks": [
+    "AwsCliLoop",
+    "AwsCliPlus",
+    "VersionFromBranch",
+    "BitBucketPullRequest",
+    "PostToSlackWebHook",
+    "PostToDiscordWebHook",
+    "CreateTestVariables",
+    "CompareBranches",
+    "VstsPullRequest",
+    "VstsGitPush",
+    "GitHash"
+  ],
+  "taskResources": [
+    "*.ps1",
+    "*.psd1",
+    "*.psm1",
+    "*.sh",
+    "*.txt",
+    "icon.png",
+    "icon.svg",
+    "module.json",
+    "node_modules",
+    "package.json",
+    "Strings",
+    "task.json",
+    "task.loc.json",
+    "Tests"
+  ],
+  "files": [
+    {
+      "source": "vss-extension.json",
+      "target": "vss-extension.json"
+    },
+    {
+      "source": "icon.png",
+      "target": "icon.png"
+    }
+  ]
 }
