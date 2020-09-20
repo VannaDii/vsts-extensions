@@ -17,7 +17,7 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 8
+        "Patch": 10
     },
     "demands": [],
     "minimumAgentVersion": "2.173.0",
@@ -85,6 +85,45 @@
                 "39": "39",
                 "40": "40"
             }
+        },
+        {
+            "name": "UseFallback",
+            "type": "boolean",
+            "label": "Use Fallback",
+            "defaultValue": false,
+            "required": true,
+            "helpMarkDown": "Whether or not to use a fallback if Git fails."
+        },
+        {
+            "name": "FallbackType",
+            "type": "pickList",
+            "label": "Fallback Type",
+            "defaultValue": "Value",
+            "required": true,
+            "helpMarkDown": "The type of the fallback value.",
+            "visibleRule": "UseFallback = true",
+            "options": {
+                "Value": "Value",
+                "File": "File"
+            }
+        },
+        {
+            "name": "FallbackValue",
+            "type": "string",
+            "label": "Fallback Source",
+            "defaultValue": "$(Build.SourceVersion)",
+            "required": true,
+            "helpMarkDown": "The value to use, or variable to read from, if Git fails.",
+            "visibleRule": "UseFallback = true && FallbackType = Value"
+        },
+        {
+            "name": "FallbackFile",
+            "type": "filePath",
+            "label": "Fallback Source",
+            "defaultValue": "$(Build.SourceVersion)",
+            "required": true,
+            "helpMarkDown": "The file read from if Git fails. The first non-empty line is expected to be the value.",
+            "visibleRule": "UseFallback = true && FallbackType = File"
         }
     ],
     "messages": {

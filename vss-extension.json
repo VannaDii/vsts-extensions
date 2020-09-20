@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gio-build-tasks",
     "name": "Gio's Build Tasks",
-    "version": "0.1.89",
+    "version": "0.1.93",
     "publisher": "palacino-gio",
     "targets": [
         {

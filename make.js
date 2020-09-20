@@ -571,13 +571,17 @@ target.bump = function() {
     fs.writeFileSync(extJsonPath, JSON.stringify(extJson, null, 4));
 
     taskList.forEach(function (taskName) {
-        var taskJsonPath = path.join(__dirname, 'Tasks', taskName, 'task.json');
-        var taskJson = JSON.parse(fs.readFileSync(taskJsonPath));
-        if (typeof taskJson.version.Patch != 'number') {
-            fail(`Error processing '${taskName}'. version.Patch should be a number.`);
-        }
+        try {
+          var taskJsonPath = path.join(__dirname, 'Tasks', taskName, 'task.json');
+          var taskJson = JSON.parse(fs.readFileSync(taskJsonPath));
+          if (typeof taskJson.version.Patch != 'number') {
+            fail(`Error processing '${taskName}/task.json'. version.Patch should be a number.`);
+          }
 
-        taskJson.version.Patch = taskJson.version.Patch + 1;
-        fs.writeFileSync(taskJsonPath, JSON.stringify(taskJson, null, 4));
+          taskJson.version.Patch = taskJson.version.Patch + 1;
+          fs.writeFileSync(taskJsonPath, JSON.stringify(taskJson, null, 4));
+        } catch (error) {
+            fail(`Error processing '${taskName}/task.json'. ${error.name}: ${error.message}\n${error.stack}`);
+        }
     });
 }

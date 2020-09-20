@@ -17,7 +17,7 @@
   "version": {
     "Major": 0,
     "Minor": 0,
-    "Patch": 8
+    "Patch": 10
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",
@@ -85,6 +85,45 @@
         "39": "39",
         "40": "40"
       }
+    },
+    {
+      "name": "UseFallback",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.UseFallback",
+      "defaultValue": false,
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.UseFallback"
+    },
+    {
+      "name": "FallbackType",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.FallbackType",
+      "defaultValue": "Value",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.FallbackType",
+      "visibleRule": "UseFallback = true",
+      "options": {
+        "Value": "Value",
+        "File": "File"
+      }
+    },
+    {
+      "name": "FallbackValue",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.FallbackValue",
+      "defaultValue": "$(Build.SourceVersion)",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.FallbackValue",
+      "visibleRule": "UseFallback = true && FallbackType = Value"
+    },
+    {
+      "name": "FallbackFile",
+      "type": "filePath",
+      "label": "ms-resource:loc.input.label.FallbackFile",
+      "defaultValue": "$(Build.SourceVersion)",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.FallbackFile",
+      "visibleRule": "UseFallback = true && FallbackType = File"
     }
   ],
   "messages": {
