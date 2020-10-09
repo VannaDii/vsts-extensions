@@ -1,0 +1,12 @@
+{
+  "name": "discord-webhook",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Post a message to a discord channel",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "0.20.0",
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

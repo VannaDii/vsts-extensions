@@ -1,0 +1,11 @@
+{
+  "name": "compare-branches",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Compares to branches raising an error if one is ahead of the other",
+  "main": "index.js",
+  "dependencies": {
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

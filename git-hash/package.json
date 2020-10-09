@@ -1,0 +1,11 @@
+{
+  "name": "git-hash",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Obtains a git sha/hash with multiple fallback options",
+  "main": "index.js",
+  "dependencies": {
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

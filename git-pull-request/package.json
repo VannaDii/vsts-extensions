@@ -1,0 +1,12 @@
+{
+  "name": "pull-request",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Create a git pull request",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "0.20.0",
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

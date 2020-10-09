@@ -1,0 +1,36 @@
+{
+  "manifestVersion": 1,
+  "id": "pull-request",
+  "name": "Pull Request",
+  "description": "Create a git pull request",
+  "version": "0.0.75",
+  "publisher": "palacino-gio",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "icon.png"
+  },
+  "files": [
+    {
+      "path": "."
+    }
+  ],
+  "contributions": [
+    {
+      "id": "pull-request",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "pull-request"
+      }
+    }
+  ]
+}

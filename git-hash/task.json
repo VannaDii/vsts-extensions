@@ -1,0 +1,132 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "0fdf7d97-1436-4cc1-8253-99c2cd709558",
+  "name": "GitHash",
+  "friendlyName": "Git Hash",
+  "description": "Makes variables containing git hashes.",
+  "helpMarkDown": "Makes variables containing git hashes",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 84
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.173.0",
+  "instanceNameFormat": "Git Hash",
+  "execution": {
+    "Node10": {
+      "target": "index.js"
+    }
+  },
+  "inputs": [
+    {
+      "name": "VariableName",
+      "type": "string",
+      "label": "Variable Name",
+      "defaultValue": "GitShaShort",
+      "required": true,
+      "helpMarkDown": "The name of the variable in which to store the git hash value."
+    },
+    {
+      "name": "HashLength",
+      "type": "pickList",
+      "label": "Hash Length",
+      "defaultValue": "7",
+      "required": true,
+      "helpMarkDown": "The length of the the git hash value to be stored.",
+      "options": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "10",
+        "11": "11",
+        "12": "12",
+        "13": "13",
+        "14": "14",
+        "15": "15",
+        "16": "16",
+        "17": "17",
+        "18": "18",
+        "19": "19",
+        "20": "20",
+        "21": "21",
+        "22": "22",
+        "23": "23",
+        "24": "24",
+        "25": "25",
+        "26": "26",
+        "27": "27",
+        "28": "28",
+        "29": "29",
+        "30": "30",
+        "31": "31",
+        "32": "32",
+        "33": "33",
+        "34": "34",
+        "35": "35",
+        "36": "36",
+        "37": "37",
+        "38": "38",
+        "39": "39",
+        "40": "40"
+      }
+    },
+    {
+      "name": "UseFallback",
+      "type": "boolean",
+      "label": "Use Fallback",
+      "defaultValue": false,
+      "required": true,
+      "helpMarkDown": "Whether or not to use a fallback if Git fails."
+    },
+    {
+      "name": "FallbackType",
+      "type": "pickList",
+      "label": "Fallback Type",
+      "defaultValue": "Value",
+      "required": true,
+      "helpMarkDown": "The type of the fallback value.",
+      "visibleRule": "UseFallback = true",
+      "options": {
+        "Value": "Value",
+        "File": "File"
+      }
+    },
+    {
+      "name": "FallbackValue",
+      "type": "string",
+      "label": "Fallback Source",
+      "defaultValue": "$(Build.SourceVersion)",
+      "required": true,
+      "helpMarkDown": "The value to use, or variable to read from, if Git fails.",
+      "visibleRule": "UseFallback = true && FallbackType = Value"
+    },
+    {
+      "name": "FallbackFile",
+      "type": "filePath",
+      "label": "Fallback Source",
+      "defaultValue": "$(Build.SourceVersion)",
+      "required": true,
+      "helpMarkDown": "The file read from if Git fails. The first non-empty line is expected to be the value.",
+      "visibleRule": "UseFallback = true && FallbackType = File"
+    }
+  ],
+  "messages": {
+    "NoGit": "Git is not installed."
+  }
+}

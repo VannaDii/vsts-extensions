@@ -1,0 +1,11 @@
+{
+  "name": "version-from-branch",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Extracts a version number from a branch name",
+  "main": "index.js",
+  "dependencies": {
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

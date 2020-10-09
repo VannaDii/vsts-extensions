@@ -1,0 +1,126 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "BE1ACB03-BF70-4B5D-AFD5-88A5E475FAED",
+  "name": "VstsPullRequest",
+  "friendlyName": "VSTS Pull Request",
+  "description": "Creates a pull request for two branches.",
+  "helpMarkDown": "Creates a pull request on [Visual Studio](https://www.visualstudio.com) for two branches.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 13
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.173.0",
+  "inputs": [
+    {
+      "name": "ProjectTeam",
+      "type": "pickList",
+      "label": "Reviewer Team",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Select the project team from which reviewers will be selected.",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "ProjectRepo",
+      "type": "pickList",
+      "label": "Repository",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Select the repository in which the pull request should be created.",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "TargetBranchType",
+      "type": "radio",
+      "label": "Target Branch Type",
+      "defaultValue": "Specific",
+      "required": true,
+      "helpMarkDown": "Select the type of branch targeting to use.",
+      "options": {
+        "Specific": "Specific",
+        "Pattern": "Pattern"
+      }
+    },
+    {
+      "name": "TargetBranchPattern",
+      "type": "string",
+      "label": "Target Branch",
+      "defaultValue": ".+\\/release\\/v((?:\\.?\\d+)+)",
+      "required": true,
+      "helpMarkDown": "Provide a branch matching pattern with a single captures which yields a version number. If more than one branch matches the captured version will be usd to select the most recent branch.",
+      "visibleRule": "TargetBranchType = Pattern"
+    },
+    {
+      "name": "TargetBranch",
+      "type": "pickList",
+      "label": "Target Branch",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Select the branch to be targeted by the pull request.",
+      "visibleRule": "TargetBranchType = Specific",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "PullRequestTitle",
+      "type": "string",
+      "label": "Pull Request Title",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The title of the pull request to be created."
+    }
+  ],
+  "sourceDefinitions": [
+    {
+      "target": "ProjectTeam",
+      "endpoint": "/_apis/projects/$(system.teamProject)/teams?api-version=3.0-preview.1",
+      "selector": "jsonpath:$.value[*].name",
+      "keySelector": "jsonpath:$.value[*].id",
+      "authKey": "tfs:teamfoundation"
+    },
+    {
+      "target": "ProjectRepo",
+      "endpoint": "/$(system.teamProject)/_apis/git/repositories?api-version=3.0-preview.1",
+      "selector": "jsonpath:$.value[*].name",
+      "keySelector": "jsonpath:$.value[*].id",
+      "authKey": "tfs:teamfoundation"
+    },
+    {
+      "target": "TargetBranch",
+      "endpoint": "/$(system.teamProject)/_apis/git/repositories/$(ProjectRepo)/refs/heads?api-version=1.0",
+      "selector": "jsonpath:$.value[*].name",
+      "authKey": "tfs:teamfoundation"
+    }
+  ],
+  "instanceNameFormat": "Create Pull Request",
+  "execution": {
+    "Node10": {
+      "target": "index.js"
+    }
+  },
+  "messages": {
+    "NoProjectTeam": "No reviewer team was selected.",
+    "NoTargetBranch": "No target branch was specified for the pull request.",
+    "NoPullRequestTitle": "No pull request title provided.",
+    "NoProjectRepo": "No project repository was provided.",
+    "InvalidTargetBranchType": "Invalid target branch type selected.",
+    "NoMatchingRefs": "No refs found in the repository which match the pattern.",
+    "NoAccessToken": "No access token is available for API calls. Did you forget to turn on the \"Allow scripts to access OAuth token\" option under Build -> Options, or Release -> Environment -> Run On Agent?"
+  }
+}

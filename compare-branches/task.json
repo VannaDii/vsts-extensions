@@ -1,0 +1,88 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "8F524E18-054A-4D38-A255-E46A79D17CC5",
+  "name": "CompareBranches",
+  "friendlyName": "Compare Branches",
+  "description": "Compares two source control branches.",
+  "helpMarkDown": "Compares two source control branches.",
+  "category": "Utility",
+  "visibility": [
+    "Build"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 2,
+    "Minor": 10,
+    "Patch": 46
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.173.0",
+  "inputs": [
+    {
+      "name": "IsRemoteGitServiceEnabled",
+      "type": "boolean",
+      "label": "Use Connected Service",
+      "required": true,
+      "defaultValue": "True",
+      "helpMarkDown": "Select this option to use a git connected service."
+    },
+    {
+      "name": "GitServiceName",
+      "type": "connectedService:git",
+      "label": "Git Service Endpoint",
+      "required": true,
+      "helpMarkDown": "Which Git Service Endpoint to use.",
+      "visibleRule": "IsRemoteGitServiceEnabled = True"
+    },
+    {
+      "name": "PrimaryBranch",
+      "type": "string",
+      "label": "Primary Branch",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The primary branch in the comparison."
+    },
+    {
+      "name": "SecondaryBranch",
+      "type": "string",
+      "label": "Secondary Branch",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The secondary branch in the comparison."
+    },
+    {
+      "name": "IsIgnoreMergesEnabled",
+      "type": "boolean",
+      "label": "Ignore Merges",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "If this is checked, the comparison will ignore merge commits."
+    },
+    {
+      "name": "ActionOnDiff",
+      "type": "radio",
+      "label": "Action On Differences",
+      "defaultValue": "Warn",
+      "required": true,
+      "helpMarkDown": "Select the action to take when differences are present.",
+      "options": {
+        "Fail": "Fail",
+        "Warn": "Warn"
+      }
+    }
+  ],
+  "instanceNameFormat": "Compare $(PrimaryBranch) and $(SecondaryBranch)",
+  "execution": {
+    "Node10": {
+      "target": "index.js"
+    }
+  },
+  "messages": {
+    "NoPrimaryBranchProvided": "No primary branch was provided.",
+    "NoSecondaryBranchProvided": "No secondary branch was provided.",
+    "NoGitAvailable": "Git is not available on the system."
+  }
+}

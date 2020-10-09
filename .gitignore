@@ -1,4 +1,7 @@
-_build
+.built
+.bundled
 .vscode
+.jest
+.taskkey
 node_modules
 Tasks/**/Strings

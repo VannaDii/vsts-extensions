@@ -1,0 +1,12 @@
+{
+  "name": "git-push",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Pushes a commit to a git repository",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "0.20.0",
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

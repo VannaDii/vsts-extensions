@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "f83cf7e5-7af3-41b9-8f17-861628a35732",
+  "name": "PostToDiscordWebHook",
+  "friendlyName": "Post To Discord Web Hook",
+  "description": "Posts a custom message to a Discord web hook.",
+  "helpMarkDown": "Posts a custom message to a [Discord](https://www.discord.com) web hook.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 110
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.173.0",
+  "inputs": [
+    {
+      "name": "DiscordChannelId",
+      "type": "string",
+      "label": "Discord Channel Id",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The channel ID of the [Discord webhook](https://discord.com/developers/docs/resources/webhook)."
+    },
+    {
+      "name": "DiscordWebhookKey",
+      "type": "string",
+      "label": "Discord Webhook Key",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The webhook key of the [Discord webhook](https://discord.com/developers/docs/resources/webhook)."
+    },
+    {
+      "name": "DiscordCustomMessage",
+      "type": "multiLine",
+      "label": "Custom Message JSON",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The JSON Payload [custom message](https://discord.com/developers/docs/resources/webhook#execute-webhook) to post to this web hook. An appropriate timestamp value is available in the variable $(DiscordTimeStamp)."
+    }
+  ],
+  "instanceNameFormat": "Post to Discord",
+  "execution": {
+    "Node10": {
+      "target": "index.js"
+    }
+  },
+  "messages": {
+    "NoChannelId": "No channel ID to Discord was provided.",
+    "NoWebhookKey": "No webhook key to Discord was provided.",
+    "NoCustomMessage": "No custom message was provided.",
+    "CustomMessageNotJson": "The custom message was not JSON."
+  }
+}

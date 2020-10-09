@@ -1,0 +1,36 @@
+{
+  "manifestVersion": 1,
+  "id": "version-from-branch",
+  "name": "Version From Branch",
+  "description": "Extracts a version number from a branch name",
+  "version": "0.0.75",
+  "publisher": "palacino-gio",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "icon.png"
+  },
+  "files": [
+    {
+      "path": "."
+    }
+  ],
+  "contributions": [
+    {
+      "id": "version-from-branch",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "version-from-branch"
+      }
+    }
+  ]
+}

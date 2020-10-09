@@ -1,0 +1,36 @@
+{
+  "manifestVersion": 1,
+  "id": "compare-branches",
+  "name": "Compare Branches",
+  "description": "Compares to branches raising an error if one is ahead of the other",
+  "version": "0.0.75",
+  "publisher": "palacino-gio",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "icon.png"
+  },
+  "files": [
+    {
+      "path": "."
+    }
+  ],
+  "contributions": [
+    {
+      "id": "compare-branches",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "compare-branches"
+      }
+    }
+  ]
+}
