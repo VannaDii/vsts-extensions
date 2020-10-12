@@ -3,7 +3,7 @@
   "id": "branch-version",
   "name": "Branch Version",
   "description": "Extracts a version number from a branch name",
-  "version": "0.0.90",
+  "version": "0.0.93",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,7 +14,7 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "task/icon.png"
+    "default": "icon.png"
   },
   "files": [
     {

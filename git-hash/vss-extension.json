@@ -3,7 +3,7 @@
   "id": "git-hash",
   "name": "Git Hash",
   "description": "Obtains a git sha/hash with multiple fallback options",
-  "version": "0.0.90",
+  "version": "0.0.93",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,7 +14,7 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "task/icon.png"
+    "default": "icon.png"
   },
   "files": [
     {
