@@ -1,12 +1,11 @@
-import path, { resolve } from 'path';
-import { promises as fs, existsSync } from 'fs';
+import path from 'path';
+import { promises as fs, existsSync, Dirent } from 'fs';
 import { ChildProcess, execSync, spawn, SpawnOptions } from 'child_process';
 
 import gulp from 'gulp';
 import gulpSm from 'gulp-sourcemaps';
 import gulpTs from 'gulp-typescript';
 import { EventEmitter } from 'events';
-import { reject } from 'q';
 
 const PathTo = {
   Source: __dirname,
@@ -17,6 +16,7 @@ const PathTo = {
 const KeyTo = {
   BuiltRoots: 'builtRoots',
   SourceRoots: 'sourceRoots',
+  Bundles: 'bundles',
 };
 const spawnOpts: SpawnOptions = {
   shell: true,
@@ -43,7 +43,7 @@ async function withMany<TIn = any, TOut = any>(sources: TIn[], handler: (source:
     sources.map((source) => {
       const result = handler(source);
       if (result instanceof EventEmitter) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
           result
             .on('error', (...args: any[]) => {
               reject(...args);
@@ -78,7 +78,11 @@ function waitForProcess(childProcess: ChildProcess) {
           stderr: stderrChunks.join('\n').trim(),
         });
       } else {
-        reject(code);
+        reject({
+          code,
+          stdout: stdoutChunks.join('\n').trim(),
+          stderr: stderrChunks.join('\n').trim(),
+        });
       }
     });
     childProcess.once('error', (err: any) => {
@@ -97,31 +101,39 @@ function printOutput(tag: string, output: string) {
   );
 }
 
+async function getAllRootsFrom(base: string, filter?: (value: Dirent, index: number, array: Dirent[]) => boolean) {
+  const entries = await fs.readdir(base, { withFileTypes: true });
+  return entries.filter((v, i, a) => (!!filter ? filter(v, i, a) : true)).map((ent) => path.resolve(base, ent.name));
+}
+
 async function getAllSourceRoots() {
-  return withCache(KeyTo.SourceRoots, async () => {
-    const entries = await fs.readdir('.', { withFileTypes: true });
-    return entries
-      .filter(
-        (ent) =>
-          ent.isDirectory() &&
-          existsSync(path.join(ent.name, 'vss-extension.json')) &&
-          existsSync(path.join(ent.name, 'task.json'))
-      )
-      .map((ent) => path.resolve('.', ent.name));
-  });
+  return withCache(KeyTo.SourceRoots, () =>
+    getAllRootsFrom(
+      PathTo.Source,
+      (ent) =>
+        ent.isDirectory() &&
+        existsSync(path.join(ent.name, 'vss-extension.json')) &&
+        existsSync(path.join(ent.name, 'task.json'))
+    )
+  );
 }
 
 async function getAllBuiltRoots() {
-  return withCache(KeyTo.BuiltRoots, async () => {
-    const entries = await fs.readdir(PathTo.Built, { withFileTypes: true });
-    return entries
-      .filter(
-        (ent) =>
-          ent.isDirectory() &&
-          existsSync(path.join(ent.name, 'vss-extension.json')) &&
-          existsSync(path.join(ent.name, 'task.json'))
-      )
-      .map((ent) => path.resolve(PathTo.Built, ent.name));
+  return withCache(KeyTo.BuiltRoots, () =>
+    getAllRootsFrom(
+      PathTo.Built,
+      (ent) =>
+        ent.isDirectory() &&
+        existsSync(path.join(ent.name, 'vss-extension.json')) &&
+        existsSync(path.join(ent.name, 'task.json'))
+    )
+  );
+}
+
+async function getAllBundles() {
+  return withCache(KeyTo.Bundles, async () => {
+    const files = await fs.readdir(PathTo.Bundled);
+    return files.filter((f) => f.endsWith('vsix')).map((f) => path.join(PathTo.Bundled, f));
   });
 }
 
@@ -135,7 +147,6 @@ async function writeJson<T = any>(data: T, toFile: string) {
 
 async function updateExtensions(...folders: string[]) {
   await withMany(folders, async (folder) => {
-    const baseName = path.basename(folder);
     const taskFilePath = path.join(folder, 'task.json');
     const packageFilePath = path.join(folder, 'package.json');
     const manifestFilePath = path.join(folder, 'vss-extension.json');
@@ -159,13 +170,13 @@ async function updateExtensions(...folders: string[]) {
       .map((s) => `${s[0].toUpperCase()}${s.slice(1)}`)
       .join(' ');
     _manifest.description = _package.description;
-    _manifest.files = [{ path: `.` }];
+    _manifest.files = [{ path: 'task' }];
     _manifest.contributions = [
       {
-        id: `${_manifest.id}`,
+        id: _manifest.id,
         type: 'ms.vss-distributed-task.task',
         targets: ['ms.vss-distributed-task.tasks'],
-        properties: { name: _manifest.id },
+        properties: { name: 'task' },
       },
     ];
     _manifest.version = _manifest.version
@@ -188,24 +199,32 @@ async function compileExtensions(...folders: string[]): Promise<void> {
       .pipe(gulpSm.init())
       .pipe(tsProj(reporter))
       .pipe(gulpSm.write())
-      .pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder))));
+      .pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder), 'task')));
   });
 }
 
 async function copyExtensionAssets(...folders: string[]) {
   await withMany(folders, async (folder) => {
+    const stageFolder = path.join(PathTo.Built, path.basename(folder));
     const includes = ['json', 'png'].map((ext) => `${folder}/**/*.${ext}`);
-    const excludes = [`!${folder}/node_modules/**/*`, `!${folder}/tsconfig.json`, `!${folder}/tests/**/*`];
-    return gulp.src([...includes, ...excludes]).pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder))));
+    const excludes = [
+      `!${folder}/node_modules/**/*`,
+      `!${folder}/(tsconfig|vss-extension).json`,
+      `!${folder}/tests/**/*`,
+    ];
+    const _manifest = await readJson<VssManifest>(path.join(folder, 'vss-extension.json'));
+    const iconPath = path.basename(_manifest.icons.default);
+    await fs.copyFile(path.join(folder, 'vss-extension.json'), path.join(stageFolder, 'vss-extension.json'));
+    await fs.copyFile(path.join(folder, iconPath), path.join(stageFolder, iconPath));
+    return gulp.src([...includes, ...excludes]).pipe(gulp.dest(path.join(stageFolder, 'task')));
   });
 }
 
-async function installExtensionProdDeps(...folders: string[]) {
+async function installExtensionDeps(...folders: string[]) {
   await withMany(folders, async (folder) => {
-    const cwd = path.join(PathTo.Built, path.basename(folder));
     const args = [
       '--cwd',
-      `${cwd}/`,
+      `${folder}/task`,
       'install',
       '--production',
       '--no-lockfile',
@@ -215,6 +234,14 @@ async function installExtensionProdDeps(...folders: string[]) {
     ];
     return await waitForProcess(spawn(Tools.Yarn, args, { ...spawnOpts }));
   });
+}
+
+async function testExtensions(...folders: string[]) {
+  const args: string[] = [];
+  const userArgs = process.argv.slice(3).map((a) => (a.includes(' ') ? `"${a}"` : a));
+  await waitForProcess(
+    spawn(Tools.Jest, [...args, ...userArgs], { ...spawnOpts, stdio: ['ignore', 'inherit', 'inherit'] })
+  );
 }
 
 async function makeExtensionBuildFolders(...folders: string[]) {
@@ -242,12 +269,36 @@ async function bundleExtensions(...folders: string[]) {
   });
 }
 
-async function testExtensions(...folders: string[]) {
-  const args: string[] = [];
-  const userArgs = process.argv.slice(3).map((a) => (a.includes(' ') ? `"${a}"` : a));
-  await waitForProcess(
-    spawn(Tools.Jest, [...args, ...userArgs], { ...spawnOpts, stdio: ['ignore', 'inherit', 'inherit'] })
-  );
+async function publishExtensions(...files: string[]) {
+  const token = process.env.TFX_PUBLISH_TOKEN;
+  if (!token || token.length < 52) {
+    throw new Error(`Cannot publish without a token in TFX_PUBLISH_TOKEN!`);
+  }
+  await withMany(files, async (file) => {
+    const args = [
+      'extension',
+      'publish',
+      '--no-color',
+      '--no-prompt',
+      '--auth-type',
+      'pat',
+      '--token',
+      token,
+      '--vsix',
+      file,
+    ];
+    try {
+      const result = await waitForProcess(spawn(Tools.Tfx, args, { ...spawnOpts }));
+      printOutput(path.basename(file), result.stdout);
+    } catch (error) {
+      printOutput(path.basename(file), error.stdout);
+    }
+  });
+}
+
+export async function install() {
+  const taskFolders = await getAllSourceRoots();
+  await installExtensionDeps(...taskFolders);
 }
 
 export async function clean() {
@@ -263,7 +314,9 @@ export async function build() {
 
   await Promise.all([updateExtensions(...taskFolders), makeExtensionBuildFolders(...taskFolders)]);
   await Promise.all([compileExtensions(...taskFolders), copyExtensionAssets(...taskFolders)]);
-  await installExtensionProdDeps(...taskFolders);
+
+  const builtFolders = await getAllBuiltRoots();
+  await installExtensionDeps(...builtFolders);
 }
 
 export async function test() {
@@ -282,6 +335,11 @@ export async function bundle() {
   await bundleExtensions(...builtFolders);
 }
 
+export async function publish() {
+  const vsixFiles = await getAllBundles();
+  await publishExtensions(...vsixFiles);
+}
+
 type ChildProcessResult = { code: number; stdout: string; stderr: string };
 
 type VssTask = {
@@ -294,6 +352,7 @@ type VssManifest = {
   name: string;
   description: string;
   version: string;
+  icons: { [key: string]: string };
   files: { path: string }[];
   contributions: {
     id: string;

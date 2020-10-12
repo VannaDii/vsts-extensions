@@ -3,7 +3,7 @@
   "id": "git-push",
   "name": "Git Push",
   "description": "Pushes a commit to a git repository",
-  "version": "0.0.75",
+  "version": "0.0.90",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,11 +14,11 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "icon.png"
+    "default": "task/icon.png"
   },
   "files": [
     {
-      "path": "."
+      "path": "task"
     }
   ],
   "contributions": [
@@ -29,7 +29,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "git-push"
+        "name": "task"
       }
     }
   ]

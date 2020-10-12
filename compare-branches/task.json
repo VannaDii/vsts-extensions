@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-  "id": "8F524E18-054A-4D38-A255-E46A79D17CC5",
+  "id": "5e393999-e7ad-41e4-b76a-5f9462a02ce1",
   "name": "CompareBranches",
   "friendlyName": "Compare Branches",
   "description": "Compares two source control branches.",
@@ -16,7 +16,7 @@
   "version": {
     "Major": 2,
     "Minor": 10,
-    "Patch": 46
+    "Patch": 61
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",

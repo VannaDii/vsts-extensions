@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-  "id": "D5139737-5C2D-4D78-B0BF-AE61C70EC07F",
+  "id": "cfea2bf2-d215-4f6d-8a0e-ecbb627092fc",
   "name": "GitPush",
   "friendlyName": "Git - Push",
   "description": "Pushes a commit, to a git repository.",
@@ -17,7 +17,7 @@
   "version": {
     "Major": 0,
     "Minor": 0,
-    "Patch": 44
+    "Patch": 59
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",

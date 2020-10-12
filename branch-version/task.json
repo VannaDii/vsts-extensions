@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-  "id": "8D9C92B7-90FD-4C5F-ADA2-69C63E4AB548",
-  "name": "VersionFromBranch",
+  "id": "419140bb-53eb-4dde-a3b2-34a7007db0a0",
+  "name": "BranchVersion",
   "friendlyName": "Version From Branch",
   "description": "Extracts a version number from the branch name.",
   "helpMarkDown": "",
@@ -16,7 +16,7 @@
   "version": {
     "Major": 1,
     "Minor": 10,
-    "Patch": 46
+    "Patch": 61
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",

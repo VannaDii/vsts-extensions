@@ -1,109 +1,48 @@
+pool: default
+
 trigger:
-- master
+  branches:
+    include:
+      - dev
 
-pool:
-  vmImage: "ubuntu-latest"
+name: $(Version.Major).$(Version.Minor)$(Rev:.r)
 
-variables:
-  - group: variable-group # Rename to whatever you named your variable group in the prerequisite stage of step 6
+steps:
+  - task: Cache@2
+    inputs:
+      key: yarn | $(Agent.OS) | admin
+      path: $(YARN_CACHE_FOLDER)
+      cacheHitVar: 'CACHED_DEPS'
+      restoreKeys: |
+        yarn | $(Agent.OS) | admin
+        yarn | $(Agent.OS)
+        yarn
+    displayName: Dependency Cache
 
-stages:
-  - stage: Run_and_publish_unit_tests
-    jobs:
-      - job:
-        steps:
-          - task: TfxInstaller@3
-            inputs:
-              version: "v0.7.x"
-          - task: Npm@1
-            inputs:
-              command: 'install'
-              workingDir: '/TaskDirectory' # Update to the name of the directory of your task
-          - task: Bash@3
-            displayName: Compile Javascript
-            inputs:
-              targetType: "inline"
-              script: |
-                cd TaskDirectory # Update to the name of the directory of your task
-                tsc
-          - task: Npm@1
-            inputs:
-              command: 'custom'
-              workingDir: '/TestsDirectory' # Update to the name of the directory of your task's tests
-              customCommand: 'testScript' # See the definition in the explanation section below - it may be called test
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/ResultsFile.xml'
-  - stage: Package_extension_and_publish_build_artifacts
-    jobs:
-      - job:
-        steps:
-          - task: TfxInstaller@3
-            inputs:
-              version: "v0.7.x"
-          - task: Npm@1
-            inputs:
-              command: 'install'
-              workingDir: '/TaskDirectory' # Update to the name of the directory of your task
-          - task: Bash@3
-            displayName: Compile Javascript
-            inputs:
-              targetType: "inline"
-              script: |
-                cd TaskDirectory # Update to the name of the directory of your task
-                tsc
-          - task: QueryAzureDevOpsExtensionVersion@3
-            inputs:
-              connectTo: 'VsTeam'
-              connectedServiceName: 'ServiceConnection' # Change to whatever you named the service connection
-              publisherId: '$(PublisherID)'
-              extensionId: '$(ExtensionID)'
-              versionAction: 'Patch'
-              outputVariable: 'Task.Extension.Version'
-          - task: PackageAzureDevOpsExtension@3
-            inputs:
-              rootFolder: '$(System.DefaultWorkingDirectory)'
-              publisherId: '$(PublisherID)'
-              extensionId: '$(ExtensionID)'
-              extensionName: '$(ExtensionName)'
-              extensionVersion: '$(Task.Extension.Version)'
-              updateTasksVersion: true
-              updateTasksVersionType: 'patch'
-              extensionVisibility: 'private' # Change to public if you're publishing to the marketplace
-              extensionPricing: 'free'
-          - task: CopyFiles@2
-            displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)"
-            inputs:
-              Contents: "**/*.vsix"
-              TargetFolder: "$(Build.ArtifactStagingDirectory)"
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: '$(ArtifactName)'
-              publishLocation: 'Container'
-  - stage: Download_build_artifacts_and_publish_the_extension
-    jobs:
-      - job:
-        steps:
-          - task: TfxInstaller@3
-            inputs:
-              version: "v0.7.x"
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: "current"
-              downloadType: "single"
-              artifactName: "$(ArtifactName)"
-              downloadPath: "$(System.DefaultWorkingDirectory)"
-          - task: PublishAzureDevOpsExtension@3
-            inputs:
-              connectTo: 'VsTeam'
-              connectedServiceName: 'ServiceConnection' # Change to whatever you named the service connection
-              fileType: 'vsix'
-              vsixFile: '/Publisher.*.vsix'
-              publisherId: '$(PublisherID)'
-              extensionId: '$(ExtensionID)'
-              extensionName: '$(ExtensionName)'
-              updateTasksVersion: false
-              extensionVisibility: 'private' # Change to public if you're publishing to the marketplace
-              extensionPricing: 'free'
+  - script: yarn install
+    displayName: Install Dependencies
+    workingDirectory: $(WorkspacePath)
+
+  - script: yarn test
+    displayName: Run Unit Tests
+    workingDirectory: $(WorkspacePath)
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/junit.xml'
+
+  - script: yarn build
+    displayName: Build Sources
+    workingDirectory: $(WorkspacePath)
+
+  - script: yarn bundle
+    displayName: Bundle Extensions
+    workingDirectory: $(WorkspacePath)
+
+  - script: yarn run publish # This MUST use `yarn run ...` since `publish` is for NPM publishing
+    displayName: Publish Extensions
+    workingDirectory: $(WorkspacePath)
+    env:
+      TFX_PUBLISH_TOKEN: $(Tfx.Token)

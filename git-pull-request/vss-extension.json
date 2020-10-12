@@ -3,7 +3,7 @@
   "id": "pull-request",
   "name": "Pull Request",
   "description": "Create a git pull request",
-  "version": "0.0.75",
+  "version": "0.0.90",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,11 +14,11 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "icon.png"
+    "default": "task/icon.png"
   },
   "files": [
     {
-      "path": "."
+      "path": "task"
     }
   ],
   "contributions": [
@@ -29,7 +29,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "pull-request"
+        "name": "task"
       }
     }
   ]

@@ -1,9 +1,9 @@
 {
   "manifestVersion": 1,
-  "id": "version-from-branch",
-  "name": "Version From Branch",
+  "id": "branch-version",
+  "name": "Branch Version",
   "description": "Extracts a version number from a branch name",
-  "version": "0.0.75",
+  "version": "0.0.90",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,22 +14,22 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "icon.png"
+    "default": "task/icon.png"
   },
   "files": [
     {
-      "path": "."
+      "path": "task"
     }
   ],
   "contributions": [
     {
-      "id": "version-from-branch",
+      "id": "branch-version",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "version-from-branch"
+        "name": "task"
       }
     }
   ]
