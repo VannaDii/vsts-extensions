@@ -3,7 +3,7 @@
   "id": "compare-branches",
   "name": "Compare Branches",
   "description": "Compares to branches raising an error if one is ahead of the other",
-  "version": "0.0.90",
+  "version": "0.0.93",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,7 +14,7 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "task/icon.png"
+    "default": "icon.png"
   },
   "files": [
     {
