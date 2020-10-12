@@ -1,5 +1,5 @@
 {
-  "name": "version-from-branch",
+  "name": "branch-version",
   "version": "1.0.0",
   "author": "Gio Palacino",
   "license": "MIT",

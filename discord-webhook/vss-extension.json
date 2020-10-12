@@ -3,7 +3,7 @@
   "id": "discord-webhook",
   "name": "Discord Webhook",
   "description": "Post a message to a discord channel",
-  "version": "0.0.87",
+  "version": "0.0.102",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -14,11 +14,11 @@
     "Azure Pipelines"
   ],
   "icons": {
-    "default": "icon.png"
+    "default": "task/icon.png"
   },
   "files": [
     {
-      "path": "."
+      "path": "task"
     }
   ],
   "contributions": [
@@ -29,7 +29,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "discord-webhook"
+        "name": "task"
       }
     }
   ]

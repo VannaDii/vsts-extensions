@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-  "id": "f83cf7e5-7af3-41b9-8f17-861628a35732",
+  "id": "44e671d4-4771-4aa1-8f57-5235c0891645",
   "name": "PostToDiscordWebHook",
   "friendlyName": "Post To Discord Web Hook",
   "description": "Posts a custom message to a Discord web hook.",
@@ -17,7 +17,7 @@
   "version": {
     "Major": 0,
     "Minor": 0,
-    "Patch": 110
+    "Patch": 125
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",

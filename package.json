@@ -5,9 +5,11 @@
   "author": "Gio Palacino",
   "license": "MIT",
   "scripts": {
+    "postinstall": "gulp install",
     "test": "gulp test",
     "build": "gulp build",
-    "bundle": "gulp bundle"
+    "bundle": "gulp bundle",
+    "publish": "gulp publish"
   },
   "keywords": [
     "VSTS",

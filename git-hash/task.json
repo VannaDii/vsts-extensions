@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-  "id": "0fdf7d97-1436-4cc1-8253-99c2cd709558",
+  "id": "27c3eb76-638e-4d4c-90c3-b8cc16a31317",
   "name": "GitHash",
   "friendlyName": "Git Hash",
   "description": "Makes variables containing git hashes.",
@@ -17,7 +17,7 @@
   "version": {
     "Major": 0,
     "Minor": 0,
-    "Patch": 84
+    "Patch": 99
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",
