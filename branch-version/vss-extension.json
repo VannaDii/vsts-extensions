@@ -3,7 +3,7 @@
   "id": "branch-version",
   "name": "Branch Version",
   "description": "Extracts a version number from a branch name",
-  "version": "0.0.93",
+  "version": "0.2.0",
   "publisher": "palacino-gio",
   "targets": [
     {

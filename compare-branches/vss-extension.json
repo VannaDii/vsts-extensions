@@ -3,7 +3,7 @@
   "id": "compare-branches",
   "name": "Compare Branches",
   "description": "Compares to branches raising an error if one is ahead of the other",
-  "version": "0.0.93",
+  "version": "0.2.0",
   "publisher": "palacino-gio",
   "targets": [
     {
