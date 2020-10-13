@@ -1,0 +1,113 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "b5063937-00a4-48a1-8520-a8b03e5cbe47",
+  "name": "CodeClimate",
+  "friendlyName": "Code Climate",
+  "description": "Provides Code Climate interactions",
+  "helpMarkDown": "Provides Code Climate interactions",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "author": "Gio Palacino",
+  "version": {
+    "Major": 0,
+    "Minor": 2,
+    "Patch": 3
+  },
+  "demands": [],
+  "minimumAgentVersion": "2.173.0",
+  "instanceNameFormat": "Code Climate",
+  "execution": {
+    "Node10": {
+      "target": "index.js"
+    }
+  },
+  "inputs": [
+    {
+      "name": "CcCommand",
+      "type": "pickList",
+      "label": "Command",
+      "defaultValue": "install",
+      "required": true,
+      "helpMarkDown": "The name of the Code Climate command to run.",
+      "options": {
+        "analyze": "analyze",
+        "install": "install",
+        "engines:install": "engines:install"
+      }
+    },
+    {
+      "name": "CcConfigFile",
+      "type": "filePath",
+      "label": "Config Path",
+      "defaultValue": "$(Build.SourcesDirectory)",
+      "required": true,
+      "helpMarkDown": "The folder path to the Code Climate configuration file."
+    },
+    {
+      "name": "CcAnalyzeFormat",
+      "type": "pickList",
+      "label": "Format",
+      "defaultValue": "Value",
+      "required": true,
+      "helpMarkDown": "Controls the output format of analysis.",
+      "visibleRule": "CcCommand = analyze",
+      "options": {
+        "json": "json",
+        "text": "text",
+        "html": "html"
+      }
+    },
+    {
+      "name": "CcSourcePath",
+      "type": "filePath",
+      "label": "Source Path",
+      "defaultValue": "$(Build.SourcesDirectory)/src",
+      "required": true,
+      "helpMarkDown": "The path to source files which Code Climate should analyze. Should be sibling to the Config Path."
+    },
+    {
+      "name": "CcOutputPath",
+      "type": "filePath",
+      "label": "Output Path",
+      "defaultValue": "$(Build.SourcesDirectory)/.codeclimate.json",
+      "required": true,
+      "helpMarkDown": "The path to which Code Climate write analysis results."
+    },
+    {
+      "name": "CcDebug",
+      "type": "boolean",
+      "label": "Debug",
+      "defaultValue": false,
+      "required": true,
+      "groupName": "Advanced",
+      "helpMarkDown": "Whether or not to set CODECLIMATE_DEBUG=1."
+    },
+    {
+      "name": "CcContainerTimeout",
+      "type": "string",
+      "label": "Container Timeout",
+      "defaultValue": "900",
+      "required": true,
+      "groupName": "Advanced",
+      "helpMarkDown": "The number of seconds for analysis container run-time provided via CONTAINER_TIMEOUT_SECONDS."
+    },
+    {
+      "name": "CcContainerMemLimit",
+      "type": "string",
+      "label": "Container Memory Limit",
+      "defaultValue": "1024000000",
+      "required": true,
+      "groupName": "Advanced",
+      "helpMarkDown": "The amount of memory, in bytes, to be the upper bound for engine containers via ENGINE_MEMORY_LIMIT_BYTES."
+    }
+  ],
+  "messages": {
+    "NoGit": "Code Climate is not installed."
+  }
+}

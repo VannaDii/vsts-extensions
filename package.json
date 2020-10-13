@@ -9,7 +9,8 @@
     "test": "gulp test",
     "build": "gulp build",
     "bundle": "gulp bundle",
-    "publish": "gulp publish"
+    "publish": "gulp publish",
+    "manifest": "gulp manifest"
   },
   "keywords": [
     "VSTS",
