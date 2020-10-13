@@ -36,7 +36,7 @@ steps:
       testResultsFormat: 'JUnit'
       testResultsFiles: '**/junit.xml'
 
-  - script: yarn build
+  - script: yarn build --cli-version $(Version.Major).$(Version.Minor)$(Rev:.r)
     displayName: Build Sources
     workingDirectory: $(WorkspacePath)
 
