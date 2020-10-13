@@ -3,6 +3,6 @@
 .vscode
 .jest
 .taskkey
-.DS_Store
+**/.DS_Store
 node_modules
 Tasks/**/Strings

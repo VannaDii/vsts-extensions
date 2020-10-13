@@ -1,0 +1,11 @@
+{
+  "name": "code-climate",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Provides Code Climate interactions",
+  "main": "index.js",
+  "dependencies": {
+    "azure-pipelines-task-lib": "2.11.2"
+  }
+}

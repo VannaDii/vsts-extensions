@@ -176,6 +176,7 @@ async function updateExtensions(...folders: string[]) {
         target: _package.main,
       },
     };
+    _task.helpMarkDown = _task.description = _package.description;
 
     _manifest.id = _package.name;
     _manifest.name = _package.name
@@ -317,6 +318,11 @@ export async function clean() {
   await fs.rmdir(PathTo.Jest, { recursive: true });
 }
 
+export async function manifest() {
+  const taskFolders = await getAllSourceRoots();
+  await updateExtensions(...taskFolders);
+}
+
 export async function build() {
   await fs.rmdir(PathTo.Built, { recursive: true });
 
@@ -351,6 +357,8 @@ export async function publish() {
 type ChildProcessResult = { code: number; stdout: string; stderr: string };
 
 type VssTask = {
+  description: string;
+  helpMarkDown: string;
   version: { Major: number; Minor: number; Patch: number };
   execution: { [key: string]: { [key: string]: string } };
 };
