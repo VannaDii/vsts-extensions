@@ -5,6 +5,9 @@ trigger:
     include:
       - dev
 
+variables:
+  - group: 'Common Variables'
+
 name: $(Version.Major).$(Version.Minor)$(Rev:.r)
 
 steps:
