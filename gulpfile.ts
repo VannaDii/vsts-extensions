@@ -157,7 +157,20 @@ async function updateExtensions(...folders: string[]) {
       readJson<VssManifest>(manifestFilePath),
     ]);
 
-    _task.version.Patch = _task.version.Patch + 1;
+    const userArgs = process.argv.slice(3).map((a) => (a.includes(' ') ? `"${a}"` : a));
+    const cliVersion =
+      userArgs.indexOf('--cli-version') >= 0 ? userArgs[userArgs.indexOf('--cli-version') + 1] : undefined;
+    const finalVersion =
+      cliVersion ||
+      _manifest.version
+        .split('.')
+        .map((v, i) => (i === 2 ? parseInt(v) + 1 : v)) // Only increment the patch segment
+        .join('.');
+    const finalVersionParts = finalVersion.split('.').map((s) => parseInt(s));
+
+    _task.version.Major = finalVersionParts[0];
+    _task.version.Minor = finalVersionParts[1];
+    _task.version.Patch = finalVersionParts[2];
     _task.execution = {
       Node10: {
         target: _package.main,
@@ -170,6 +183,7 @@ async function updateExtensions(...folders: string[]) {
       .map((s) => `${s[0].toUpperCase()}${s.slice(1)}`)
       .join(' ');
     _manifest.description = _package.description;
+    _manifest.version = finalVersion;
     _manifest.files = [{ path: 'task' }];
     _manifest.contributions = [
       {
@@ -179,10 +193,6 @@ async function updateExtensions(...folders: string[]) {
         properties: { name: 'task' },
       },
     ];
-    _manifest.version = _manifest.version
-      .split('.')
-      .map((v, i) => (i === 2 ? parseInt(v) + 1 : v)) // Only increment the patch segment
-      .join('.');
 
     await Promise.all([writeJson(_task, taskFilePath), writeJson(_manifest, manifestFilePath)]);
   });
@@ -321,8 +331,7 @@ export async function build() {
 
 export async function test() {
   const builtFolders = await getAllSourceRoots();
-  const testFolders = builtFolders
-    .filter((folder) => existsSync(path.join(folder, 'tests')));
+  const testFolders = builtFolders.filter((folder) => existsSync(path.join(folder, 'tests')));
   await testExtensions(...testFolders);
 }
 
