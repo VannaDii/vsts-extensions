@@ -1,9 +1,8 @@
 import path from 'path';
-import { execSync } from 'child_process';
 import { setMockRunnerInputs } from '../../jest.azure';
 import * as tmrm from 'azure-pipelines-task-lib/mock-run';
 
-const gitPath = execSync(`which git`).toString().trim();
+const gitPath = '/usr/local/bin/git';
 
 const taskPath = path.join(__dirname, '../index.ts');
 const tmr = new tmrm.TaskMockRunner(taskPath);
