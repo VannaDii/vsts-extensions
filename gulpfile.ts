@@ -320,9 +320,8 @@ export async function build() {
 }
 
 export async function test() {
-  const builtFolders = await getAllBuiltRoots();
+  const builtFolders = await getAllSourceRoots();
   const testFolders = builtFolders
-    .map((folder) => folder.replace('/.built/', '/'))
     .filter((folder) => existsSync(path.join(folder, 'tests')));
   await testExtensions(...testFolders);
 }
