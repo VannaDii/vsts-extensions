@@ -3,7 +3,7 @@
   "id": "discord-webhook",
   "name": "Discord Webhook",
   "description": "Post a message to a discord channel",
-  "version": "0.0.105",
+  "version": "0.2.0",
   "publisher": "palacino-gio",
   "targets": [
     {

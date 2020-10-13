@@ -3,7 +3,7 @@
   "id": "pull-request",
   "name": "Pull Request",
   "description": "Create a git pull request",
-  "version": "0.0.93",
+  "version": "0.2.0",
   "publisher": "palacino-gio",
   "targets": [
     {
