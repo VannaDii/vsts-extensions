@@ -53,7 +53,7 @@
       "name": "CcAnalyzeFormat",
       "type": "pickList",
       "label": "Format",
-      "defaultValue": "Value",
+      "defaultValue": "json",
       "required": true,
       "helpMarkDown": "Controls the output format of analysis.",
       "visibleRule": "CcCommand = analyze",
