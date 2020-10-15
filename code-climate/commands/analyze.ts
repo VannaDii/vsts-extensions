@@ -10,6 +10,7 @@ export async function analyze(config: TaskConfig) {
   if (!codeClimate.exists) {
     return tl.setResult(tl.TaskResult.Failed, 'Code Climate is not installed.', true);
   }
+  tl.mkdirP(path.dirname(config.outputPath));
 
   const defaultTimeout = 900;
   const defaultMemory = 1024000000;
