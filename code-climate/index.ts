@@ -6,15 +6,15 @@ import { AnalysisFormats, TaskConfig } from './types';
 
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 async function run() {
-  const command = (tl.getInput('CcCommand', true) as string).toLowerCase();
+  const command = (tl.getInput('Command', true) as string).toLowerCase();
   const config: TaskConfig = {
-    configFilePath: tl.getPathInput('CcConfigFile', true, true) as string,
-    analysisFormat: tl.getInput('CcAnalyzeFormat', true) as AnalysisFormats,
-    sourcePath: tl.getPathInput('CcSourcePath', true, true) as string,
-    outputPath: tl.getPathInput('CcOutputPath', true) as string,
-    debug: tl.getBoolInput('CcDebug', true),
-    engineTimeout: parseInt(tl.getInput('CcContainerTimeout', true) as string),
-    memLimit: parseInt(tl.getInput('CcContainerMemLimit', true) as string),
+    configFilePath: tl.getPathInput('ConfigPath', true, true) as string,
+    analysisFormat: tl.getInput('AnalyzeFormat', true) as AnalysisFormats,
+    sourcePath: tl.getPathInput('SourcePath', true, true) as string,
+    outputPath: tl.getPathInput('OutputPath', true) as string,
+    debug: tl.getBoolInput('Debug', true),
+    engineTimeout: parseInt(tl.getInput('EngineTimeout', true) as string),
+    memLimit: parseInt(tl.getInput('EngineMemLimit', true) as string),
   };
 
   switch (command) {

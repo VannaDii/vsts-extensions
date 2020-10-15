@@ -18,7 +18,6 @@ export async function analyze(config: TaskConfig) {
   const execOptions: IExecSyncOptions = {
     cwd: config.configFilePath,
     env: {
-      ...process.env,
       CODECLIMATE_DEBUG: config.debug ? '1' : undefined,
       CONTAINER_TIMEOUT_SECONDS: config.engineTimeout !== defaultTimeout ? config.engineTimeout.toString() : undefined,
       ENGINE_MEMORY_LIMIT_BYTES: config.memLimit !== defaultMemory ? config.memLimit.toString() : undefined,
