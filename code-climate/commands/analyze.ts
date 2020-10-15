@@ -14,25 +14,27 @@ export async function analyze(config: TaskConfig) {
 
   const defaultTimeout = 900;
   const defaultMemory = 1024000000;
-  const outputFile = fs.createWriteStream(config.outputPath, { encoding: 'utf8' });
+  const outputStream = fs.createWriteStream(config.outputPath, { encoding: 'utf8' });
   const relativeSourcePath = path.join('.', path.relative(config.configFilePath, config.sourcePath));
   const execOptions: IExecSyncOptions = {
     cwd: config.configFilePath,
-    outStream: outputFile,
     env: {
       CODECLIMATE_DEBUG: config.debug ? '1' : undefined,
       CONTAINER_TIMEOUT_SECONDS: config.engineTimeout !== defaultTimeout ? config.engineTimeout.toString() : undefined,
       ENGINE_MEMORY_LIMIT_BYTES: config.memLimit !== defaultMemory ? config.memLimit.toString() : undefined,
     },
   };
-  console.info(`Running: ${codeClimate.path} analyze -f ${config.analysisFormat} ${relativeSourcePath}\nOptions: ${JSON.stringify(execOptions)}`);
   const result = tl
     .tool(codeClimate.path)
     .arg('analyze')
     .arg('-f')
     .arg(config.analysisFormat)
     .arg(relativeSourcePath)
+    .on('line', (data: any) => outputStream.write(data))
     .execSync(execOptions);
+
+  outputStream.close();
+
   if (result.code !== 0) {
     return tl.setResult(
       tl.TaskResult.Failed,
