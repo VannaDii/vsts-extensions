@@ -27,6 +27,13 @@
       "target": "index.js"
     }
   },
+  "groups": [
+    {
+      "name": "Advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
   "inputs": [
     {
       "name": "CcCommand",
