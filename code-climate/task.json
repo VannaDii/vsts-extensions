@@ -36,7 +36,7 @@
   ],
   "inputs": [
     {
-      "name": "CcCommand",
+      "name": "Command",
       "type": "pickList",
       "label": "Command",
       "defaultValue": "install",
@@ -49,7 +49,7 @@
       }
     },
     {
-      "name": "CcConfigFile",
+      "name": "ConfigPath",
       "type": "filePath",
       "label": "Config Path",
       "defaultValue": "$(Build.SourcesDirectory)",
@@ -57,7 +57,7 @@
       "helpMarkDown": "The folder path to the Code Climate configuration file."
     },
     {
-      "name": "CcAnalyzeFormat",
+      "name": "AnalyzeFormat",
       "type": "pickList",
       "label": "Format",
       "defaultValue": "json",
@@ -71,7 +71,7 @@
       }
     },
     {
-      "name": "CcSourcePath",
+      "name": "SourcePath",
       "type": "filePath",
       "label": "Source Path",
       "defaultValue": "$(Build.SourcesDirectory)/src",
@@ -79,7 +79,7 @@
       "helpMarkDown": "The path to source files which Code Climate should analyze. Should be sibling to the Config Path."
     },
     {
-      "name": "CcOutputPath",
+      "name": "OutputPath",
       "type": "filePath",
       "label": "Output Path",
       "defaultValue": "$(Build.SourcesDirectory)/.codeclimate.json",
@@ -87,7 +87,7 @@
       "helpMarkDown": "The path to which Code Climate write analysis results."
     },
     {
-      "name": "CcDebug",
+      "name": "Debug",
       "type": "boolean",
       "label": "Debug",
       "defaultValue": false,
@@ -96,7 +96,7 @@
       "helpMarkDown": "Whether or not to set CODECLIMATE_DEBUG=1."
     },
     {
-      "name": "CcContainerTimeout",
+      "name": "EngineTimeout",
       "type": "string",
       "label": "Container Timeout",
       "defaultValue": "900",
@@ -105,7 +105,7 @@
       "helpMarkDown": "The number of seconds for analysis container run-time provided via CONTAINER_TIMEOUT_SECONDS."
     },
     {
-      "name": "CcContainerMemLimit",
+      "name": "EngineMemLimit",
       "type": "string",
       "label": "Container Memory Limit",
       "defaultValue": "1024000000",
