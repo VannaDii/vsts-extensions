@@ -3,6 +3,7 @@ import path from 'path';
 import { TaskConfig } from '../types';
 import { findCodeClimate } from './utils';
 import * as tl from 'azure-pipelines-task-lib/task';
+import { IExecSyncOptions } from 'azure-pipelines-task-lib/toolrunner';
 
 export async function analyze(config: TaskConfig) {
   const codeClimate = findCodeClimate();
@@ -10,8 +11,20 @@ export async function analyze(config: TaskConfig) {
     return tl.setResult(tl.TaskResult.Failed, 'Code Climate is not installed.', true);
   }
 
+  const defaultTimeout = 900;
+  const defaultMemory = 1024000000;
   const outputFile = fs.createWriteStream(config.outputPath, { encoding: 'utf8' });
   const relativeSourcePath = path.join('.', path.relative(config.configFilePath, config.sourcePath));
+  const execOptions: IExecSyncOptions = {
+    cwd: config.configFilePath,
+    env: {
+      ...process.env,
+      CODECLIMATE_DEBUG: config.debug ? '1' : undefined,
+      CONTAINER_TIMEOUT_SECONDS: config.engineTimeout !== defaultTimeout ? config.engineTimeout.toString() : undefined,
+      ENGINE_MEMORY_LIMIT_BYTES: config.memLimit !== defaultMemory ? config.memLimit.toString() : undefined,
+    },
+  };
+  console.info(`Running: ${codeClimate.path} analyze -f ${config.analysisFormat} ${relativeSourcePath}\nOptions: ${JSON.stringify(execOptions)}`);
   const result = tl
     .tool(codeClimate.path)
     .arg('analyze')
@@ -19,15 +32,7 @@ export async function analyze(config: TaskConfig) {
     .arg(config.analysisFormat)
     .arg(relativeSourcePath)
     .on('stdout', (data: Buffer) => outputFile.write(data))
-    .execSync({
-      cwd: config.configFilePath,
-      env: {
-        ...process.env,
-        CODECLIMATE_DEBUG: config.debug ? '1' : '0',
-        CONTAINER_TIMEOUT_SECONDS: config.engineTimeout.toString(),
-        ENGINE_MEMORY_LIMIT_BYTES: config.memLimit.toString(),
-      },
-    });
+    .execSync(execOptions);
   if (result.code !== 0) {
     return tl.setResult(
       tl.TaskResult.Failed,
