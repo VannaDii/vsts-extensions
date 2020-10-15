@@ -63,7 +63,7 @@
       "defaultValue": "json",
       "required": true,
       "helpMarkDown": "Controls the output format of analysis.",
-      "visibleRule": "CcCommand = analyze",
+      "visibleRule": "Command = analyze",
       "options": {
         "json": "json",
         "text": "text",
