@@ -18,6 +18,7 @@ export async function analyze(config: TaskConfig) {
   const relativeSourcePath = path.join('.', path.relative(config.configFilePath, config.sourcePath));
   const execOptions: IExecSyncOptions = {
     cwd: config.configFilePath,
+    outStream: outputFile,
     env: {
       CODECLIMATE_DEBUG: config.debug ? '1' : undefined,
       CONTAINER_TIMEOUT_SECONDS: config.engineTimeout !== defaultTimeout ? config.engineTimeout.toString() : undefined,
@@ -31,7 +32,6 @@ export async function analyze(config: TaskConfig) {
     .arg('-f')
     .arg(config.analysisFormat)
     .arg(relativeSourcePath)
-    .on('stdout', (data: Buffer) => outputFile.write(data))
     .execSync(execOptions);
   if (result.code !== 0) {
     return tl.setResult(
