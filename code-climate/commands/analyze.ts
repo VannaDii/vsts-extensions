@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import { TaskConfig } from '../types';
 import { findCodeClimate } from './utils';
-import * as lineReader from 'line-reader';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { IExecSyncOptions } from 'azure-pipelines-task-lib/toolrunner';
 
