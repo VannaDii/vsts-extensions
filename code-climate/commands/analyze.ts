@@ -15,7 +15,6 @@ export async function analyze(config: TaskConfig) {
 
   const defaultTimeout = 900;
   const defaultMemory = 1024000000;
-  const outputStream = fs.createWriteStream(config.outputPath, { encoding: 'utf8', autoClose: true });
   const relativeSourcePath = path.join('.', path.relative(config.configFilePath, config.sourcePath));
   const execOptions: IExecSyncOptions = {
     cwd: config.configFilePath,
@@ -31,21 +30,24 @@ export async function analyze(config: TaskConfig) {
     .arg('-f')
     .arg(config.analysisFormat)
     .arg(relativeSourcePath)
-    .on('stdout', (data: Buffer) => {
-      outputStream.write(
-        Buffer.from(
-          data
-            .toString()
-            .split(os.EOL)
-            .filter((line) => !line.startsWith('[command]'))
-            .join(os.EOL)
-        )
-      );
-    })
-    .on('errline', (line: string) => console.error(line))
-    .exec(execOptions);
+    .execSync(execOptions);
 
-  if (result !== 0) {
-    return tl.setResult(tl.TaskResult.Failed, `Code: ${result} - See output for details`, true);
+  if (result.code !== 0) {
+    return tl.setResult(
+      tl.TaskResult.Failed,
+      `${result.error.name}: ${result.error.message}\n${result.error.stack}\n\n${result.stderr}`,
+      true
+    );
+  } else {
+    fs.writeFileSync(
+      config.outputPath,
+      Buffer.from(
+        result.stdout
+          .split(os.EOL)
+          .filter((line) => !line.startsWith('[command]'))
+          .join(os.EOL)
+      ),
+      { encoding: 'utf8' }
+    );
   }
 }
