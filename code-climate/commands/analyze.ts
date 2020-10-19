@@ -14,10 +14,11 @@ export async function analyze(config: TaskConfig) {
 
   const defaultTimeout = 900;
   const defaultMemory = 1024000000;
-  const outputStream = fs.createWriteStream(config.outputPath, { encoding: 'utf8' });
+  const outputStream = fs.createWriteStream(config.outputPath, { encoding: 'utf8', autoClose: true });
   const relativeSourcePath = path.join('.', path.relative(config.configFilePath, config.sourcePath));
   const execOptions: IExecSyncOptions = {
     cwd: config.configFilePath,
+    outStream: outputStream,
     env: {
       CODECLIMATE_DEBUG: config.debug ? '1' : undefined,
       CONTAINER_TIMEOUT_SECONDS: config.engineTimeout !== defaultTimeout ? config.engineTimeout.toString() : undefined,
@@ -30,10 +31,9 @@ export async function analyze(config: TaskConfig) {
     .arg('-f')
     .arg(config.analysisFormat)
     .arg(relativeSourcePath)
-    .on('line', (data: any) => outputStream.write(data))
     .execSync(execOptions);
 
-  outputStream.close();
+  // TODO: Efficiently remove the "[command]blah blah blah" first line from the output file
 
   if (result.code !== 0) {
     return tl.setResult(
