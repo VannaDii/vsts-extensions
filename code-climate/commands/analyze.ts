@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { TaskConfig } from '../types';
 import { findCodeClimate } from './utils';
+import * as lineReader from 'line-reader';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { IExecSyncOptions } from 'azure-pipelines-task-lib/toolrunner';
 
@@ -12,9 +13,11 @@ export async function analyze(config: TaskConfig) {
   }
   tl.mkdirP(path.dirname(config.outputPath));
 
+  const tempFilePath = `${config.outputPath}.tmp`;
+
   const defaultTimeout = 900;
   const defaultMemory = 1024000000;
-  const outputStream = fs.createWriteStream(config.outputPath, { encoding: 'utf8', autoClose: true });
+  const outputStream = fs.createWriteStream(tempFilePath, { encoding: 'utf8', autoClose: true });
   const relativeSourcePath = path.join('.', path.relative(config.configFilePath, config.sourcePath));
   const execOptions: IExecSyncOptions = {
     cwd: config.configFilePath,
@@ -33,7 +36,17 @@ export async function analyze(config: TaskConfig) {
     .arg(relativeSourcePath)
     .execSync(execOptions);
 
-  // TODO: Efficiently remove the "[command]blah blah blah" first line from the output file
+  let lineIndex = 0;
+  const tempFileStream = fs.createReadStream(tempFilePath, { encoding: 'utf8' });
+  const finalStream = fs.createWriteStream(config.outputPath, { encoding: 'utf8', autoClose: true });
+  lineReader.eachLine(tempFileStream, (line) => {
+    if (lineIndex === 0) return;
+    finalStream.write(`${line}\n`);
+    lineIndex++;
+  });
+  finalStream.close();
+  tempFileStream.close();
+  fs.unlinkSync(tempFilePath);
 
   if (result.code !== 0) {
     return tl.setResult(
