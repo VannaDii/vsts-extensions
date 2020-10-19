@@ -1,3 +1,4 @@
+import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import { TaskConfig } from '../types';
@@ -31,10 +32,16 @@ export async function analyze(config: TaskConfig) {
     .arg('-f')
     .arg(config.analysisFormat)
     .arg(relativeSourcePath)
-    .on('stdline', (line: string) => {
-      if (!line.startsWith('[command]')) {
-        outputStream.write(`${line}\n`);
-      }
+    .on('stdout', (data: Buffer) => {
+      outputStream.write(
+        Buffer.from(
+          data
+            .toString()
+            .split(os.EOL)
+            .filter((line) => !line.startsWith('[command]'))
+            .join(os.EOL)
+        )
+      );
     })
     .on('errline', (line: string) => console.error(line))
     .exec(execOptions);
