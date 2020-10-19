@@ -7,14 +7,14 @@ asap@~2.0.3:
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
   integrity sha1-5QNHYR1+aQlDIIu9r+vLwvuGbUY=
 
-axios@^0.20.0:
+axios@0.20.0:
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.20.0.tgz#057ba30f04884694993a8cd07fa394cff11c50bd"
   integrity sha512-ANA4rr2BDcmmAQLOKft2fufrtuvlqR+cXNNinUmvfeSNCOF98PZL+7M/v1zIdGo7OLjEA9J2gXJL+j4zGsl0bA==
   dependencies:
     follow-redirects "^1.10.0"
 
-azure-pipelines-task-lib@^2.11.2:
+azure-pipelines-task-lib@2.11.2:
   version "2.11.2"
   resolved "https://registry.yarnpkg.com/azure-pipelines-task-lib/-/azure-pipelines-task-lib-2.11.2.tgz#348dcf766dfdcb61777c148f4122acd0fcda9439"
   integrity sha512-v4rVaoeCggmoClyeVWwZs48yjUyfT9GHKJHNplA7nXUPsH6oODsUTuA1pnesxsM6RzMq4kD6UlIu9/KMd6MFKw==
