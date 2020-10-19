@@ -247,6 +247,19 @@ async function installExtensionDeps(...folders: string[]) {
   });
 }
 
+async function installExtensionDepsDev(...folders: string[]) {
+  await withMany(folders, async (folder) => {
+    const args = [
+      '--cwd',
+      `${folder}`,
+      'install',
+      '--silent',
+      ...yarnArgs,
+    ];
+    return await waitForProcess(spawn(Tools.Yarn, args, { ...spawnOpts }));
+  });
+}
+
 async function testExtensions(...folders: string[]) {
   const args: string[] = [];
   const userArgs = process.argv.slice(3).map((a) => (a.includes(' ') ? `"${a}"` : a));
@@ -309,7 +322,7 @@ async function publishExtensions(...files: string[]) {
 
 export async function install() {
   const taskFolders = await getAllSourceRoots();
-  await installExtensionDeps(...taskFolders);
+  await installExtensionDepsDev(...taskFolders);
 }
 
 export async function clean() {
