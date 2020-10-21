@@ -6,10 +6,12 @@
   "description": "Provides Code Climate interactions",
   "main": "index.js",
   "dependencies": {
+    "axios": "0.20.0",
     "azure-pipelines-task-lib": "2.11.2",
-    "line-reader": "0.4.0"
+    "markdown-it": "12.0.1",
+    "markdown-it-highlightjs": "3.3.0"
   },
   "devDependencies": {
-    "@types/line-reader": "0.0.30"
+    "@types/markdown-it": "10.0.2"
   }
 }
