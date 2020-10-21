@@ -87,6 +87,14 @@
       "helpMarkDown": "The path to which Code Climate write analysis results."
     },
     {
+      "name": "TrackIssues",
+      "type": "boolean",
+      "label": "Track Issues",
+      "defaultValue": "true",
+      "required": true,
+      "helpMarkDown": "Wether or not to track Code Climate issues as bugs in Azure."
+    },
+    {
       "name": "Debug",
       "type": "boolean",
       "label": "Debug",
@@ -115,6 +123,11 @@
     }
   ],
   "messages": {
-    "NoGit": "Code Climate is not installed."
+    "NoGit": "Code Climate is not installed.",
+    "NoProjectName": "No project name is available.",
+    "NoCollectionUrl": "No collection URL is available.",
+    "NoBuildNumber": "No build number is available.",
+    "NoDefinitionName": "No build definition name is available.",
+    "NoAccessToken": "No access token is available for API calls. Did you forget to turn on the \"Allow scripts to access OAuth token\" option under Build -> Options, or Release -> Environment -> Run On Agent?"
   }
 }
