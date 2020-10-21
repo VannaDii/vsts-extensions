@@ -8,6 +8,7 @@ tl.setResourcePath(path.join(__dirname, 'task.json'));
 async function run() {
   const command = (tl.getInput('Command', true) as string).toLowerCase();
   const config: TaskConfig = {
+    trackIssues: tl.getBoolInput('TrackIssues', true),
     configFilePath: tl.getPathInput('ConfigPath', true, true) as string,
     analysisFormat: tl.getInput('AnalyzeFormat', true) as AnalysisFormats,
     sourcePath: tl.getPathInput('SourcePath', true, true) as string,
@@ -23,7 +24,7 @@ async function run() {
     case 'engines:install':
       return commands.installEngines(config);
     case 'analyze':
-      return commands.analyze(config);
+      return commands.analyze(config).then(() => commands.trackIssues(config));
     default:
       return tl.setResult(tl.TaskResult.Failed, `Unsupported command '${command}'.`, true);
   }

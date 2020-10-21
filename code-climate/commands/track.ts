@@ -57,6 +57,11 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints
 }
 
 export async function trackIssues(config: TaskConfig) {
+  if (!config || config.trackIssues !== true) {
+    console.info('Issue Tracking Is Disabled. Skipping.');
+    return;
+  }
+
   const result = tl.exist(config.outputPath);
   if (!result) {
     return tl.setResult(tl.TaskResult.Failed, 'Analysis file not found.', true);
