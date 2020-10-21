@@ -8,6 +8,7 @@ export type TaskConfig = {
   debug: boolean;
   engineTimeout: number;
   memLimit: number;
+  trackIssues: boolean;
 };
 
 /**  The class to represent a collection of REST reference links. */
