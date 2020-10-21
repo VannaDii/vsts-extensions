@@ -48,9 +48,11 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints
         },
       ]
     );
-    const workItemIds = queryResult.workItems.map(w => w.id);
-    const workItemBatch = await workItemClient.get(['System.Id', FieldNameFullyQualified], ...workItemIds);
-    result.push(...workItemBatch.value);
+    const workItemIds = queryResult?.workItems.map((w) => w.id);
+    if (!!workItemIds) {
+      const workItemBatch = await workItemClient.get(['System.Id', FieldNameFullyQualified], ...workItemIds);
+      if (!!workItemBatch) result.push(...workItemBatch.value);
+    }
   } while (fingerprints.length > 0);
 
   return result;
@@ -120,11 +122,13 @@ export async function trackIssues(config: TaskConfig) {
       (w.fields[FieldNameFullyQualified] as string).length > 0
   );
   for (const workItem of updateItems) {
-    pendingOps.push(workItemClient.update(workItem.id, {
-      op: 'add',
-      path: '/fields/Microsoft.VSTS.Build.FoundIn',
-      value: `${buildDefName}_${buildLabel}`,
-    }));
+    pendingOps.push(
+      workItemClient.update(workItem.id, {
+        op: 'add',
+        path: '/fields/Microsoft.VSTS.Build.FoundIn',
+        value: `${buildDefName}_${buildLabel}`,
+      })
+    );
   }
 
   await Promise.all(pendingOps);
