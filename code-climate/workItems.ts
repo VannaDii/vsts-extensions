@@ -57,7 +57,7 @@ export class WorkItemClient {
     } catch (error) {
       tl.debug(`[${correlationId}] Context: ${JSON.stringify(context)}`);
       tl.error(`[${correlationId}] ${error.name}: ${error.message}\n${error.stack}`);
-      if (!!error.toJSON) tl.debug(`[${correlationId}] ${error.toJSON()}`);
+      if (!!error.toJSON) tl.debug(`[${correlationId}] ${JSON.stringify(error.toJSON())}`);
     }
     return undefined;
   }
@@ -71,7 +71,7 @@ export class WorkItemClient {
       const ops = [
         {
           op: 'add',
-          path: '/fields/CodeClimate.Fingerprint',
+          path: `/fields/CodeClimate.Fingerprint`,
           value: issue.fingerprint,
           from: null,
         },
@@ -155,6 +155,7 @@ export class WorkItemClient {
 
       context.scope = this.query.name;
       context.url = this.witUrls.WIQL;
+      context.wiqlQuery = wiqlQuery;
       const result = await Axios.post<WorkItemQueryResult>(
         this.witUrls.WIQL,
         { query: wiqlQuery },
