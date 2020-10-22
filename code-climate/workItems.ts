@@ -65,7 +65,7 @@ export class WorkItemClient {
       return await op(context);
     } catch (err) {
       const response = err.response?.body || 'No response data available';
-      const error = !!err.toJSON ? err.toJSON() : Object.keys(err).reduce((p,c) => ({...p, [c]: err[c]}), {});
+      const error = !!err.toJSON ? err.toJSON() : Object.keys(err).reduce((p, c) => ({ ...p, [c]: err[c] }), {});
       tl.error(`[${correlationId}] ${JSON.stringify({ error, context, response }, undefined, 2)}`);
     }
     return undefined;
@@ -125,7 +125,11 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.create.name;
       this.log('debug', context, 'Creating work item for analysis issue.');
-      const result = await got.patch<WorkItem>(workItemUrl, { ...this.webOpts, json: ops });
+      const result = await got.patch<WorkItem>(workItemUrl, {
+        ...this.webOpts,
+        json: ops,
+        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json-patch+json' },
+      });
 
       return result.body;
     });
