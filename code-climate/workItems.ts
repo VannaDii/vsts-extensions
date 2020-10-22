@@ -26,9 +26,12 @@ export class WorkItemClient {
     WorkItemsBatch: 'workitemsbatch',
     WorkItems: 'workitems',
   };
-  private readonly markdown = new MarkdownIt({ linkify: true, typographer: true, xhtmlOut: true }).use(MarkdownItHighlightJs, {
-    inline: true,
-  });
+  private readonly markdown = new MarkdownIt({ linkify: true, typographer: true, xhtmlOut: true }).use(
+    MarkdownItHighlightJs,
+    {
+      inline: true,
+    }
+  );
   private readonly nanoid = customAlphabet('1234567890abcdef', 10);
 
   constructor(collectionUrl: string, projName: string, accessToken: string) {
@@ -47,12 +50,14 @@ export class WorkItemClient {
   }
 
   private async tryCatch<T>(op: (context: Dictionary) => Promise<T>): Promise<T | undefined> {
-    const context: Dictionary = { correlationId: this.nanoid() };
+    const correlationId = this.nanoid();
+    const context: Dictionary = { correlationId };
     try {
       return await op(context);
     } catch (error) {
-      tl.debug(`Context: ${JSON.stringify(context)}`);
-      tl.error(`${error.name}: ${error.message}\n${error.stack}`);
+      tl.debug(`[${correlationId}] Context: ${JSON.stringify(context)}`);
+      tl.error(`[${correlationId}] ${error.name}: ${error.message}\n${error.stack}`);
+      if (!!error.toJSON) tl.debug(`[${correlationId}] ${error.toJSON()}`);
     }
     return undefined;
   }
