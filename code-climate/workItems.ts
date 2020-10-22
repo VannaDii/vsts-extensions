@@ -36,12 +36,12 @@ export class WorkItemClient {
 
   constructor(private readonly collectionUrl: string, private readonly projName: string, accessToken: string) {
     this.axiosConfig = {
-      baseURL: path.join(collectionUrl, projName, '/_apis/wit'),
       params: { 'api-version': '6.0' },
       headers: {
         authorization: `Bearer ${accessToken}`,
       },
       responseType: 'json',
+      proxy: false,
     };
   }
 
@@ -206,7 +206,7 @@ export class WorkItemClient {
       const fieldUrlProj = this.qualify(path.join(this.witUrls.Fields, fieldName));
       const fieldUrlColl = this.qualify(path.join(this.witUrls.Fields, fieldName), false);
       context.urlProj = fieldUrlProj;
-      context.urlColl = fieldUrlColl;;
+      context.urlColl = fieldUrlColl;
       context.scope = this.fieldGet.name;
       this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
