@@ -33,11 +33,11 @@ export class WorkItemClient {
       inline: true,
     }
   );
-  private readonly nanoid = customAlphabet('1234567890abcdef', 10);
+  private readonly nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 
   constructor(collectionUrl: string, projName: string, accessToken: string) {
     this.axiosConfig = {
-      baseURL: `${collectionUrl}/${projName}/_apis/wit`,
+      baseURL: path.join(collectionUrl, projName, '/_apis/wit'),
       params: { 'api-version': '6.0' },
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -46,7 +46,7 @@ export class WorkItemClient {
     };
     this.axiosConfigFallback = {
       ...this.axiosConfig,
-      baseURL: `${collectionUrl}/_apis/wit`,
+      baseURL: path.join(collectionUrl, '/_apis/wit'),
     };
   }
 
