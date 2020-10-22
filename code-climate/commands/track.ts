@@ -11,7 +11,7 @@ const FieldNameFullyQualified = `${FieldNamespace}.${FieldNameFingerprint}`;
 function fieldFactory(fieldName: string): WorkItemField {
   return {
     name: `${FieldNamespace} ${fieldName}`,
-    referenceName: `${FieldNamespace}.${fieldName.replace(' ', '')}`,
+    referenceName: `${FieldNameFullyQualified}`,
     description: `Stores a ${FieldNamespace} ${fieldName}`,
     type: 'string',
     usage: 'workItem',
@@ -102,7 +102,7 @@ export async function trackIssues(config: TaskConfig) {
   const analysisItems = loadAnalysisIssues(config.outputPath);
   const fingerprints = Object.keys(analysisItems);
   const workItemClient = new WorkItemClient(collectionUrl, projName, accessToken);
-  await workItemClient.fieldEnsure(FieldNameFingerprint, fieldFactory);
+  await workItemClient.fieldEnsure(FieldNameFullyQualified, fieldFactory);
 
   // Get all fingerprinted work items and setup for awaiting
   const workItems = await getIssueWorkItems(workItemClient, ...fingerprints);
