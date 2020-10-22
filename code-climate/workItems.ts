@@ -1,9 +1,9 @@
 import path from 'path';
+import got, { OptionsOfJSONResponseBody } from 'got';
 import MarkdownIt from 'markdown-it';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { customAlphabet } from 'nanoid/non-secure';
 import MarkdownItHighlightJs from 'markdown-it-highlightjs';
-import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   AnalysisIssue,
   QueryCondition,
@@ -14,7 +14,6 @@ import {
   WorkItemQueryResult,
   WorkItemType,
 } from './types';
-import { url } from 'inspector';
 
 type LogType = 'debug' | 'info' | 'warn' | 'error';
 type OpContext = { correlationId: string; [key: string]: string | number | boolean | object };
@@ -33,30 +32,26 @@ export class WorkItemClient {
     }
   );
   private readonly nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
-  private readonly projectClient: AxiosInstance;
-  private readonly collectionClient: AxiosInstance;
+  private readonly webOpts: OptionsOfJSONResponseBody = {
+    searchParams: { 'api-version': '6.0' },
+    headers: {
+      authorization: `Bearer ${this.accessToken}`,
+    },
+    resolveBodyOnly: false,
+    responseType: 'json',
+    isStream: false,
+  };
 
   constructor(
     private readonly collectionUrl: string,
     private readonly projName: string,
     private readonly accessToken: string
-  ) {
-    const baseAxiosConfig: AxiosRequestConfig = {
-      params: { 'api-version': '6.0' },
-      headers: {
-        authorization: `Bearer ${this.accessToken}`,
-      },
-      responseType: 'json',
-      proxy: false,
-    };
-    this.projectClient = Axios.create({
-      ...baseAxiosConfig,
-      baseURL: path.join(this.collectionUrl, this.projName, '_apis/wit'),
-    });
-    this.collectionClient = Axios.create({
-      ...baseAxiosConfig,
-      baseURL: path.join(this.collectionUrl, '_apis/wit'),
-    });
+  ) {}
+
+  private qualify(url: string, useProject: boolean = true) {
+    return useProject
+      ? path.join(this.collectionUrl, this.projName, '_apis/wit', url)
+      : path.join(this.collectionUrl, '_apis/wit', url);
   }
 
   private log(type: LogType, context: OpContext, message: string) {
@@ -130,8 +125,9 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.create.name;
       this.log('debug', context, 'Creating work item for analysis issue.');
-      const result = await this.projectClient.patch<WorkItem>(workItemUrl, ops);
-      return result.data;
+      const result = await got.patch<WorkItem>(workItemUrl, { ...this.webOpts, json: ops });
+
+      return result.body;
     });
   }
 
@@ -142,9 +138,9 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.update.name;
       this.log('debug', context, 'Updating work item for analysis issue.');
-      const result = await this.projectClient.patch<WorkItem>(workItemUrl, ops);
+      const result = await got.patch<WorkItem>(workItemUrl, { ...this.webOpts, json: ops });
 
-      return result.data;
+      return result.body;
     });
   }
 
@@ -162,9 +158,9 @@ export class WorkItemClient {
           value: [],
         } as WorkItemBatch;
       }
-      const result = await this.projectClient.post<WorkItemBatch>(batchUrl, { ids, fields });
+      const result = await got.post<WorkItemBatch>(batchUrl, { ...this.webOpts, json: { ids, fields } });
 
-      return result.data;
+      return result.body;
     });
   }
 
@@ -179,9 +175,9 @@ export class WorkItemClient {
       context.scope = this.query.name;
       context.wiqlQuery = wiqlQuery;
       this.log('debug', context, 'Querying work items.');
-      const result = await this.projectClient.post<WorkItemQueryResult>(wiqlUrl, { query: wiqlQuery });
+      const result = await got.post<WorkItemQueryResult>(wiqlUrl, { ...this.webOpts, json: { query: wiqlQuery } });
 
-      return result.data;
+      return result.body;
     });
   }
 
@@ -203,9 +199,9 @@ export class WorkItemClient {
       context.scope = this.fieldCreate.name;
       context.field = field;
       this.log('debug', context, 'Creating work item field.');
-      const result = await this.projectClient.post<WorkItemField>(fieldsUrl, field);
+      const result = await got.post<WorkItemField>(fieldsUrl, { ...this.webOpts, json: field });
 
-      return result.data;
+      return result.body;
     });
   }
 
@@ -216,11 +212,11 @@ export class WorkItemClient {
       context.scope = this.fieldGet.name;
       this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
-        this.projectClient.get<WorkItemField>(fieldUrl),
-        this.collectionClient.get<WorkItemField>(fieldUrl),
+        got<WorkItemField>(fieldUrl, this.webOpts),
+        got<WorkItemField>(fieldUrl, this.webOpts),
       ]);
 
-      return result.status === 200 ? result.data : fallback.data;
+      return result.statusCode === 200 ? result.body : fallback.body;
     });
   }
 }
