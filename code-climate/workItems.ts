@@ -14,12 +14,12 @@ import {
   WorkItemQueryResult,
   WorkItemType,
 } from './types';
+import { url } from 'inspector';
 
 type LogType = 'debug' | 'info' | 'warn' | 'error';
 type OpContext = { correlationId: string; [key: string]: string | number | boolean | object };
 
 export class WorkItemClient {
-  private readonly axiosConfig: AxiosRequestConfig;
   private readonly witUrls = {
     Fields: 'fields',
     WIQL: 'wiql',
@@ -34,21 +34,28 @@ export class WorkItemClient {
   );
   private readonly nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 
-  constructor(private readonly collectionUrl: string, private readonly projName: string, accessToken: string) {
-    this.axiosConfig = {
-      params: { 'api-version': '6.0' },
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      responseType: 'json',
-      proxy: false,
-    };
-  }
+  constructor(
+    private readonly collectionUrl: string,
+    private readonly projName: string,
+    private readonly accessToken: string
+  ) {}
 
   private qualify(url: string, forProject: boolean = true) {
     return forProject
       ? path.join(this.collectionUrl, this.projName, '_apis/wit', url)
       : path.join(this.collectionUrl, '_apis/wit', url);
+  }
+
+  private axiosConfig(url: string): AxiosRequestConfig {
+    return {
+      url,
+      params: { 'api-version': '6.0' },
+      headers: {
+        authorization: `Bearer ${this.accessToken}`,
+      },
+      responseType: 'json',
+      proxy: false,
+    };
   }
 
   private log(type: LogType, context: OpContext, message: string) {
@@ -122,7 +129,7 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.create.name;
       this.log('debug', context, 'Creating work item for analysis issue.');
-      const result = await Axios.patch<WorkItem>(workItemUrl, ops, { ...this.axiosConfig });
+      const result = await Axios.patch<WorkItem>(workItemUrl, ops, this.axiosConfig(workItemUrl));
       return result.data;
     });
   }
@@ -134,7 +141,7 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.update.name;
       this.log('debug', context, 'Updating work item for analysis issue.');
-      const result = await Axios.patch<WorkItem>(workItemUrl, ops, { ...this.axiosConfig });
+      const result = await Axios.patch<WorkItem>(workItemUrl, ops, this.axiosConfig(workItemUrl));
 
       return result.data;
     });
@@ -154,7 +161,7 @@ export class WorkItemClient {
           value: [],
         } as WorkItemBatch;
       }
-      const result = await Axios.post<WorkItemBatch>(batchUrl, { ids, fields }, { ...this.axiosConfig });
+      const result = await Axios.post<WorkItemBatch>(batchUrl, { ids, fields }, this.axiosConfig(batchUrl));
 
       return result.data;
     });
@@ -171,7 +178,7 @@ export class WorkItemClient {
       context.scope = this.query.name;
       context.wiqlQuery = wiqlQuery;
       this.log('debug', context, 'Querying work items.');
-      const result = await Axios.post<WorkItemQueryResult>(wiqlUrl, { query: wiqlQuery }, { ...this.axiosConfig });
+      const result = await Axios.post<WorkItemQueryResult>(wiqlUrl, { query: wiqlQuery }, this.axiosConfig(wiqlUrl));
 
       return result.data;
     });
@@ -195,7 +202,7 @@ export class WorkItemClient {
       context.scope = this.fieldCreate.name;
       context.field = field;
       this.log('debug', context, 'Creating work item field.');
-      const result = await Axios.post<WorkItemField>(fieldsUrl, field, { ...this.axiosConfig });
+      const result = await Axios.post<WorkItemField>(fieldsUrl, field, this.axiosConfig(fieldsUrl));
 
       return result.data;
     });
@@ -210,8 +217,8 @@ export class WorkItemClient {
       context.scope = this.fieldGet.name;
       this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
-        Axios.get<WorkItemField>(fieldUrlProj, { ...this.axiosConfig }),
-        Axios.get<WorkItemField>(fieldUrlColl, { ...this.axiosConfig }),
+        Axios.get<WorkItemField>(fieldUrlProj, this.axiosConfig(fieldUrlProj)),
+        Axios.get<WorkItemField>(fieldUrlColl, this.axiosConfig(fieldUrlColl)),
       ]);
 
       return result.status === 200 ? result.data : fallback.data;
