@@ -1,5 +1,5 @@
 import path from 'path';
-import got, { OptionsOfJSONResponseBody } from 'got';
+import got, { OptionsOfJSONResponseBody, HTTPError } from 'got';
 import MarkdownIt from 'markdown-it';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { customAlphabet } from 'nanoid/non-secure';
@@ -64,8 +64,8 @@ export class WorkItemClient {
     try {
       return await op(context);
     } catch (err) {
-      const response = err.response?.data || 'No response data available';
-      const error = !!err.toJSON ? err.toJSON() : { name: err.name, message: err.message, stack: err.stack };
+      const response = err.response?.body || 'No response data available';
+      const error = !!err.toJSON ? err.toJSON() : Object.keys(err).reduce((p,c) => ({...p, [c]: err[c]}), {});
       tl.error(`[${correlationId}] ${JSON.stringify({ error, context, response }, undefined, 2)}`);
     }
     return undefined;
