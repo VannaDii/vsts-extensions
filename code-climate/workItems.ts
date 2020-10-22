@@ -142,7 +142,11 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.update.name;
       this.log('debug', context, 'Updating work item for analysis issue.');
-      const result = await got.patch<WorkItem>(workItemUrl, { ...this.webOpts, json: ops });
+      const result = await got.patch<WorkItem>(workItemUrl, {
+        ...this.webOpts,
+        json: ops,
+        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json-patch+json' },
+      });
 
       return result.body;
     });
