@@ -60,8 +60,9 @@ export class WorkItemClient {
     try {
       return await op(context);
     } catch (err) {
+      const response = err.response?.data || 'No response data available';
       const error = !!err.toJSON ? err.toJSON() : { name: err.name, message: err.message, stack: err.stack };
-      tl.error(`[${correlationId}] ${JSON.stringify({ error, context }, undefined, 2)}`);
+      tl.error(`[${correlationId}] ${JSON.stringify({ error, context, response }, undefined, 2)}`);
     }
     return undefined;
   }
@@ -121,7 +122,6 @@ export class WorkItemClient {
       context.scope = this.create.name;
       this.log('debug', context, 'Creating work item for analysis issue.');
       const result = await Axios.patch<WorkItem>(workItemUrl, ops, { ...this.axiosConfig });
-
       return result.data;
     });
   }
