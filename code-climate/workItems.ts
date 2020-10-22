@@ -73,7 +73,7 @@ export class WorkItemClient {
 
   async create(type: WorkItemType, issue: AnalysisIssue, component: string, buildVersion: string) {
     return this.tryCatch(async (context) => {
-      const workItemUrl = path.join(this.witUrls.WorkItems, `$${type.toLowerCase()}`);
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${type.toLowerCase()}`));
       const titlePrefix = issue.check_name[0].toUpperCase() + issue.check_name.replace('-', ' ').slice(1);
       const basicDesc = `<ol><li>Open ${component} > ${issue.location.path} and observe lines ${issue.location.positions.begin.line} - ${issue.location.positions.end.line}.</li></ol>`;
       const extDesc = this.markdown.render(issue.content.body);
@@ -133,7 +133,7 @@ export class WorkItemClient {
 
   async update(id: number, ...ops: WorkItemPatch) {
     return this.tryCatch(async (context) => {
-      const workItemUrl = path.join(this.witUrls.WorkItems, id.toString());
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, id.toString()));
 
       context.url = workItemUrl;
       context.scope = this.update.name;
@@ -146,7 +146,7 @@ export class WorkItemClient {
 
   async get(fields: string[], ...ids: number[]) {
     return this.tryCatch(async (context) => {
-      const batchUrl = this.witUrls.WorkItemsBatch;
+      const batchUrl = this.qualify(this.witUrls.WorkItemsBatch);
       context.url = batchUrl;
       context.scope = this.get.name;
       context.fields = fields;
@@ -169,7 +169,7 @@ export class WorkItemClient {
       const fieldSet = fields.map((v) => `[${v}]`).join(', ');
       const conditionSet = conditions.map((c) => `[${c.fieldName}] ${c.operator} ${c.value}`).join(' AND ');
       const wiqlQuery = `Select ${fieldSet} From WorkItems Where ${conditionSet}`;
-      const wiqlUrl = this.witUrls.WIQL;
+      const wiqlUrl = this.qualify(this.witUrls.WIQL);
 
       context.url = this.witUrls.WIQL;
       context.scope = this.query.name;
@@ -194,7 +194,7 @@ export class WorkItemClient {
 
   async fieldCreate(field: WorkItemField) {
     return this.tryCatch(async (context) => {
-      const fieldsUrl = this.witUrls.Fields;
+      const fieldsUrl = this.qualify(this.witUrls.Fields);
       context.url = fieldsUrl;
       context.scope = this.fieldCreate.name;
       context.field = field;
@@ -207,13 +207,15 @@ export class WorkItemClient {
 
   async fieldGet(fieldName: string) {
     return this.tryCatch(async (context) => {
-      const fieldUrl = this.witUrls.Fields;
-      context.url = fieldUrl;
+      const fieldUrlProj = this.qualify(path.join(this.witUrls.Fields, fieldName));
+      const fieldUrlColl = this.qualify(path.join(this.witUrls.Fields, fieldName), false);
+      context.urlProj = fieldUrlProj;
+      context.urlColl = fieldUrlColl;
       context.scope = this.fieldGet.name;
       this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
-        got<WorkItemField>(fieldUrl, this.webOpts),
-        got<WorkItemField>(fieldUrl, this.webOpts),
+        got<WorkItemField>(fieldUrlProj, this.webOpts),
+        got<WorkItemField>(fieldUrlColl, this.webOpts),
       ]);
 
       return result.statusCode === 200 ? result.body : fallback.body;
