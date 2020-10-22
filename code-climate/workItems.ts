@@ -15,7 +15,8 @@ import {
   WorkItemType,
 } from './types';
 
-type Dictionary = { [key: string]: string | number | boolean | object };
+type LogType = 'debug' | 'info' | 'warn' | 'error';
+type OpContext = { correlationId: string; [key: string]: string | number | boolean | object };
 
 export class WorkItemClient {
   private readonly axiosConfig: AxiosRequestConfig;
@@ -49,15 +50,18 @@ export class WorkItemClient {
     };
   }
 
-  private async tryCatch<T>(op: (context: Dictionary) => Promise<T>): Promise<T | undefined> {
+  private log(type: LogType, context: OpContext, message: string) {
+    return console[type](`[${context.correlationId}] ${message}`, context);
+  }
+
+  private async tryCatch<T>(op: (context: OpContext) => Promise<T>): Promise<T | undefined> {
     const correlationId = this.nanoid();
-    const context: Dictionary = { correlationId };
+    const context: OpContext = { correlationId };
     try {
       return await op(context);
-    } catch (error) {
-      tl.debug(`[${correlationId}] Context: ${JSON.stringify(context)}`);
-      tl.error(`[${correlationId}] ${error.name}: ${error.message}\n${error.stack}`);
-      if (!!error.toJSON) tl.debug(`[${correlationId}] ${JSON.stringify(error.toJSON())}`);
+    } catch (err) {
+      const error = !!err.toJSON ? err.toJSON() : { name: err.name, message: err.message, stack: err.stack };
+      tl.error(`[${correlationId}] ${JSON.stringify({ error, context }, undefined, 2)}`);
     }
     return undefined;
   }
@@ -113,8 +117,9 @@ export class WorkItemClient {
         },
       ];
 
-      context.scope = this.create.name;
       context.url = workItemUrl;
+      context.scope = this.create.name;
+      this.log('debug', context, 'Creating work item for analysis issue.');
       const result = await Axios.patch<WorkItem>(workItemUrl, ops, { ...this.axiosConfig });
 
       return result.data;
@@ -125,8 +130,9 @@ export class WorkItemClient {
     return this.tryCatch(async (context) => {
       const workItemUrl = path.join(this.witUrls.WorkItems, id.toString());
 
-      context.scope = this.update.name;
       context.url = workItemUrl;
+      context.scope = this.update.name;
+      this.log('debug', context, 'Updating work item for analysis issue.');
       const result = await Axios.patch<WorkItem>(workItemUrl, ops, { ...this.axiosConfig });
 
       return result.data;
@@ -135,8 +141,17 @@ export class WorkItemClient {
 
   async get(fields: string[], ...ids: number[]) {
     return this.tryCatch(async (context) => {
-      context.scope = this.get.name;
       context.url = this.witUrls.WorkItemsBatch;
+      context.scope = this.get.name;
+      context.fields = fields;
+      context.ids = ids;
+      this.log('debug', context, 'Getting work items.');
+      if (!ids || ids.length === 0) {
+        return {
+          count: 0,
+          value: [],
+        } as WorkItemBatch;
+      }
       const result = await Axios.post<WorkItemBatch>(
         this.witUrls.WorkItemsBatch,
         { ids, fields },
@@ -153,9 +168,10 @@ export class WorkItemClient {
       const conditionSet = conditions.map((c) => `[${c.fieldName}] ${c.operator} ${c.value}`).join(' AND ');
       const wiqlQuery = `Select ${fieldSet} From WorkItems Where ${conditionSet}`;
 
-      context.scope = this.query.name;
       context.url = this.witUrls.WIQL;
+      context.scope = this.query.name;
       context.wiqlQuery = wiqlQuery;
+      this.log('debug', context, 'Querying work items.');
       const result = await Axios.post<WorkItemQueryResult>(
         this.witUrls.WIQL,
         { query: wiqlQuery },
@@ -179,8 +195,10 @@ export class WorkItemClient {
 
   async fieldCreate(field: WorkItemField) {
     return this.tryCatch(async (context) => {
-      context.scope = this.fieldCreate.name;
       context.url = this.witUrls.Fields;
+      context.scope = this.fieldCreate.name;
+      context.field = field;
+      this.log('debug', context, 'Creating work item field.');
       const result = await Axios.post<WorkItemField>(this.witUrls.Fields, field, { ...this.axiosConfig });
 
       return result.data;
@@ -190,8 +208,9 @@ export class WorkItemClient {
   async fieldGet(fieldName: string) {
     return this.tryCatch(async (context) => {
       const fieldUrl = path.join(this.witUrls.Fields, fieldName);
-      context.scope = this.fieldGet.name;
       context.url = fieldUrl;
+      context.scope = this.fieldGet.name;
+      this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
         Axios.get<WorkItemField>(fieldUrl, { ...this.axiosConfig }),
         Axios.get<WorkItemField>(fieldUrl, { ...this.axiosConfigFallback }),
