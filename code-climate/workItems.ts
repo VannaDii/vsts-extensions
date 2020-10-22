@@ -20,7 +20,6 @@ type OpContext = { correlationId: string; [key: string]: string | number | boole
 
 export class WorkItemClient {
   private readonly axiosConfig: AxiosRequestConfig;
-  private readonly axiosConfigFallback: AxiosRequestConfig;
   private readonly witUrls = {
     Fields: 'fields',
     WIQL: 'wiql',
@@ -35,7 +34,7 @@ export class WorkItemClient {
   );
   private readonly nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 
-  constructor(collectionUrl: string, projName: string, accessToken: string) {
+  constructor(private readonly collectionUrl: string, private readonly projName: string, accessToken: string) {
     this.axiosConfig = {
       baseURL: path.join(collectionUrl, projName, '/_apis/wit'),
       params: { 'api-version': '6.0' },
@@ -44,10 +43,12 @@ export class WorkItemClient {
       },
       responseType: 'json',
     };
-    this.axiosConfigFallback = {
-      ...this.axiosConfig,
-      baseURL: path.join(collectionUrl, '/_apis/wit'),
-    };
+  }
+
+  private qualify(url: string, forProject: boolean = true) {
+    return forProject
+      ? path.join(this.collectionUrl, this.projName, '_apis/wit', url)
+      : path.join(this.collectionUrl, '_apis/wit', url);
   }
 
   private log(type: LogType, context: OpContext, message: string) {
@@ -69,7 +70,7 @@ export class WorkItemClient {
 
   async create(type: WorkItemType, issue: AnalysisIssue, component: string, buildVersion: string) {
     return this.tryCatch(async (context) => {
-      const workItemUrl = path.join(this.witUrls.WorkItems, `$${type.toLowerCase()}`);
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${type.toLowerCase()}`));
       const titlePrefix = issue.check_name[0].toUpperCase() + issue.check_name.replace('-', ' ').slice(1);
       const basicDesc = `<ol><li>Open ${component} > ${issue.location.path} and observe lines ${issue.location.positions.begin.line} - ${issue.location.positions.end.line}.</li></ol>`;
       const extDesc = this.markdown.render(issue.content.body);
@@ -128,7 +129,7 @@ export class WorkItemClient {
 
   async update(id: number, ...ops: WorkItemPatch) {
     return this.tryCatch(async (context) => {
-      const workItemUrl = path.join(this.witUrls.WorkItems, id.toString());
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, id.toString()));
 
       context.url = workItemUrl;
       context.scope = this.update.name;
@@ -141,7 +142,8 @@ export class WorkItemClient {
 
   async get(fields: string[], ...ids: number[]) {
     return this.tryCatch(async (context) => {
-      context.url = this.witUrls.WorkItemsBatch;
+      const batchUrl = this.qualify(this.witUrls.WorkItemsBatch);
+      context.url = batchUrl;
       context.scope = this.get.name;
       context.fields = fields;
       context.ids = ids;
@@ -152,11 +154,7 @@ export class WorkItemClient {
           value: [],
         } as WorkItemBatch;
       }
-      const result = await Axios.post<WorkItemBatch>(
-        this.witUrls.WorkItemsBatch,
-        { ids, fields },
-        { ...this.axiosConfig }
-      );
+      const result = await Axios.post<WorkItemBatch>(batchUrl, { ids, fields }, { ...this.axiosConfig });
 
       return result.data;
     });
@@ -167,16 +165,13 @@ export class WorkItemClient {
       const fieldSet = fields.map((v) => `[${v}]`).join(', ');
       const conditionSet = conditions.map((c) => `[${c.fieldName}] ${c.operator} ${c.value}`).join(' AND ');
       const wiqlQuery = `Select ${fieldSet} From WorkItems Where ${conditionSet}`;
+      const wiqlUrl = this.qualify(this.witUrls.WIQL);
 
       context.url = this.witUrls.WIQL;
       context.scope = this.query.name;
       context.wiqlQuery = wiqlQuery;
       this.log('debug', context, 'Querying work items.');
-      const result = await Axios.post<WorkItemQueryResult>(
-        this.witUrls.WIQL,
-        { query: wiqlQuery },
-        { ...this.axiosConfig }
-      );
+      const result = await Axios.post<WorkItemQueryResult>(wiqlUrl, { query: wiqlQuery }, { ...this.axiosConfig });
 
       return result.data;
     });
@@ -195,11 +190,12 @@ export class WorkItemClient {
 
   async fieldCreate(field: WorkItemField) {
     return this.tryCatch(async (context) => {
-      context.url = this.witUrls.Fields;
+      const fieldsUrl = this.qualify(this.witUrls.Fields);
+      context.url = fieldsUrl;
       context.scope = this.fieldCreate.name;
       context.field = field;
       this.log('debug', context, 'Creating work item field.');
-      const result = await Axios.post<WorkItemField>(this.witUrls.Fields, field, { ...this.axiosConfig });
+      const result = await Axios.post<WorkItemField>(fieldsUrl, field, { ...this.axiosConfig });
 
       return result.data;
     });
@@ -207,13 +203,15 @@ export class WorkItemClient {
 
   async fieldGet(fieldName: string) {
     return this.tryCatch(async (context) => {
-      const fieldUrl = path.join(this.witUrls.Fields, fieldName);
-      context.url = fieldUrl;
+      const fieldUrlProj = this.qualify(path.join(this.witUrls.Fields, fieldName));
+      const fieldUrlColl = this.qualify(path.join(this.witUrls.Fields, fieldName), false);
+      context.urlProj = fieldUrlProj;
+      context.urlColl = fieldUrlColl;;
       context.scope = this.fieldGet.name;
       this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
-        Axios.get<WorkItemField>(fieldUrl, { ...this.axiosConfig }),
-        Axios.get<WorkItemField>(fieldUrl, { ...this.axiosConfigFallback }),
+        Axios.get<WorkItemField>(fieldUrlProj, { ...this.axiosConfig }),
+        Axios.get<WorkItemField>(fieldUrlColl, { ...this.axiosConfig }),
       ]);
 
       return result.status === 200 ? result.data : fallback.data;
