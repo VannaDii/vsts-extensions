@@ -218,9 +218,13 @@ export class WorkItemClient {
       context.scope = this.fieldGet.name;
       this.log('debug', context, 'Getting work item field.');
       const [result, fallback] = await Promise.all([
-        got<WorkItemField>(fieldUrlProj, this.webOpts),
-        got<WorkItemField>(fieldUrlColl, this.webOpts),
+        got<WorkItemField>(fieldUrlProj, { ...this.webOpts, throwHttpErrors: false }),
+        got<WorkItemField>(fieldUrlColl, { ...this.webOpts, throwHttpErrors: false }),
       ]);
+
+      if (result.statusCode !== 200 && fallback.statusCode !== 200) {
+        throw new HTTPError(fallback);
+      }
 
       return result.statusCode === 200 ? result.body : fallback.body;
     });
