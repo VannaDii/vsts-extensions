@@ -20,6 +20,18 @@
   resolved "https://registry.yarnpkg.com/@types/mdurl/-/mdurl-1.0.2.tgz#e2ce9d83a613bacf284c7be7d491945e39e1f8e9"
   integrity sha512-eC4U9MlIcu2q0KQmXszyn5Akca/0jrQmwDRgpAMJai7qBWq4amIQhZyNau4VYGtCeALvW1/NtjzJJ567aZxfKA==
 
+"@types/nanoid@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/nanoid/-/nanoid-2.1.0.tgz#41edfda78986e9127d0dc14de982de766f994020"
+  integrity sha512-xdkn/oRTA0GSNPLIKZgHWqDTWZsVrieKomxJBOQUK9YDD+zfSgmwD5t4WJYra5S7XyhTw7tfvwznW+pFexaepQ==
+  dependencies:
+    "@types/node" "*"
+
+"@types/node@*":
+  version "14.14.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.2.tgz#d25295f9e4ca5989a2c610754dc02a9721235eeb"
+  integrity sha512-jeYJU2kl7hL9U5xuI/BhKPZ4vqGM/OmK6whiFAXVhlstzZhVamWhDSmHyGLIp+RVyuF9/d0dqr2P85aFj4BvJg==
+
 argparse@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
@@ -179,6 +191,11 @@ mockery@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/mockery/-/mockery-1.7.0.tgz#f4ede0d8750c1c9727c272ea2c60629e2c9a1c4f"
   integrity sha1-9O3g2HUMHJcnwnLqLGBiniyaHE8=
+
+nanoid@3.1.13:
+  version "3.1.13"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.13.tgz#7f4f0729ab8a824291deb72b0d10cf357bc7563c"
+  integrity sha512-oYL7jWZUdScASxYOrcwE8EvISFGzO3/1g+t56vCyR0s2nrpmBcOc7hTAFJaVf6HMyEPJrnNelnjRnMN6KZnCPA==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
