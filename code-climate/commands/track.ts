@@ -97,8 +97,12 @@ export async function trackIssues(config: TaskConfig) {
   const analysisItems = loadAnalysisIssues(config.outputPath);
   const fingerprints = Object.keys(analysisItems);
   const workItemClient = new WorkItemClient(collectionUrl, projName, accessToken);
-  await workItemClient.fieldEnsure(FieldNameCategoryQualified, fieldFactory, false);
-  await workItemClient.fieldEnsure(FieldNameFingerprintQualified, fieldFactory, true);
+  try {
+    await workItemClient.fieldEnsure(FieldNameCategoryQualified, fieldFactory, false);
+    await workItemClient.fieldEnsure(FieldNameFingerprintQualified, fieldFactory, true);
+  } catch (error) {
+    return tl.setResult(tl.TaskResult.Failed, `${error.name}: ${error.message}\n${error.stack}`, true);
+  }
 
   // Get all fingerprinted work items and setup for awaiting
   const workItems = await getIssueWorkItems(workItemClient, ...fingerprints);
@@ -118,7 +122,7 @@ export async function trackIssues(config: TaskConfig) {
         categoryFieldName: FieldNameCategoryQualified,
         fingerprintFieldName: FieldNameFingerprintQualified,
         areaPath: config.issueAreaPath,
-        iterationPath: config.issueIterationPath
+        iterationPath: config.issueIterationPath,
       })
     );
     pendingOps = await waitAtThreshold(pendingOps);

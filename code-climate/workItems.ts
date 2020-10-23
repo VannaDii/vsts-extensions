@@ -75,7 +75,7 @@ export class WorkItemClient {
     }
   }
 
-  private async tryCatch<T>(op: (context: OpContext) => Promise<T>): Promise<T | undefined> {
+  private async tryCatch<T>(op: (context: OpContext) => Promise<T>, reThrow: boolean = false): Promise<T | undefined> {
     const correlationId = this.nanoid();
     const context: OpContext = { correlationId };
     try {
@@ -89,6 +89,7 @@ export class WorkItemClient {
         ? errorKeys.reduce((p, c) => ({ ...p, [c]: err[c] }), {}) // For basic custom errors
         : { name: err.name, message: err.message, stack: err.stack }; // For built-in errors
       tl.error(`[${correlationId}] ${JSON.stringify({ error, context, response }, undefined, 2)}`);
+      if (reThrow) throw err;
     }
     return undefined;
   }
@@ -321,7 +322,7 @@ export class WorkItemClient {
       this.log('info', context, 'Created work item field.');
 
       return result.body;
-    });
+    }, true);
   }
 
   async fieldGet(fieldName: string) {
