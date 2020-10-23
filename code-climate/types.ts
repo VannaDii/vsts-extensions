@@ -11,6 +11,8 @@ export type TaskConfig = {
   trackIssues: boolean;
 };
 
+export type BuildLinkType = 'Build' | 'Found in build' | 'Integrated in build';
+
 /**  The class to represent a collection of REST reference links. */
 export type ReferenceLinks = { readonly links: Object };
 
