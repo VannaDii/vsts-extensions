@@ -1,5 +1,5 @@
 import { TaskConfig } from '../types';
-import { findCodeClimate } from './utils';
+import { findCodeClimate } from '../utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 export async function install(config: TaskConfig) {
