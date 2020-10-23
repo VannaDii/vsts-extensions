@@ -13,10 +13,11 @@ const FieldNameFingerprint = 'Fingerprint';
 const FieldNameFingerprintQualified = `${FieldNamespace}.${FieldNameFingerprint}`;
 
 function fieldFactory(fieldName: string, isIdentity: boolean): WorkItemField {
+  const displayName = fieldName.replace('.', ' ');
   return {
-    name: `${FieldNamespace} ${fieldName}`,
-    referenceName: `${FieldNamespace}.${fieldName}`,
-    description: `Stores a ${FieldNamespace} ${fieldName}`,
+    name: displayName,
+    referenceName: fieldName,
+    description: `Stores a ${displayName}`,
     type: 'string',
     usage: 'workItem',
     readOnly: false,
