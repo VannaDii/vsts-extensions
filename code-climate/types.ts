@@ -23,6 +23,8 @@ export type WorkItemOptions = {
   buildDefName: string;
   buildLabel: string;
   buildId: number;
+  areaPath: string;
+  iterationPath: string;
 };
 
 /**  The class to represent a collection of REST reference links. */
