@@ -11,8 +11,8 @@ import {
   WorkItemBatch,
   WorkItemField,
   WorkItemFieldPatch,
-  WorkItemOptionsCreate,
-  WorkItemOptionsUpdate,
+  WorkItemOptions,
+  WorkItemPatch,
   WorkItemQueryResult,
 } from './types';
 
@@ -81,77 +81,78 @@ export class WorkItemClient {
     return undefined;
   }
 
-  private getBuildRelationOp(buildId: number, linkType: BuildLinkType): WorkItemFieldPatch {
+  private getStandardIssueOps(opts: WorkItemOptions): WorkItemPatch {
     const timestamp = new Date().toISOString();
-    return {
-      op: 'add',
-      path: '/relations/-',
-      value: {
-        rel: 'ArtifactLink',
-        url: `vstfs:///Build/Build/${buildId}`,
-        attributes: {
-          authorizedDate: timestamp,
-          resourceCreatedDate: timestamp,
-          resourceModifiedDate: timestamp,
-          revisedDate: '9999-01-01T00:00:00Z',
-          comment: 'Linked by Code Climate',
-          name: linkType,
+    const buildLinkType: BuildLinkType = 'Found in build';
+    const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
+    const basicDesc = `<ol><li>Open ${opts.buildDefName} > ${opts.issue.location.path} and observe lines ${opts.issue.location.positions.begin.line} - ${opts.issue.location.positions.end.line}.</li></ol>`;
+    const extDesc = this.markdown.render(opts.issue.content.body);
+    return [
+      {
+        op: 'add',
+        path: `/fields/${opts.fingerprintFieldName}`,
+        value: opts.issue.fingerprint,
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/System.Tags',
+        value: ['Code Climate', ...opts.issue.categories, opts.issue.check_name].join(','),
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/System.Title',
+        value: `${titlePrefix} in ${opts.buildDefName} > ${opts.issue.location.path}`,
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/System.State',
+        value: 'New',
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/Microsoft.VSTS.Build.FoundIn',
+        value: `${opts.buildDefName}_${opts.buildLabel}`,
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/Microsoft.VSTS.Scheduling.Effort',
+        value: Math.max(1, opts.issue.remediation_points / 10000).toString(),
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/Microsoft.VSTS.TCM.ReproSteps',
+        value: `${opts.issue.description}<br/><br/>${basicDesc}<br/><br/>${extDesc}`,
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/relations/-',
+        value: {
+          rel: 'ArtifactLink',
+          url: `vstfs:///Build/Build/${opts.buildId}`,
+          attributes: {
+            authorizedDate: timestamp,
+            resourceCreatedDate: timestamp,
+            resourceModifiedDate: timestamp,
+            revisedDate: '9999-01-01T00:00:00Z',
+            comment: 'Linked by Code Climate',
+            name: buildLinkType,
+          },
         },
       },
-    };
+    ];
   }
 
-  async create(opts: WorkItemOptionsCreate) {
+  async create(opts: WorkItemOptions) {
     return this.tryCatch(async (context) => {
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${opts.type.toLowerCase()}`));
-      const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
-      const basicDesc = `<ol><li>Open ${opts.buildDefName} > ${opts.issue.location.path} and observe lines ${opts.issue.location.positions.begin.line} - ${opts.issue.location.positions.end.line}.</li></ol>`;
-      const extDesc = this.markdown.render(opts.issue.content.body);
-      const ops = [
-        {
-          op: 'add',
-          path: `/fields/${opts.fingerprintFieldName}`,
-          value: opts.issue.fingerprint,
-          from: null,
-        },
-        {
-          op: 'add',
-          path: '/fields/System.Tags',
-          value: ['Code Climate', ...opts.issue.categories, opts.issue.check_name].join(','),
-          from: null,
-        },
-        {
-          op: 'add',
-          path: '/fields/System.Title',
-          value: `${titlePrefix} in ${opts.buildDefName} > ${opts.issue.location.path}`,
-          from: null,
-        },
-        {
-          op: 'add',
-          path: '/fields/System.State',
-          value: 'New',
-          from: null,
-        },
-        {
-          op: 'add',
-          path: '/fields/Microsoft.VSTS.Build.FoundIn',
-          value: `${opts.buildDefName}_${opts.buildLabel}`,
-          from: null,
-        },
-        {
-          op: 'add',
-          path: '/fields/Microsoft.VSTS.Scheduling.Effort',
-          value: Math.max(1, opts.issue.remediation_points / 10000).toString(),
-          from: null,
-        },
-        {
-          op: 'add',
-          path: '/fields/Microsoft.VSTS.TCM.ReproSteps',
-          value: `${opts.issue.description}<br/><br/>${basicDesc}<br/><br/>${extDesc}`,
-          from: null,
-        },
-        this.getBuildRelationOp(opts.buildId, 'Found in build'),
-      ];
+      const ops = this.getStandardIssueOps(opts);
 
       context.url = workItemUrl;
       context.scope = this.create.name;
@@ -166,17 +167,12 @@ export class WorkItemClient {
     });
   }
 
-  async update(opts: WorkItemOptionsUpdate) {
+  async update(opts: WorkItemOptions) {
     return this.tryCatch(async (context) => {
+      if (!opts.id) throw new Error('Cannot update a work item without an ID.');
+
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, opts.id.toString()));
-      const ops = [
-        {
-          op: 'add',
-          path: '/fields/Microsoft.VSTS.Build.FoundIn',
-          value: `${opts.buildDefName}_${opts.buildLabel}`,
-        },
-        this.getBuildRelationOp(opts.buildId, 'Found in build'),
-      ];
+      const ops = this.getStandardIssueOps(opts);
 
       context.url = workItemUrl;
       context.scope = this.update.name;
