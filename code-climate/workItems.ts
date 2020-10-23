@@ -5,12 +5,12 @@ import * as tl from 'azure-pipelines-task-lib/task';
 import { customAlphabet } from 'nanoid/non-secure';
 import MarkdownItHighlightJs from 'markdown-it-highlightjs';
 import {
+  AnalysisIssue,
   BuildLinkType,
   QueryCondition,
   WorkItem,
   WorkItemBatch,
   WorkItemField,
-  WorkItemFieldPatch,
   WorkItemOptions,
   WorkItemPatch,
   WorkItemQueryResult,
@@ -18,6 +18,13 @@ import {
 
 type LogType = 'debug' | 'info' | 'warn' | 'error';
 type OpContext = { correlationId: string; [key: string]: string | number | boolean | object };
+const SeverityMap: { [key: string]: string } = {
+  info: '4 - Low',
+  minor: '3 - Medium',
+  major: '2 - High',
+  critical: '1 - Critical',
+  blocker: '1 - Critical',
+};
 
 export class WorkItemClient {
   private readonly witUrls = {
@@ -86,17 +93,49 @@ export class WorkItemClient {
     return undefined;
   }
 
+  private getAffectedLinesMarkup(issue: AnalysisIssue, sourceRoot: string): string {
+    const lines: string[] = [];
+    const category = (issue.categories.length > 0 ? issue.categories[0] : 'Unknown').toUpperCase();
+    switch (category) {
+      case 'STYLE':
+        lines.push(
+          `Open ${sourceRoot}/${issue.location.path} and observe lines ${issue.location.positions.begin.line} - ${issue.location.positions.end.line}.`
+        );
+        break;
+      case 'COMPLEXITY':
+        lines.push(
+          `Open ${sourceRoot}/${issue.location.path} and observe lines ${issue.location.lines.begin} - ${issue.location.lines.end}.`
+        );
+        break;
+      case 'DUPLICATION':
+        lines.push(
+          `Open ${sourceRoot}/${issue.location.path} and observe lines ${issue.location.lines.begin} - ${issue.location.lines.end}.`,
+          ...issue.other_locations.map(
+            (loc) => `Open ${sourceRoot}/${loc.path} and observe lines ${loc.lines.begin} - ${loc.lines.end}.`
+          )
+        );
+        break;
+    }
+    return `<ol><li>${lines.join('</li><li>')}</li></ol>`;
+  }
+
   private getStandardIssueOps(opts: WorkItemOptions): WorkItemPatch {
     const timestamp = new Date().toISOString();
     const buildLinkType: BuildLinkType = 'Found in build';
     const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
-    const basicDesc = `<ol><li>Open ${opts.sourceRoot}/${opts.issue.location.path} and observe lines ${opts.issue.location.positions.begin.line} - ${opts.issue.location.positions.end.line}.</li></ol>`;
-    const extDesc = this.markdown.render(opts.issue.content.body);
+    const basicDesc = this.getAffectedLinesMarkup(opts.issue, opts.sourceRoot);
+    const extDesc = opts.issue.content.body.length > 0 ? this.markdown.render(opts.issue.content.body) : '';
     return [
       {
         op: 'add',
         path: `/fields/${opts.fingerprintFieldName}`,
         value: opts.issue.fingerprint,
+        from: null,
+      },
+      {
+        op: 'add',
+        path: `/fields/${opts.categoryFieldName}`,
+        value: opts.issue.categories.length > 0 ? opts.issue.categories[0] : 'Unknown',
         from: null,
       },
       {
@@ -151,6 +190,12 @@ export class WorkItemClient {
         op: 'add',
         path: '/fields/Microsoft.VSTS.Common.ValueArea',
         value: 'Architectural',
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/Microsoft.VSTS.Common.Severity',
+        value: SeverityMap[opts.issue.severity.toLowerCase()] || '3 - Medium',
         from: null,
       },
       {
@@ -247,13 +292,17 @@ export class WorkItemClient {
     });
   }
 
-  async fieldEnsure(fieldName: string, factory: (fieldName: string) => WorkItemField) {
+  async fieldEnsure(
+    fieldName: string,
+    factory: (fieldName: string, isIdentity: boolean) => WorkItemField,
+    isIdentity: boolean
+  ) {
     let field!: WorkItemField | undefined;
     try {
       field = await this.fieldGet(fieldName);
     } catch (error) {
       if (!factory) throw error;
-      field = await this.fieldCreate(factory(fieldName));
+      field = await this.fieldCreate(factory(fieldName, isIdentity));
     }
     return field;
   }

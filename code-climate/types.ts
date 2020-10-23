@@ -19,6 +19,7 @@ export type WorkItemOptions = {
   id?: number;
   type: WorkItemType;
   issue: AnalysisIssue;
+  categoryFieldName: string;
   fingerprintFieldName: string;
   buildDefName: string;
   buildLabel: string;
@@ -352,6 +353,10 @@ export interface AnalysisMeasurement extends AnalysisItem {
 
 export interface AnalysisIssueLocation {
   path: string;
+  lines: {
+    begin: number;
+    end: number;
+  };
   positions: {
     begin: {
       line: number;
@@ -374,6 +379,7 @@ export interface AnalysisIssue extends AnalysisItem {
   categories: string[];
   remediation_points: number;
   location: AnalysisIssueLocation;
+  other_locations: AnalysisIssueLocation[];
   fingerprint: string;
   severity: string;
 }
