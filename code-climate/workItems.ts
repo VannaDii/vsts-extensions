@@ -5,16 +5,15 @@ import * as tl from 'azure-pipelines-task-lib/task';
 import { customAlphabet } from 'nanoid/non-secure';
 import MarkdownItHighlightJs from 'markdown-it-highlightjs';
 import {
-  AnalysisIssue,
   BuildLinkType,
   QueryCondition,
   WorkItem,
   WorkItemBatch,
   WorkItemField,
   WorkItemFieldPatch,
-  WorkItemPatch,
+  WorkItemOptionsCreate,
+  WorkItemOptionsUpdate,
   WorkItemQueryResult,
-  WorkItemType,
 } from './types';
 
 type LogType = 'debug' | 'info' | 'warn' | 'error';
@@ -57,11 +56,15 @@ export class WorkItemClient {
   }
 
   private log(type: LogType, context: OpContext, message: string) {
-    switch(type) {
-      case 'debug': return tl.debug(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
-      case 'error': return tl.error(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
-      case 'warn': return tl.warning(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
-      case 'info': return console.info(`[${context.correlationId}] ${message}`, context);
+    switch (type) {
+      case 'debug':
+        return tl.debug(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
+      case 'error':
+        return tl.error(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
+      case 'warn':
+        return tl.warning(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
+      case 'info':
+        return console.info(`[${context.correlationId}] ${message}`, context);
     }
   }
 
@@ -98,36 +101,29 @@ export class WorkItemClient {
     };
   }
 
-  async create(
-    type: WorkItemType,
-    issue: AnalysisIssue,
-    component: string,
-    buildVersion: string,
-    buildId: number,
-    fingerprintFieldName: string
-  ) {
+  async create(opts: WorkItemOptionsCreate) {
     return this.tryCatch(async (context) => {
-      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${type.toLowerCase()}`));
-      const titlePrefix = issue.check_name[0].toUpperCase() + issue.check_name.replace('-', ' ').slice(1);
-      const basicDesc = `<ol><li>Open ${component} > ${issue.location.path} and observe lines ${issue.location.positions.begin.line} - ${issue.location.positions.end.line}.</li></ol>`;
-      const extDesc = this.markdown.render(issue.content.body);
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${opts.type.toLowerCase()}`));
+      const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
+      const basicDesc = `<ol><li>Open ${opts.buildDefName} > ${opts.issue.location.path} and observe lines ${opts.issue.location.positions.begin.line} - ${opts.issue.location.positions.end.line}.</li></ol>`;
+      const extDesc = this.markdown.render(opts.issue.content.body);
       const ops = [
         {
           op: 'add',
-          path: `/fields/${fingerprintFieldName}`,
-          value: issue.fingerprint,
+          path: `/fields/${opts.fingerprintFieldName}`,
+          value: opts.issue.fingerprint,
           from: null,
         },
         {
           op: 'add',
           path: '/fields/System.Tags',
-          value: ['Code Climate', ...issue.categories, issue.check_name].join(','),
+          value: ['Code Climate', ...opts.issue.categories, opts.issue.check_name].join(','),
           from: null,
         },
         {
           op: 'add',
           path: '/fields/System.Title',
-          value: `${titlePrefix} in ${component} > ${issue.location.path}`,
+          value: `${titlePrefix} in ${opts.buildDefName} > ${opts.issue.location.path}`,
           from: null,
         },
         {
@@ -139,22 +135,22 @@ export class WorkItemClient {
         {
           op: 'add',
           path: '/fields/Microsoft.VSTS.Build.FoundIn',
-          value: `${component}_${buildVersion}`,
+          value: `${opts.buildDefName}_${opts.buildLabel}`,
           from: null,
         },
         {
           op: 'add',
           path: '/fields/Microsoft.VSTS.Scheduling.Effort',
-          value: Math.max(1, issue.remediation_points / 10000).toString(),
+          value: Math.max(1, opts.issue.remediation_points / 10000).toString(),
           from: null,
         },
         {
           op: 'add',
           path: '/fields/Microsoft.VSTS.TCM.ReproSteps',
-          value: `${issue.description}<br/><br/>${basicDesc}<br/><br/>${extDesc}`,
+          value: `${opts.issue.description}<br/><br/>${basicDesc}<br/><br/>${extDesc}`,
           from: null,
         },
-        this.getBuildRelationOp(buildId, 'Found in build'),
+        this.getBuildRelationOp(opts.buildId, 'Found in build'),
       ];
 
       context.url = workItemUrl;
@@ -170,16 +166,16 @@ export class WorkItemClient {
     });
   }
 
-  async update(id: number, buildDefName: string, buildLabel: string, buildId: number) {
+  async update(opts: WorkItemOptionsUpdate) {
     return this.tryCatch(async (context) => {
-      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, id.toString()));
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, opts.id.toString()));
       const ops = [
         {
           op: 'add',
           path: '/fields/Microsoft.VSTS.Build.FoundIn',
-          value: `${buildDefName}_${buildLabel}`,
+          value: `${opts.buildDefName}_${opts.buildLabel}`,
         },
-        this.getBuildRelationOp(buildId, 'Found in build'),
+        this.getBuildRelationOp(opts.buildId, 'Found in build'),
       ];
 
       context.url = workItemUrl;
