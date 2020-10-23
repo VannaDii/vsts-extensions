@@ -69,17 +69,9 @@ export async function trackIssues(config: TaskConfig) {
     return tl.setResult(tl.TaskResult.Failed, 'Analysis file not found.', true);
   }
 
-  const buildLabel = tl.getVariable('Build.BuildNumber');
-  if (!buildLabel || buildLabel.length === 0) {
-    tl.setResult(tl.TaskResult.Failed, tl.loc('NoBuildNumber'));
-    return;
-  }
-
-  const buildDefName = tl.getVariable('Build.DefinitionName');
-  if (!buildDefName || buildDefName.length === 0) {
-    tl.setResult(tl.TaskResult.Failed, tl.loc('NoDefinitionName'));
-    return;
-  }
+  const buildId = parseInt(tl.getVariable('Build.BuildId') as string);
+  const buildLabel = tl.getVariable('Build.BuildNumber') as string;
+  const buildDefName = tl.getVariable('Build.DefinitionName') as string;
 
   const projName = tl.getVariable('System.TeamProject');
   if (!projName || projName.length === 0) {
@@ -111,7 +103,16 @@ export async function trackIssues(config: TaskConfig) {
   // Create new ones
   const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFullyQualified] === f));
   for (const fingerprint of createItems) {
-    pendingOps.push(workItemClient.create('bug', analysisItems[fingerprint], buildDefName, buildLabel));
+    pendingOps.push(
+      workItemClient.create(
+        'bug',
+        analysisItems[fingerprint],
+        buildDefName,
+        buildLabel,
+        buildId,
+        FieldNameFullyQualified
+      )
+    );
   }
 
   // Update existing ones
@@ -122,13 +123,7 @@ export async function trackIssues(config: TaskConfig) {
       (w.fields[FieldNameFullyQualified] as string).length > 0
   );
   for (const workItem of updateItems) {
-    pendingOps.push(
-      workItemClient.update(workItem.id, {
-        op: 'add',
-        path: '/fields/Microsoft.VSTS.Build.FoundIn',
-        value: `${buildDefName}_${buildLabel}`,
-      })
-    );
+    pendingOps.push(workItemClient.update(workItem.id, buildDefName, buildLabel, buildId));
   }
 
   await Promise.all(pendingOps);

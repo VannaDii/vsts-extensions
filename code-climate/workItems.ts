@@ -6,10 +6,12 @@ import { customAlphabet } from 'nanoid/non-secure';
 import MarkdownItHighlightJs from 'markdown-it-highlightjs';
 import {
   AnalysisIssue,
+  BuildLinkType,
   QueryCondition,
   WorkItem,
   WorkItemBatch,
   WorkItemField,
+  WorkItemFieldPatch,
   WorkItemPatch,
   WorkItemQueryResult,
   WorkItemType,
@@ -71,7 +73,34 @@ export class WorkItemClient {
     return undefined;
   }
 
-  async create(type: WorkItemType, issue: AnalysisIssue, component: string, buildVersion: string) {
+  private getBuildRelationOp(buildId: number, linkType: BuildLinkType): WorkItemFieldPatch {
+    const timestamp = new Date().toISOString();
+    return {
+      op: 'add',
+      path: '/relations/-',
+      value: {
+        rel: 'ArtifactLink',
+        url: `vstfs:///Build/Build/${buildId}`,
+        attributes: {
+          authorizedDate: timestamp,
+          resourceCreatedDate: timestamp,
+          resourceModifiedDate: timestamp,
+          revisedDate: '9999-01-01T00:00:00Z',
+          comment: 'Linked by Code Climate',
+          name: linkType,
+        },
+      },
+    };
+  }
+
+  async create(
+    type: WorkItemType,
+    issue: AnalysisIssue,
+    component: string,
+    buildVersion: string,
+    buildId: number,
+    fingerprintFieldName: string
+  ) {
     return this.tryCatch(async (context) => {
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${type.toLowerCase()}`));
       const titlePrefix = issue.check_name[0].toUpperCase() + issue.check_name.replace('-', ' ').slice(1);
@@ -80,7 +109,7 @@ export class WorkItemClient {
       const ops = [
         {
           op: 'add',
-          path: `/fields/CodeClimate.Fingerprint`,
+          path: `/fields/${fingerprintFieldName}`,
           value: issue.fingerprint,
           from: null,
         },
@@ -120,6 +149,7 @@ export class WorkItemClient {
           value: `${issue.description}<br/><br/>${basicDesc}<br/><br/>${extDesc}`,
           from: null,
         },
+        this.getBuildRelationOp(buildId, 'Found in build'),
       ];
 
       context.url = workItemUrl;
@@ -135,9 +165,17 @@ export class WorkItemClient {
     });
   }
 
-  async update(id: number, ...ops: WorkItemPatch) {
+  async update(id: number, buildDefName: string, buildLabel: string, buildId: number) {
     return this.tryCatch(async (context) => {
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, id.toString()));
+      const ops = [
+        {
+          op: 'add',
+          path: '/fields/Microsoft.VSTS.Build.FoundIn',
+          value: `${buildDefName}_${buildLabel}`,
+        },
+        this.getBuildRelationOp(buildId, 'Found in build'),
+      ];
 
       context.url = workItemUrl;
       context.scope = this.update.name;
