@@ -132,6 +132,18 @@ export class WorkItemClient {
       },
       {
         op: 'add',
+        path: '/fields/System.AreaPath',
+        value: opts.areaPath,
+        from: null,
+      },
+      {
+        op: 'add',
+        path: '/fields/System.IterationPath',
+        value: opts.iterationPath,
+        from: null,
+      },
+      {
+        op: 'add',
         path: '/relations/-',
         value: {
           rel: 'ArtifactLink',

@@ -111,6 +111,8 @@ export async function trackIssues(config: TaskConfig) {
         buildLabel,
         buildId,
         fingerprintFieldName: FieldNameFullyQualified,
+        areaPath: config.issueAreaPath,
+        iterationPath: config.issueIterationPath
       })
     );
   }
@@ -132,6 +134,8 @@ export async function trackIssues(config: TaskConfig) {
         type: 'bug',
         issue: analysisItems[workItem.fields[FieldNameFullyQualified] as string],
         fingerprintFieldName: FieldNameFullyQualified,
+        areaPath: config.issueAreaPath,
+        iterationPath: config.issueIterationPath,
       })
     );
   }
