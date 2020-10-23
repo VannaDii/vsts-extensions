@@ -85,7 +85,7 @@ export class WorkItemClient {
     const timestamp = new Date().toISOString();
     const buildLinkType: BuildLinkType = 'Found in build';
     const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
-    const basicDesc = `<ol><li>Open ${opts.buildDefName} > ${opts.issue.location.path} and observe lines ${opts.issue.location.positions.begin.line} - ${opts.issue.location.positions.end.line}.</li></ol>`;
+    const basicDesc = `<ol><li>Open ${opts.sourceRoot}/${opts.issue.location.path} and observe lines ${opts.issue.location.positions.begin.line} - ${opts.issue.location.positions.end.line}.</li></ol>`;
     const extDesc = this.markdown.render(opts.issue.content.body);
     return [
       {
@@ -103,7 +103,7 @@ export class WorkItemClient {
       {
         op: 'add',
         path: '/fields/System.Title',
-        value: `${titlePrefix} in ${opts.buildDefName} > ${opts.issue.location.path}`,
+        value: `${titlePrefix} in ${opts.sourceRoot}/${opts.issue.location.path}`,
         from: null,
       },
       {

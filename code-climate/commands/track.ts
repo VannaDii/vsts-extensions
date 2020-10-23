@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 import { WorkItemClient } from '../workItems';
@@ -69,22 +70,12 @@ export async function trackIssues(config: TaskConfig) {
     return tl.setResult(tl.TaskResult.Failed, 'Analysis file not found.', true);
   }
 
+  const sourceRoot = path.basename(config.configFilePath);
   const buildId = parseInt(tl.getVariable('Build.BuildId') as string);
   const buildLabel = tl.getVariable('Build.BuildNumber') as string;
   const buildDefName = tl.getVariable('Build.DefinitionName') as string;
-
-  const projName = tl.getVariable('System.TeamProject');
-  if (!projName || projName.length === 0) {
-    tl.setResult(tl.TaskResult.Failed, tl.loc('NoProjectName'));
-    return;
-  }
-
-  const collectionUrl = tl.getVariable('System.TeamFoundationCollectionUri');
-  if (!collectionUrl || collectionUrl.length === 0) {
-    tl.setResult(tl.TaskResult.Failed, tl.loc('NoCollectionUrl'));
-    return;
-  }
-
+  const projName = tl.getVariable('System.TeamProject') as string;
+  const collectionUrl = tl.getVariable('System.TeamFoundationCollectionUri') as string;
   const accessToken = tl.getVariable('System.AccessToken');
   if (!accessToken || accessToken.length === 0) {
     tl.setResult(tl.TaskResult.Failed, tl.loc('NoAccessToken'));
@@ -110,6 +101,7 @@ export async function trackIssues(config: TaskConfig) {
         buildDefName,
         buildLabel,
         buildId,
+        sourceRoot,
         fingerprintFieldName: FieldNameFullyQualified,
         areaPath: config.issueAreaPath,
         iterationPath: config.issueIterationPath
@@ -131,6 +123,7 @@ export async function trackIssues(config: TaskConfig) {
         buildDefName,
         buildLabel,
         buildId,
+        sourceRoot,
         type: 'bug',
         issue: analysisItems[workItem.fields[FieldNameFullyQualified] as string],
         fingerprintFieldName: FieldNameFullyQualified,
