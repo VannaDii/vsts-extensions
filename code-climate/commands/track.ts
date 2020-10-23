@@ -4,6 +4,7 @@ import * as tl from 'azure-pipelines-task-lib/task';
 
 import { WorkItemClient } from '../workItems';
 import { AllSupportedOperations, AnalysisIssue, AnalysisItem, TaskConfig, WorkItem, WorkItemField } from '../types';
+import { getEvenHash } from '../utils';
 
 const OpThreshold = 20;
 const FieldNamespace = 'CodeClimate';
@@ -39,8 +40,9 @@ function loadAnalysisIssues(analysisPath: string): { [key: string]: AnalysisIssu
     .reduce((p, c) => ({ ...p, [c.fingerprint]: c }), {});
 }
 
-async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints: string[]) {
+async function getIssueWorkItems(workItemClient: WorkItemClient, sourceRoot: string, ...fingerprints: string[]) {
   const result: WorkItem[] = [];
+  const sourceRootHash = getEvenHash(sourceRoot);
   do {
     const batchIds = fingerprints.splice(0, 200);
     const queryResult = await workItemClient.query(
@@ -49,7 +51,7 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints
         {
           fieldName: FieldNameFingerprintQualified,
           operator: 'IN',
-          value: `(${batchIds.map((v) => `'${v}'`).join(', ')})`,
+          value: `(${batchIds.map((v) => `'${sourceRootHash}-${v}'`).join(', ')})`,
         },
       ]
     );
@@ -105,7 +107,7 @@ export async function trackIssues(config: TaskConfig) {
   }
 
   // Get all fingerprinted work items and setup for awaiting
-  const workItems = await getIssueWorkItems(workItemClient, ...fingerprints);
+  const workItems = await getIssueWorkItems(workItemClient, sourceRoot, ...fingerprints);
   let pendingOps: Promise<any>[] = [];
 
   // Create new ones

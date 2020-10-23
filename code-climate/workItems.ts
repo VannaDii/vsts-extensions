@@ -15,6 +15,7 @@ import {
   WorkItemPatch,
   WorkItemQueryResult,
 } from './types';
+import { getEvenHash } from './utils';
 
 type LogType = 'debug' | 'info' | 'warn' | 'error';
 type OpContext = { correlationId: string; [key: string]: string | number | boolean | object };
@@ -126,11 +127,13 @@ export class WorkItemClient {
     const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
     const basicDesc = this.getAffectedLinesMarkup(opts.issue, opts.sourceRoot);
     const extDesc = opts.issue.content?.body.length > 0 ? this.markdown.render(opts.issue.content.body) : '';
+    const sourceRootHash = getEvenHash(opts.sourceRoot);
+
     return [
       {
         op: 'add',
         path: `/fields/${opts.fingerprintFieldName}`,
-        value: opts.issue.fingerprint,
+        value: `${sourceRootHash}-${opts.issue.fingerprint}`,
         from: null,
       },
       {
