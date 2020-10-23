@@ -6,13 +6,8 @@
   "description": "Provides Code Climate interactions",
   "helpMarkDown": "Provides Code Climate interactions",
   "category": "Utility",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
-  "runsOn": [
-    "Agent"
-  ],
+  "visibility": ["Build", "Release"],
+  "runsOn": ["Agent"],
   "author": "Gio Palacino",
   "version": {
     "Major": 0,
@@ -92,7 +87,31 @@
       "label": "Track Issues",
       "defaultValue": "true",
       "required": true,
-      "helpMarkDown": "Wether or not to track Code Climate issues as bugs in Azure."
+      "helpMarkDown": "Whether or not to track Code Climate issues as bugs in Azure."
+    },
+    {
+      "name": "AreaPath",
+      "type": "pickList",
+      "label": "Issue Area",
+      "defaultValue": "",
+      "required": true,
+      "visibleRule": "TrackIssues = true",
+      "helpMarkDown": "The area in which to track issues.",
+      "properties": {
+        "DisableManageLink": "True"
+      }
+    },
+    {
+      "name": "IterationPath",
+      "type": "pickList",
+      "label": "Issue Iteration",
+      "defaultValue": "",
+      "required": true,
+      "visibleRule": "TrackIssues = true",
+      "helpMarkDown": "The iteration in which to track issues.",
+      "properties": {
+        "DisableManageLink": "True"
+      }
     },
     {
       "name": "Debug",
@@ -120,6 +139,22 @@
       "required": true,
       "groupName": "Advanced",
       "helpMarkDown": "The amount of memory, in bytes, to be the upper bound for engine containers via ENGINE_MEMORY_LIMIT_BYTES."
+    }
+  ],
+  "sourceDefinitions": [
+    {
+      "target": "AreaPath",
+      "endpoint": "/$(system.teamProject)/_apis/wit/classificationnodes/Areas?api-version=6.0&$depth=5",
+      "selector": "jsonpath:$..path",
+      "keySelector": "jsonpath:$..path",
+      "authKey": "tfs:teamfoundation"
+    },
+    {
+      "target": "IterationPath",
+      "endpoint": "/$(system.teamProject)/_apis/wit/classificationnodes/Iterations?api-version=6.0&$depth=5",
+      "selector": "jsonpath:$..path",
+      "keySelector": "jsonpath:$..path",
+      "authKey": "tfs:teamfoundation"
     }
   ],
   "messages": {

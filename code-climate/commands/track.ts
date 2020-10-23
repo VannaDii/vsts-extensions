@@ -104,14 +104,14 @@ export async function trackIssues(config: TaskConfig) {
   const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFullyQualified] === f));
   for (const fingerprint of createItems) {
     pendingOps.push(
-      workItemClient.create(
-        'bug',
-        analysisItems[fingerprint],
+      workItemClient.create({
+        type: 'bug',
+        issue: analysisItems[fingerprint],
         buildDefName,
         buildLabel,
         buildId,
-        FieldNameFullyQualified
-      )
+        fingerprintFieldName: FieldNameFullyQualified,
+      })
     );
   }
 
@@ -123,7 +123,7 @@ export async function trackIssues(config: TaskConfig) {
       (w.fields[FieldNameFullyQualified] as string).length > 0
   );
   for (const workItem of updateItems) {
-    pendingOps.push(workItemClient.update(workItem.id, buildDefName, buildLabel, buildId));
+    pendingOps.push(workItemClient.update({ id: workItem.id, buildDefName, buildLabel, buildId }));
   }
 
   await Promise.all(pendingOps);

@@ -9,9 +9,27 @@ export type TaskConfig = {
   engineTimeout: number;
   memLimit: number;
   trackIssues: boolean;
+  issueAreaPath: string;
+  issueIterationPath: string;
 };
 
 export type BuildLinkType = 'Build' | 'Found in build' | 'Integrated in build';
+
+export type WorkItemOptions = {
+  buildDefName: string;
+  buildLabel: string;
+  buildId: number;
+};
+
+export type WorkItemOptionsCreate = WorkItemOptions & {
+  type: WorkItemType;
+  issue: AnalysisIssue;
+  fingerprintFieldName: string;
+};
+
+export type WorkItemOptionsUpdate = WorkItemOptions & {
+  id: number;
+};
 
 /**  The class to represent a collection of REST reference links. */
 export type ReferenceLinks = { readonly links: Object };

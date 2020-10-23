@@ -7,8 +7,11 @@ import { AnalysisFormats, TaskConfig } from './types';
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 async function run() {
   const command = (tl.getInput('Command', true) as string).toLowerCase();
+  const trackIssues = tl.getBoolInput('TrackIssues', true);
   const config: TaskConfig = {
-    trackIssues: tl.getBoolInput('TrackIssues', true),
+    trackIssues,
+    issueAreaPath: tl.getInput('AreaPath', trackIssues) as string,
+    issueIterationPath: tl.getInput('IterationPath', trackIssues) as string,
     configFilePath: tl.getPathInput('ConfigPath', true, true) as string,
     analysisFormat: tl.getInput('AnalyzeFormat', true) as AnalysisFormats,
     sourcePath: tl.getPathInput('SourcePath', true, true) as string,
