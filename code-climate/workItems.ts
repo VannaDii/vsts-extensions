@@ -125,7 +125,7 @@ export class WorkItemClient {
     const buildLinkType: BuildLinkType = 'Found in build';
     const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
     const basicDesc = this.getAffectedLinesMarkup(opts.issue, opts.sourceRoot);
-    const extDesc = opts.issue.content.body.length > 0 ? this.markdown.render(opts.issue.content.body) : '';
+    const extDesc = opts.issue.content?.body.length > 0 ? this.markdown.render(opts.issue.content.body) : '';
     return [
       {
         op: 'add',
