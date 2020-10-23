@@ -144,6 +144,12 @@ export class WorkItemClient {
       },
       {
         op: 'add',
+        path: '/fields/Microsoft.VSTS.Common.ValueArea',
+        value: 'Architectural',
+        from: null,
+      },
+      {
+        op: 'add',
         path: '/relations/-',
         value: {
           rel: 'ArtifactLink',
