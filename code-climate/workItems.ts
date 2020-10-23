@@ -302,7 +302,8 @@ export class WorkItemClient {
       field = await this.fieldGet(fieldName);
     } catch (error) {
       if (!factory) throw error;
-      field = await this.fieldCreate(factory(fieldName, isIdentity));
+      field = factory(fieldName, isIdentity);
+      field = await this.fieldCreate(field);
     }
     return field;
   }
@@ -313,8 +314,10 @@ export class WorkItemClient {
       context.url = fieldsUrl;
       context.scope = this.fieldCreate.name;
       context.field = field;
-      this.log('debug', context, 'Creating work item field.');
+      this.log('info', context, 'Creating work item field.');
       const result = await got.post<WorkItemField>(fieldsUrl, { ...this.webOpts, json: field });
+      context.field = field;
+      this.log('info', context, 'Created work item field.');
 
       return result.body;
     });
