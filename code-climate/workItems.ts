@@ -57,7 +57,12 @@ export class WorkItemClient {
   }
 
   private log(type: LogType, context: OpContext, message: string) {
-    return console[type](`[${context.correlationId}] ${message}`, context);
+    switch(type) {
+      case 'debug': return tl.debug(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
+      case 'error': return tl.error(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
+      case 'warn': return tl.warning(`[${context.correlationId}] ${message} ${JSON.stringify(context)}`);
+      case 'info': return console.info(`[${context.correlationId}] ${message}`, context);
+    }
   }
 
   private async tryCatch<T>(op: (context: OpContext) => Promise<T>): Promise<T | undefined> {
