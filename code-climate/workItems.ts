@@ -300,6 +300,7 @@ export class WorkItemClient {
     let field!: WorkItemField | undefined;
     try {
       field = await this.fieldGet(fieldName);
+      if (!field?.referenceName) throw new Error(`Cannot find ${fieldName}`);
     } catch (error) {
       if (!factory) throw error;
       field = factory(fieldName, isIdentity);
