@@ -16,19 +16,13 @@ export type TaskConfig = {
 export type BuildLinkType = 'Build' | 'Found in build' | 'Integrated in build';
 
 export type WorkItemOptions = {
-  buildDefName: string;
-  buildLabel: string;
-  buildId: number;
-};
-
-export type WorkItemOptionsCreate = WorkItemOptions & {
+  id?: number;
   type: WorkItemType;
   issue: AnalysisIssue;
   fingerprintFieldName: string;
-};
-
-export type WorkItemOptionsUpdate = WorkItemOptions & {
-  id: number;
+  buildDefName: string;
+  buildLabel: string;
+  buildId: number;
 };
 
 /**  The class to represent a collection of REST reference links. */
@@ -63,7 +57,7 @@ export type WorkItemPatch = WorkItemFieldPatch[];
 
 export interface WorkItemFieldPatch {
   /** The path to copy from for the Move/Copy operation. */
-  from?: string;
+  from?: string | null;
 
   /** The patch operation */
   op: WorkItemOperation;
