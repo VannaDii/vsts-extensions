@@ -5,6 +5,7 @@ import * as tl from 'azure-pipelines-task-lib/task';
 import { WorkItemClient } from '../workItems';
 import { AllSupportedOperations, AnalysisIssue, AnalysisItem, TaskConfig, WorkItem, WorkItemField } from '../types';
 
+const OpThreshold = 20;
 const FieldNamespace = 'CodeClimate';
 const FieldNameFingerprint = 'Fingerprint';
 const FieldNameFullyQualified = `${FieldNamespace}.${FieldNameFingerprint}`;
@@ -59,6 +60,14 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints
   return result;
 }
 
+async function waitAtThreshold<T>(ops: Promise<T>[]): Promise<Promise<T>[]> {
+  if (ops.length >= OpThreshold) {
+    await Promise.all(ops);
+    return [];
+  }
+  return ops;
+}
+
 export async function trackIssues(config: TaskConfig) {
   if (!config || config.trackIssues !== true) {
     console.info('Issue Tracking Is Disabled. Skipping.');
@@ -89,7 +98,7 @@ export async function trackIssues(config: TaskConfig) {
 
   // Get all fingerprinted work items and setup for awaiting
   const workItems = await getIssueWorkItems(workItemClient, ...fingerprints);
-  const pendingOps: Promise<any>[] = [];
+  let pendingOps: Promise<any>[] = [];
 
   // Create new ones
   const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFullyQualified] === f));
@@ -107,6 +116,7 @@ export async function trackIssues(config: TaskConfig) {
         iterationPath: config.issueIterationPath
       })
     );
+    pendingOps = await waitAtThreshold(pendingOps);
   }
 
   // Update existing ones
@@ -131,7 +141,8 @@ export async function trackIssues(config: TaskConfig) {
         iterationPath: config.issueIterationPath,
       })
     );
+    pendingOps = await waitAtThreshold(pendingOps);
   }
 
-  await Promise.all(pendingOps);
+  pendingOps = await waitAtThreshold(pendingOps);
 }
