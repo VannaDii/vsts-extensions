@@ -123,7 +123,17 @@ export async function trackIssues(config: TaskConfig) {
       (w.fields[FieldNameFullyQualified] as string).length > 0
   );
   for (const workItem of updateItems) {
-    pendingOps.push(workItemClient.update({ id: workItem.id, buildDefName, buildLabel, buildId }));
+    pendingOps.push(
+      workItemClient.update({
+        id: workItem.id,
+        buildDefName,
+        buildLabel,
+        buildId,
+        type: 'bug',
+        issue: analysisItems[workItem.fields[FieldNameFullyQualified] as string],
+        fingerprintFieldName: FieldNameFullyQualified,
+      })
+    );
   }
 
   await Promise.all(pendingOps);
