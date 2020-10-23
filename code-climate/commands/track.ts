@@ -113,10 +113,11 @@ export async function trackIssues(config: TaskConfig) {
   // Create new ones
   const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFingerprintQualified] === f));
   for (const fingerprint of createItems) {
+    const issue = analysisItems[fingerprint];
     pendingOps.push(
       workItemClient.create({
+        issue,
         type: 'bug',
-        issue: analysisItems[fingerprint],
         buildDefName,
         buildLabel,
         buildId,
@@ -138,15 +139,16 @@ export async function trackIssues(config: TaskConfig) {
       (w.fields[FieldNameFingerprintQualified] as string).length > 0
   );
   for (const workItem of updateItems) {
+    const issue = analysisItems[workItem.fields[FieldNameFingerprintQualified] as string];
     pendingOps.push(
       workItemClient.update({
+        issue,
         id: workItem.id,
         buildDefName,
         buildLabel,
         buildId,
         sourceRoot,
         type: 'bug',
-        issue: analysisItems[workItem.fields[FieldNameFingerprintQualified] as string],
         categoryFieldName: FieldNameCategoryQualified,
         fingerprintFieldName: FieldNameFingerprintQualified,
         areaPath: config.issueAreaPath,

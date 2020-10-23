@@ -122,9 +122,14 @@ export class WorkItemClient {
   }
 
   private getStandardIssueOps(opts: WorkItemOptions): WorkItemPatch {
+    if (!opts.issue) {
+      throw new Error(`Cannot build operations with an issue. ${JSON.stringify(opts)}`);
+    }
+
+    const checkName = opts.issue.check_name;
     const timestamp = new Date().toISOString();
     const buildLinkType: BuildLinkType = 'Found in build';
-    const titlePrefix = opts.issue.check_name[0].toUpperCase() + opts.issue.check_name.replace('-', ' ').slice(1);
+    const titlePrefix = `${checkName[0].toUpperCase()}${checkName.replace('-', ' ').slice(1)}`;
     const basicDesc = this.getAffectedLinesMarkup(opts.issue, opts.sourceRoot);
     const extDesc = opts.issue.content?.body.length > 0 ? this.markdown.render(opts.issue.content.body) : '';
     const sourceRootHash = getEvenHash(opts.sourceRoot);
