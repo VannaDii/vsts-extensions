@@ -74,8 +74,13 @@ export class WorkItemClient {
     try {
       return await op(context);
     } catch (err) {
+      const errorKeys = Object.keys(err);
       const response = err.response?.body || 'No response data available';
-      const error = !!err.toJSON ? err.toJSON() : Object.keys(err).reduce((p, c) => ({ ...p, [c]: err[c] }), {});
+      const error = !!err.toJSON
+        ? err.toJSON() // For advanced errors
+        : errorKeys.length > 0
+        ? errorKeys.reduce((p, c) => ({ ...p, [c]: err[c] }), {}) // For basic custom errors
+        : { name: err.name, message: err.message, stack: err.stack }; // For built-in errors
       tl.error(`[${correlationId}] ${JSON.stringify({ error, context, response }, undefined, 2)}`);
     }
     return undefined;
