@@ -43,15 +43,20 @@ function fieldFactory(fieldName: string, isIdentity: boolean): WorkItemField {
 function loadAnalysisIssues(analysisPath: string, sourceRoot: string): { [key: string]: AnalysisIssue } {
   const sourceRootHash = getEvenHash(sourceRoot);
   const data = JSON.parse(fs.readFileSync(analysisPath).toString());
-  return (data as AnalysisItem[])
+  const allIssues = (data as AnalysisItem[])
     .filter((i) => i.type === 'issue')
     .map((v) => v as AnalysisIssue)
     .reduce((p, c) => ({ ...p, [`${sourceRootHash}-${c.fingerprint}`]: c }), {});
+
+  tl.debug(`Found ${Object.keys(allIssues).length} analysis issues.`);
+
+  return allIssues;
 }
 
 async function getIssueWorkItems(workItemClient: WorkItemClient, sourceRoot: string, ...fingerprints: string[]) {
   const result: WorkItem[] = [];
   const sourceRootHash = getEvenHash(sourceRoot);
+  tl.debug(`Searching for work items with ${fingerprints.length} fingerprints.`);
   do {
     const batchFingerprints = fingerprints.splice(0, 200);
     const queryResult = await workItemClient.query(
@@ -66,10 +71,16 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, sourceRoot: str
     );
     const workItemIds = queryResult?.workItems.map((w) => w.id);
     if (!!workItemIds) {
+      tl.debug(`Getting work items with ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
       do {
         const batchIds = workItemIds.splice(0, 200);
         const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
-        if (!!workItemBatch) result.push(...workItemBatch.value);
+        if (!!workItemBatch) {
+          tl.debug(`Adding ${workItemBatch.value.length} work items for update starting at ${workItemIds[0]}.`);
+          result.push(...workItemBatch.value);
+        } else {
+          tl.debug(`No updatable items found for ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
+        }
       } while (workItemIds.length > 0);
     }
   } while (fingerprints.length > 0);
@@ -138,6 +149,7 @@ export async function trackIssues(config: TaskConfig) {
 
   // Create new ones
   const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFingerprintQualified] === f));
+  tl.debug(`Creating ${createItems.length} new work items`);
   for (const fingerprint of createItems) {
     const issue = analysisItems[fingerprint];
     pendingOps.push(
@@ -156,6 +168,7 @@ export async function trackIssues(config: TaskConfig) {
       typeof w.fields[FieldNameFingerprintQualified] === 'string' &&
       (w.fields[FieldNameFingerprintQualified] as string).length > 0
   );
+  tl.debug(`Updating ${updateItems.length} existing work items`);
   for (const workItem of updateItems) {
     const issue = analysisItems[workItem.fields[FieldNameFingerprintQualified] as string];
     pendingOps.push(
