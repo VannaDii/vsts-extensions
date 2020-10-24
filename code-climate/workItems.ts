@@ -123,7 +123,7 @@ export class WorkItemClient {
 
   private getStandardIssueOps(opts: WorkItemOptions): WorkItemPatch {
     if (!opts.issue) {
-      throw new Error(`Cannot build operations with an issue. ${JSON.stringify(opts)}`);
+      throw new Error(`Cannot build operations without an issue. ${JSON.stringify(opts)}`);
     }
 
     const checkName = opts.issue.check_name;
