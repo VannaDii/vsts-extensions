@@ -3,7 +3,15 @@ import path from 'path';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 import { WorkItemClient } from '../workItems';
-import { AllSupportedOperations, AnalysisIssue, AnalysisItem, TaskConfig, WorkItem, WorkItemField } from '../types';
+import {
+  AllSupportedOperations,
+  AnalysisIssue,
+  AnalysisItem,
+  TaskConfig,
+  WorkItem,
+  WorkItemField,
+  WorkItemOptions,
+} from '../types';
 import { getEvenHash } from '../utils';
 
 const OpThreshold = 20;
@@ -32,33 +40,37 @@ function fieldFactory(fieldName: string, isIdentity: boolean): WorkItemField {
   };
 }
 
-function loadAnalysisIssues(analysisPath: string): { [key: string]: AnalysisIssue } {
+function loadAnalysisIssues(analysisPath: string, sourceRoot: string): { [key: string]: AnalysisIssue } {
+  const sourceRootHash = getEvenHash(sourceRoot);
   const data = JSON.parse(fs.readFileSync(analysisPath).toString());
   return (data as AnalysisItem[])
     .filter((i) => i.type === 'issue')
     .map((v) => v as AnalysisIssue)
-    .reduce((p, c) => ({ ...p, [c.fingerprint]: c }), {});
+    .reduce((p, c) => ({ ...p, [`${sourceRootHash}-${c.fingerprint}`]: c }), {});
 }
 
 async function getIssueWorkItems(workItemClient: WorkItemClient, sourceRoot: string, ...fingerprints: string[]) {
   const result: WorkItem[] = [];
   const sourceRootHash = getEvenHash(sourceRoot);
   do {
-    const batchIds = fingerprints.splice(0, 200);
+    const batchFingerprints = fingerprints.splice(0, 200);
     const queryResult = await workItemClient.query(
       ['System.Id', FieldNameFingerprintQualified],
       [
         {
           fieldName: FieldNameFingerprintQualified,
           operator: 'IN',
-          value: `(${batchIds.map((v) => `'${sourceRootHash}-${v}'`).join(', ')})`,
+          value: `(${batchFingerprints.map((v) => `'${sourceRootHash}-${v}'`).join(', ')})`,
         },
       ]
     );
     const workItemIds = queryResult?.workItems.map((w) => w.id);
     if (!!workItemIds) {
-      const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...workItemIds);
-      if (!!workItemBatch) result.push(...workItemBatch.value);
+      do {
+        const batchIds = workItemIds.splice(0, 200);
+        const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
+        if (!!workItemBatch) result.push(...workItemBatch.value);
+      } while (workItemIds.length > 0);
     }
   } while (fingerprints.length > 0);
 
@@ -96,8 +108,7 @@ export async function trackIssues(config: TaskConfig) {
     return;
   }
 
-  const analysisItems = loadAnalysisIssues(config.outputPath);
-  const fingerprints = Object.keys(analysisItems);
+  const analysisItems = loadAnalysisIssues(config.outputPath, sourceRoot);
   const workItemClient = new WorkItemClient(collectionUrl, projName, accessToken);
   try {
     await workItemClient.fieldEnsure(FieldNameCategoryQualified, fieldFactory, false);
@@ -107,8 +118,23 @@ export async function trackIssues(config: TaskConfig) {
   }
 
   // Get all fingerprinted work items and setup for awaiting
+  const fingerprints = Object.keys(analysisItems);
   const workItems = await getIssueWorkItems(workItemClient, sourceRoot, ...fingerprints);
   let pendingOps: Promise<any>[] = [];
+
+  // Setup common properties
+  const allItemProps: WorkItemOptions = {
+    areaPath: config.issueAreaPath,
+    buildDefName,
+    buildId,
+    buildLabel,
+    categoryFieldName: FieldNameCategoryQualified,
+    fingerprintFieldName: FieldNameFingerprintQualified,
+    issue: (undefined as unknown) as AnalysisIssue,
+    iterationPath: config.issueIterationPath,
+    sourceRoot,
+    type: 'bug',
+  };
 
   // Create new ones
   const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFingerprintQualified] === f));
@@ -116,16 +142,8 @@ export async function trackIssues(config: TaskConfig) {
     const issue = analysisItems[fingerprint];
     pendingOps.push(
       workItemClient.create({
+        ...allItemProps,
         issue,
-        type: 'bug',
-        buildDefName,
-        buildLabel,
-        buildId,
-        sourceRoot,
-        categoryFieldName: FieldNameCategoryQualified,
-        fingerprintFieldName: FieldNameFingerprintQualified,
-        areaPath: config.issueAreaPath,
-        iterationPath: config.issueIterationPath,
       })
     );
     pendingOps = await waitAtThreshold(pendingOps);
@@ -142,17 +160,9 @@ export async function trackIssues(config: TaskConfig) {
     const issue = analysisItems[workItem.fields[FieldNameFingerprintQualified] as string];
     pendingOps.push(
       workItemClient.update({
-        issue,
+        ...allItemProps,
         id: workItem.id,
-        buildDefName,
-        buildLabel,
-        buildId,
-        sourceRoot,
-        type: 'bug',
-        categoryFieldName: FieldNameCategoryQualified,
-        fingerprintFieldName: FieldNameFingerprintQualified,
-        areaPath: config.issueAreaPath,
-        iterationPath: config.issueIterationPath,
+        issue,
       })
     );
     pendingOps = await waitAtThreshold(pendingOps);
