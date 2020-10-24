@@ -53,9 +53,8 @@ function loadAnalysisIssues(analysisPath: string, sourceRoot: string): { [key: s
   return allIssues;
 }
 
-async function getIssueWorkItems(workItemClient: WorkItemClient, sourceRoot: string, ...fingerprints: string[]) {
+async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints: string[]) {
   const result: WorkItem[] = [];
-  const sourceRootHash = getEvenHash(sourceRoot);
   tl.debug(`Searching for work items with ${fingerprints.length} fingerprints.`);
   do {
     const batchFingerprints = fingerprints.splice(0, 200);
@@ -65,7 +64,7 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, sourceRoot: str
         {
           fieldName: FieldNameFingerprintQualified,
           operator: 'IN',
-          value: `(${batchFingerprints.map((v) => `'${sourceRootHash}-${v}'`).join(', ')})`,
+          value: `(${batchFingerprints.map((v) => `'${v}'`).join(', ')})`,
         },
       ]
     );
