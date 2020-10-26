@@ -88,7 +88,7 @@ async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: stri
 
 async function getWorkItemsById(workItemClient: WorkItemClient, workItemIds?: number[]) {
   const result: WorkItem[] = [];
-  if (!!workItemIds  && workItemIds.length > 0) {
+  if (!!workItemIds && workItemIds.length > 0) {
     tl.debug(`Getting work items with ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
     do {
       const batchIds = workItemIds.splice(0, 200);
@@ -195,12 +195,14 @@ export async function trackIssues(config: TaskConfig) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
     pendingOps.push(
-      workItemClient.comment(
-        workItem.id,
-        `Transitioned to ${transitionTo} because Code Climate doesn't see this particular issue anymore. It may still exist at a different location in code because fingerprints are location sensitive.`
-      )
+      workItemClient
+        .comment(
+          workItem.id,
+          `Transitioned to ${transitionTo} because Code Climate doesn't see this particular issue anymore. It may still exist at a different location in code because fingerprints are location sensitive.`
+        )
+        .then(() => workItemClient.get(['System.Id'], workItem.id))
+        .then(() => workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }))
     );
-    pendingOps.push(workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }));
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
