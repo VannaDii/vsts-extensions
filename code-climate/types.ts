@@ -11,6 +11,7 @@ export type TaskConfig = {
   trackIssues: boolean;
   issueAreaPath: string;
   issueIterationPath: string;
+  deleteDestroy: boolean;
 };
 
 export type BuildLinkType = 'Build' | 'Found in build' | 'Integrated in build';

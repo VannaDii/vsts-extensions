@@ -239,7 +239,7 @@ export async function trackIssues(config: TaskConfig) {
   for (const workItem of itemsForDelete) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
-    pendingOps.push(workItemClient.delete({ ...allItemProps, id: workItem.id, issue }, true));
+    pendingOps.push(workItemClient.delete({ ...allItemProps, id: workItem.id, issue }, config.deleteDestroy));
     pendingOps = await waitAtThreshold(pendingOps);
   }
 

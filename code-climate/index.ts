@@ -19,6 +19,7 @@ async function run() {
     debug: tl.getBoolInput('Debug', true),
     engineTimeout: parseInt(tl.getInput('EngineTimeout', true) as string),
     memLimit: parseInt(tl.getInput('EngineMemLimit', true) as string),
+    deleteDestroy: tl.getBoolInput('DeleteDestroy', true),
   };
 
   switch (command) {
