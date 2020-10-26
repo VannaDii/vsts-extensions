@@ -194,13 +194,13 @@ export async function trackIssues(config: TaskConfig) {
   for (const workItem of itemsForTransition) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
-    pendingOps.push(workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }));
     pendingOps.push(
       workItemClient.comment(
         workItem.id,
         `Transitioned to ${transitionTo} because Code Climate doesn't see this particular issue anymore. It may still exist at a different location in code because fingerprints are location sensitive.`
       )
     );
+    pendingOps.push(workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }));
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
