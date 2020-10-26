@@ -162,18 +162,15 @@ export async function trackIssues(config: TaskConfig) {
   const fingerprints = Object.keys(analysisItems);
   const scopedWorkItems = await getScopedWorkItems(workItemClient, config.issueAreaPath, config.issueIterationPath);
   const scopedFingerprints = scopedWorkItems.map((wi) => wi.fields[FieldNameFingerprintQualified] as string);
-  const itemsForDelete = scopedWorkItems.filter((v) => {
-    const fingerprint = v.fields[FieldNameFingerprintQualified] as string;
-    const earliestOne = Math.min(
-      ...scopedWorkItems
-        .filter((wi) => {
-          const filterprint = wi.fields[FieldNameFingerprintQualified] as string;
-          return filterprint === fingerprint;
-        })
-        .map((wi) => wi.id)
-    );
-    return v.id !== earliestOne;
-  });
+  const itemsForDelete = scopedWorkItems.filter(
+    (v) =>
+      v.id !==
+      Math.min(
+        ...scopedWorkItems
+          .filter((wi) => wi.fields[FieldNameFingerprintQualified] === v.fields[FieldNameFingerprintQualified])
+          .map((wi) => wi.id)
+      )
+  );
   const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
   const itemsForUpdate = scopedWorkItems.filter((wi) =>
     fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
