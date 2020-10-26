@@ -94,10 +94,10 @@ async function getWorkItemsById(workItemClient: WorkItemClient, workItemIds?: nu
       const batchIds = workItemIds.splice(0, 200);
       const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
       if (!!workItemBatch) {
-        tl.debug(`Adding ${workItemBatch.value.length} work items for update starting at ${workItemIds[0]}.`);
+        tl.debug(`Adding ${workItemBatch.value.length} work items for update starting at ${batchIds[0]}.`);
         result.push(...workItemBatch.value);
       } else {
-        tl.debug(`No updatable items found for ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
+        tl.debug(`No updatable items found for ${batchIds.length} IDs starting at ${batchIds[0]}.`);
       }
     } while (workItemIds.length > 0);
   }
