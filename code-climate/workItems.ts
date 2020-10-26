@@ -225,7 +225,7 @@ export class WorkItemClient {
     ];
   }
 
-  async delete(opts: WorkItemOptions) {
+  async delete(opts: WorkItemOptions, destroy: boolean = false) {
     return this.tryCatch(async (context) => {
       if (!opts.id) throw new Error('Cannot delete a work item without an ID.');
 
@@ -235,7 +235,10 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.delete.name;
       this.log('debug', context, 'Deleting work item for analysis issue.');
-      const result = await got.delete<WorkItem>(workItemUrl, { ...this.webOpts });
+      const result = await got.delete<WorkItem>(workItemUrl, {
+        ...this.webOpts,
+        searchParams: { ...(this.webOpts.searchParams as any), destroy },
+      });
 
       return result.body;
     });
