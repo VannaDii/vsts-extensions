@@ -114,6 +114,15 @@
       }
     },
     {
+      "name": "DeleteDestroy",
+      "type": "boolean",
+      "label": "Destroy on Delete",
+      "defaultValue": false,
+      "required": true,
+      "visibleRule": "TrackIssues = true",
+      "helpMarkDown": "Whether or not deleting a work item destroys it."
+    },
+    {
       "name": "Debug",
       "type": "boolean",
       "label": "Debug",
