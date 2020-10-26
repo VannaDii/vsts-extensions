@@ -88,7 +88,7 @@ async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: stri
 
 async function getWorkItemsById(workItemClient: WorkItemClient, workItemIds?: number[]) {
   const result: WorkItem[] = [];
-  if (!!workItemIds) {
+  if (!!workItemIds  && workItemIds.length > 0) {
     tl.debug(`Getting work items with ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
     do {
       const batchIds = workItemIds.splice(0, 200);
