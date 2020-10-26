@@ -76,7 +76,7 @@ async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: stri
       {
         fieldName: 'CodeClimate.Fingerprint',
         operator: '<>',
-        value: `'Done'`,
+        value: `''`,
       },
     ]
   );
