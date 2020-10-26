@@ -46,7 +46,16 @@ function loadAnalysisIssues(analysisPath: string, sourceRoot: string): { [key: s
   const allIssues = (data as AnalysisItem[])
     .filter((i) => i.type === 'issue')
     .map((v) => v as AnalysisIssue)
-    .reduce((p, c) => ({ ...p, [`${sourceRootHash}-${c.fingerprint}`]: c }), {});
+    .reduce(
+      (p, c) => ({
+        ...p,
+        [`${sourceRootHash}-${c.fingerprint}`]: {
+          ...c,
+          fingerprint: `${sourceRootHash}-${c.fingerprint}`,
+        },
+      }),
+      {}
+    );
 
   tl.debug(`Found ${Object.keys(allIssues).length} analysis issues.`);
 
@@ -94,10 +103,15 @@ async function getWorkItemsById(workItemClient: WorkItemClient, workItemIds?: nu
       const batchIds = workItemIds.splice(0, 200);
       const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
       if (!!workItemBatch) {
-        tl.debug(`Adding ${workItemBatch.value.length} work items for update starting at ${batchIds[0]}.`);
+        tl.debug(`Got ${workItemBatch.value.length} work items for starting at ${batchIds[0]}.`);
+        const foundIds = workItemBatch.value.map((wi) => wi.id);
+        const noMatchItems = batchIds.filter((id) => !foundIds.includes(id));
+        if (!!noMatchItems && noMatchItems.length > 0) {
+          tl.debug(`Missing items for ${noMatchItems.join(', ')}`);
+        }
         result.push(...workItemBatch.value);
       } else {
-        tl.debug(`No updatable items found for ${batchIds.length} IDs starting at ${batchIds[0]}.`);
+        tl.debug(`No items found for ${batchIds.length} IDs starting at ${batchIds[0]}.`);
       }
     } while (workItemIds.length > 0);
   }
@@ -148,15 +162,15 @@ export async function trackIssues(config: TaskConfig) {
   const fingerprints = Object.keys(analysisItems);
   const scopedWorkItems = await getScopedWorkItems(workItemClient, config.issueAreaPath, config.issueIterationPath);
   const scopedFingerprints = scopedWorkItems.map((wi) => wi.fields[FieldNameFingerprintQualified] as string);
+  const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
   const itemsForUpdate = scopedWorkItems.filter((wi) =>
     fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
   );
   const itemsForTransition = scopedWorkItems.filter(
     (wi) => !fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
   );
-  const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
 
-  // Setup common properties, and setup for awaiting
+  // Setup common properties, and awaiting
   let pendingOps: Promise<any>[] = [];
   const allItemProps: WorkItemOptions = {
     areaPath: config.issueAreaPath,
@@ -190,7 +204,7 @@ export async function trackIssues(config: TaskConfig) {
 
   // Transition old work items
   tl.debug(`Transitioning ${itemsForTransition.length} old work items`);
-  const transitionTo = 'Done'; // Relatively safe for now. There are other ways of getting this more dynamically.
+  const transitionTo = 'Done'; // Relatively safe for now. There are ways of getting this dynamically.
   for (const workItem of itemsForTransition) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
@@ -200,13 +214,13 @@ export async function trackIssues(config: TaskConfig) {
           workItem.id,
           `Transitioned to ${transitionTo} because Code Climate doesn't see this particular issue anymore. It may still exist at a different location in code because fingerprints are location sensitive.`
         )
-        .then(() => workItemClient.get(['System.Id'], workItem.id))
+        .then(() => workItemClient.get(['System.Id'], workItem.id)) // The `Boards` server seems to track retrieval-based time for consistency checks
         .then(() => workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }))
     );
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
-  // Wait for any strangler to finish
+  // Wait for any stragglers to finish
   if (!!pendingOps && pendingOps.length > 0) {
     await Promise.all(pendingOps);
   }
