@@ -294,11 +294,11 @@ export class WorkItemClient {
       context.url = workItemUrl;
       context.scope = this.comment.name;
       this.log('debug', context, 'Commenting on work item for analysis issue.');
-      const result = await got.post<WorkItem>(workItemUrl, {
+      await got.post<WorkItem>(workItemUrl, {
         ...this.webOpts,
         json: { text: comment },
         searchParams: { 'api-version': '6.0-preview.3' },
-        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json-patch+json' },
+        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json' },
       });
     });
   }
