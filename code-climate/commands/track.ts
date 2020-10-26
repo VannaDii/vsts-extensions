@@ -204,5 +204,8 @@ export async function trackIssues(config: TaskConfig) {
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
-  pendingOps = await waitAtThreshold(pendingOps);
+  // Wait for any strangler to finish
+  if (!!pendingOps && pendingOps.length > 0) {
+    await Promise.all(pendingOps);
+  }
 }
