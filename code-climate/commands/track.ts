@@ -162,6 +162,18 @@ export async function trackIssues(config: TaskConfig) {
   const fingerprints = Object.keys(analysisItems);
   const scopedWorkItems = await getScopedWorkItems(workItemClient, config.issueAreaPath, config.issueIterationPath);
   const scopedFingerprints = scopedWorkItems.map((wi) => wi.fields[FieldNameFingerprintQualified] as string);
+  const itemsForDelete = scopedWorkItems.filter((v) => {
+    const fingerprint = v.fields[FieldNameFingerprintQualified] as string;
+    const earliestOne = Math.min(
+      ...scopedWorkItems
+        .filter((wi) => {
+          const filterprint = wi.fields[FieldNameFingerprintQualified] as string;
+          return filterprint === fingerprint;
+        })
+        .map((wi) => wi.id)
+    );
+    return v.id !== earliestOne;
+  });
   const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
   const itemsForUpdate = scopedWorkItems.filter((wi) =>
     fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
@@ -217,6 +229,15 @@ export async function trackIssues(config: TaskConfig) {
         .then(() => workItemClient.get(['System.Id'], workItem.id)) // The `Boards` server seems to track retrieval-based time for consistency checks
         .then(() => workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }))
     );
+    pendingOps = await waitAtThreshold(pendingOps);
+  }
+
+  // Delete duplicate work items
+  tl.debug(`Deleting ${itemsForUpdate.length} duplicate work items`);
+  for (const workItem of itemsForDelete) {
+    const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
+    const issue = analysisItems[fingerprint];
+    pendingOps.push(workItemClient.delete({ ...allItemProps, id: workItem.id, issue }));
     pendingOps = await waitAtThreshold(pendingOps);
   }
 

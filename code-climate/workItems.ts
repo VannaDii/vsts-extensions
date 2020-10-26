@@ -225,6 +225,22 @@ export class WorkItemClient {
     ];
   }
 
+  async delete(opts: WorkItemOptions) {
+    return this.tryCatch(async (context) => {
+      if (!opts.id) throw new Error('Cannot delete a work item without an ID.');
+
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, opts.id.toString()));
+
+      context.wiId = opts.id;
+      context.url = workItemUrl;
+      context.scope = this.delete.name;
+      this.log('debug', context, 'Deleting work item for analysis issue.');
+      const result = await got.delete<WorkItem>(workItemUrl, { ...this.webOpts });
+
+      return result.body;
+    });
+  }
+
   async create(opts: WorkItemOptions) {
     return this.tryCatch(async (context) => {
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, `$${opts.type.toLowerCase()}`));
@@ -300,7 +316,6 @@ export class WorkItemClient {
         ...this.webOpts,
         json: { text: comment },
         searchParams: { 'api-version': '6.0-preview.3' },
-        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json' },
       });
     });
   }
