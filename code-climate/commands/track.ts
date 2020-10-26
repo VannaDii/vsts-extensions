@@ -172,8 +172,8 @@ export async function trackIssues(config: TaskConfig) {
       )
   );
   const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
-  const itemsForUpdate = scopedWorkItems.filter((wi) =>
-    fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string) && !itemsForDelete.includes(wi)
+  const itemsForUpdate = scopedWorkItems.filter(
+    (wi) => fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string) && !itemsForDelete.includes(wi)
   );
   const itemsForTransition = scopedWorkItems.filter(
     (wi) => !fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
@@ -229,12 +229,17 @@ export async function trackIssues(config: TaskConfig) {
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
+  // Wait for other ops to finish before handling deletes
+  if (!!pendingOps && pendingOps.length > 0) {
+    await Promise.all(pendingOps);
+  }
+
   // Delete duplicate work items
   tl.debug(`Deleting ${itemsForDelete.length} duplicate work items`);
   for (const workItem of itemsForDelete) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
-    pendingOps.push(workItemClient.delete({ ...allItemProps, id: workItem.id, issue }));
+    pendingOps.push(workItemClient.delete({ ...allItemProps, id: workItem.id, issue }, true));
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
