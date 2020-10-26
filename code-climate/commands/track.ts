@@ -233,7 +233,7 @@ export async function trackIssues(config: TaskConfig) {
   }
 
   // Delete duplicate work items
-  tl.debug(`Deleting ${itemsForUpdate.length} duplicate work items`);
+  tl.debug(`Deleting ${itemsForDelete.length} duplicate work items`);
   for (const workItem of itemsForDelete) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
