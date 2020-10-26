@@ -173,7 +173,7 @@ export async function trackIssues(config: TaskConfig) {
   );
   const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
   const itemsForUpdate = scopedWorkItems.filter((wi) =>
-    fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
+    fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string) && !itemsForDelete.includes(wi)
   );
   const itemsForTransition = scopedWorkItems.filter(
     (wi) => !fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
