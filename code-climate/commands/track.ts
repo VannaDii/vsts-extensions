@@ -191,7 +191,7 @@ export async function trackIssues(config: TaskConfig) {
   // Transition old work items
   tl.debug(`Transitioning ${itemsForTransition.length} old work items`);
   const transitionTo = 'Done'; // Relatively safe for now. There are other ways of getting this more dynamically.
-  for (const workItem of itemsForUpdate) {
+  for (const workItem of itemsForTransition) {
     const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
     const issue = analysisItems[fingerprint];
     pendingOps.push(workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }));
