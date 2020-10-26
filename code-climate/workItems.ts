@@ -162,7 +162,7 @@ export class WorkItemClient {
       {
         op: 'add',
         path: '/fields/System.State',
-        value: 'New',
+        value: opts.transitionTo || 'New',
         from: null,
       },
       {
@@ -261,6 +261,45 @@ export class WorkItemClient {
       });
 
       return result.body;
+    });
+  }
+
+  async transition(opts: WorkItemOptions) {
+    return this.tryCatch(async (context) => {
+      if (!opts.id) throw new Error('Cannot transition a work item without an ID.');
+      if (!opts.transitionTo) throw new Error('Cannot transition a work item without a target state.');
+
+      const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, opts.id.toString()));
+      const ops: WorkItemPatch = [{ op: 'add', path: '/fields/System.State', value: opts.transitionTo, from: null }];
+
+      context.url = workItemUrl;
+      context.scope = this.transition.name;
+      this.log('debug', context, 'Transitioning work item for analysis issue.');
+      const result = await got.patch<WorkItem>(workItemUrl, {
+        ...this.webOpts,
+        json: ops,
+        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json-patch+json' },
+      });
+
+      return result.body;
+    });
+  }
+
+  async comment(id: number, comment: string) {
+    return this.tryCatch(async (context) => {
+      if (!id || id < 1) throw new Error('Cannot comment on a work item without an ID.');
+
+      const workItemUrl = this.qualify(path.join('workItems', id.toString(), 'comments'));
+
+      context.url = workItemUrl;
+      context.scope = this.comment.name;
+      this.log('debug', context, 'Commenting on work item for analysis issue.');
+      const result = await got.post<WorkItem>(workItemUrl, {
+        ...this.webOpts,
+        json: { text: comment },
+        searchParams: { 'api-version': '6.0-preview.3' },
+        headers: { ...this.webOpts.headers, 'Content-Type': 'application/json-patch+json' },
+      });
     });
   }
 

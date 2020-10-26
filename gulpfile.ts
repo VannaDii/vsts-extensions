@@ -260,9 +260,9 @@ async function installExtensionDepsDev(...folders: string[]) {
   });
 }
 
-async function testExtensions(...folders: string[]) {
+async function testExtensions() {
   const args: string[] = [];
-  const userArgs = process.argv.slice(3).map((a) => (a.includes(' ') ? `"${a}"` : a));
+  const userArgs = getUserArgs().map((a) => (a.includes(' ') ? `"${a}"` : a));
   await waitForProcess(
     spawn(Tools.Jest, [...args, ...userArgs], { ...spawnOpts, stdio: ['ignore', 'inherit', 'inherit'] })
   );
@@ -348,10 +348,14 @@ export async function build() {
   await installExtensionDeps(...builtFolders);
 }
 
+function getUserArgs() {
+  const argsIndex = process.argv.indexOf('--args');
+  const hasArgs = argsIndex >= 2;
+  return hasArgs ? process.argv.slice(argsIndex + 1) : [];
+}
+
 export async function test() {
-  const builtFolders = await getAllSourceRoots();
-  const testFolders = builtFolders.filter((folder) => existsSync(path.join(folder, 'tests')));
-  await testExtensions(...testFolders);
+  await testExtensions();
 }
 
 export async function bundle() {

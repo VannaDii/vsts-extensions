@@ -53,7 +53,12 @@ function loadAnalysisIssues(analysisPath: string, sourceRoot: string): { [key: s
   return allIssues;
 }
 
-async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints: string[]) {
+async function getIssueWorkItems(
+  workItemClient: WorkItemClient,
+  areaPath: string,
+  iterationPath: string,
+  ...fingerprints: string[]
+) {
   const result: WorkItem[] = [];
   tl.debug(`Searching for work items with ${fingerprints.length} fingerprints.`);
   do {
@@ -62,6 +67,16 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints
       ['System.Id', FieldNameFingerprintQualified],
       [
         {
+          fieldName: 'System.AreaPath',
+          operator: '=',
+          value: areaPath,
+        },
+        {
+          fieldName: 'System.IterationPath',
+          operator: '=',
+          value: iterationPath,
+        },
+        {
           fieldName: FieldNameFingerprintQualified,
           operator: 'IN',
           value: `(${batchFingerprints.map((v) => `'${v}'`).join(', ')})`,
@@ -69,21 +84,61 @@ async function getIssueWorkItems(workItemClient: WorkItemClient, ...fingerprints
       ]
     );
     const workItemIds = queryResult?.workItems.map((w) => w.id);
-    if (!!workItemIds) {
-      tl.debug(`Getting work items with ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
-      do {
-        const batchIds = workItemIds.splice(0, 200);
-        const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
-        if (!!workItemBatch) {
-          tl.debug(`Adding ${workItemBatch.value.length} work items for update starting at ${workItemIds[0]}.`);
-          result.push(...workItemBatch.value);
-        } else {
-          tl.debug(`No updatable items found for ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
-        }
-      } while (workItemIds.length > 0);
-    }
+    const workItems = await getWorkItemsById(workItemClient, workItemIds);
+    result.push(...workItems);
   } while (fingerprints.length > 0);
 
+  return result;
+}
+
+async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: string, iterationPath: string) {
+  tl.debug(`Searching for work items in ${areaPath} and ${iterationPath}.`);
+  const queryResult = await workItemClient.query(
+    ['System.Id', FieldNameFingerprintQualified],
+    [
+      {
+        fieldName: 'System.AreaPath',
+        operator: '=',
+        value: areaPath,
+      },
+      {
+        fieldName: 'System.IterationPath',
+        operator: '=',
+        value: iterationPath,
+      },
+      {
+        fieldName: 'System.State',
+        operator: '<>',
+        value: 'Done',
+      },
+      {
+        fieldName: 'CodeClimate.Fingerprint',
+        operator: '<>',
+        value: 'Done',
+      },
+    ]
+  );
+  const workItemIds = queryResult?.workItems.map((w) => w.id);
+  const result = await getWorkItemsById(workItemClient, workItemIds);
+
+  return result;
+}
+
+async function getWorkItemsById(workItemClient: WorkItemClient, workItemIds?: number[]) {
+  const result: WorkItem[] = [];
+  if (!!workItemIds) {
+    tl.debug(`Getting work items with ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
+    do {
+      const batchIds = workItemIds.splice(0, 200);
+      const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
+      if (!!workItemBatch) {
+        tl.debug(`Adding ${workItemBatch.value.length} work items for update starting at ${workItemIds[0]}.`);
+        result.push(...workItemBatch.value);
+      } else {
+        tl.debug(`No updatable items found for ${workItemIds.length} IDs starting at ${workItemIds[0]}.`);
+      }
+    } while (workItemIds.length > 0);
+  }
   return result;
 }
 
@@ -127,10 +182,17 @@ export async function trackIssues(config: TaskConfig) {
     return tl.setResult(tl.TaskResult.Failed, `${error.name}: ${error.message}\n${error.stack}`, true);
   }
 
-  // Get all fingerprinted work items and setup for awaiting
+  // Get all fingerprinted items in the area/iteration
   const fingerprints = Object.keys(analysisItems);
-  const workItems = await getIssueWorkItems(workItemClient, sourceRoot, ...fingerprints);
-  let pendingOps: Promise<any>[] = [];
+  const scopedWorkItems = await getScopedWorkItems(workItemClient, config.issueAreaPath, config.issueIterationPath);
+  const scopedFingerprints = scopedWorkItems.map((wi) => wi.fields[FieldNameFingerprintQualified] as string);
+  const itemsForUpdate = scopedWorkItems.filter((wi) =>
+    fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
+  );
+  const itemsForTransition = scopedWorkItems.filter(
+    (wi) => !fingerprints.includes(wi.fields[FieldNameFingerprintQualified] as string)
+  );
+  const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
 
   // Setup common properties
   const allItemProps: WorkItemOptions = {
@@ -146,36 +208,45 @@ export async function trackIssues(config: TaskConfig) {
     type: 'bug',
   };
 
-  // Create new ones
-  const createItems = fingerprints.filter((f) => !workItems.find((w) => w.fields[FieldNameFingerprintQualified] === f));
-  tl.debug(`Creating ${createItems.length} new work items`);
-  for (const fingerprint of createItems) {
+  // Get all fingerprinted work items and setup for awaiting
+  let pendingOps: Promise<any>[] = [];
+  const workItems = await getIssueWorkItems(
+    workItemClient,
+    sourceRoot,
+    config.issueAreaPath,
+    config.issueIterationPath,
+    ...fingerprints
+  );
+
+  // Create new work item
+  tl.debug(`Creating ${itemsForCreate.length} new work items`);
+  for (const fingerprint of itemsForCreate) {
     const issue = analysisItems[fingerprint];
-    pendingOps.push(
-      workItemClient.create({
-        ...allItemProps,
-        issue,
-      })
-    );
+    pendingOps.push(workItemClient.create({ ...allItemProps, issue }));
     pendingOps = await waitAtThreshold(pendingOps);
   }
 
-  // Update existing ones
-  const updateItems = workItems.filter(
-    (w) =>
-      !!w.fields[FieldNameFingerprintQualified] &&
-      typeof w.fields[FieldNameFingerprintQualified] === 'string' &&
-      (w.fields[FieldNameFingerprintQualified] as string).length > 0
-  );
-  tl.debug(`Updating ${updateItems.length} existing work items`);
-  for (const workItem of updateItems) {
-    const issue = analysisItems[workItem.fields[FieldNameFingerprintQualified] as string];
+  // Update existing work items
+  tl.debug(`Updating ${itemsForUpdate.length} existing work items`);
+  for (const workItem of itemsForUpdate) {
+    const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
+    const issue = analysisItems[fingerprint];
+    pendingOps.push(workItemClient.update({ ...allItemProps, id: workItem.id, issue }));
+    pendingOps = await waitAtThreshold(pendingOps);
+  }
+
+  // Transition old work items
+  tl.debug(`Transitioning ${itemsForTransition.length} old work items`);
+  const transitionTo = 'Done'; // Relatively safe for now. There are other ways of getting this more dynamically.
+  for (const workItem of itemsForUpdate) {
+    const fingerprint = workItem.fields[FieldNameFingerprintQualified] as string;
+    const issue = analysisItems[fingerprint];
+    pendingOps.push(workItemClient.transition({ ...allItemProps, transitionTo, id: workItem.id, issue }));
     pendingOps.push(
-      workItemClient.update({
-        ...allItemProps,
-        id: workItem.id,
-        issue,
-      })
+      workItemClient.comment(
+        workItem.id,
+        `Transitioned to ${transitionTo} because Code Climate doesn't see this particular issue anymore. It may still exist at a different location in code because fingerprints are location sensitive.`
+      )
     );
     pendingOps = await waitAtThreshold(pendingOps);
   }
