@@ -15,8 +15,8 @@ export function findCodeClimate() {
 
 export function getEvenHash(value: string) {
   const factor = 3; // Base64 operates on 3's
-  const pathPadding =
-    value.length + (factor - [...value.length.toString()].map((s) => parseInt(s)).reduce((p, c) => p + c, 0));
-  const sourceRootHash = Buffer.from(value.padEnd(pathPadding)).toString('base64');
-  return sourceRootHash;
+  const target = factor * Math.ceil(value.length / factor);
+  const padSize = target - value.length;
+  const pathPadding = value.length + padSize;
+  return Buffer.from(value.padEnd(pathPadding)).toString('base64');
 }
