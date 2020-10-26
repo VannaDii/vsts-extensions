@@ -132,13 +132,12 @@ export class WorkItemClient {
     const titlePrefix = `${checkName[0].toUpperCase()}${checkName.replace('-', ' ').slice(1)}`;
     const basicDesc = this.getAffectedLinesMarkup(opts.issue, opts.sourceRoot);
     const extDesc = opts.issue.content?.body.length > 0 ? this.markdown.render(opts.issue.content.body) : '';
-    const sourceRootHash = getEvenHash(opts.sourceRoot);
 
     return [
       {
         op: 'add',
         path: `/fields/${opts.fingerprintFieldName}`,
-        value: `${sourceRootHash}-${opts.issue.fingerprint}`,
+        value: `${opts.issue.fingerprint}`,
         from: null,
       },
       {
@@ -251,6 +250,7 @@ export class WorkItemClient {
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, opts.id.toString()));
       const ops = this.getStandardIssueOps(opts);
 
+      context.wiId = opts.id;
       context.url = workItemUrl;
       context.scope = this.update.name;
       this.log('debug', context, 'Updating work item for analysis issue.');
@@ -272,6 +272,7 @@ export class WorkItemClient {
       const workItemUrl = this.qualify(path.join(this.witUrls.WorkItems, opts.id.toString()));
       const ops: WorkItemPatch = [{ op: 'add', path: '/fields/System.State', value: opts.transitionTo, from: null }];
 
+      context.wiId = opts.id;
       context.url = workItemUrl;
       context.scope = this.transition.name;
       this.log('debug', context, 'Transitioning work item for analysis issue.');
@@ -291,6 +292,7 @@ export class WorkItemClient {
 
       const workItemUrl = this.qualify(path.join('workItems', id.toString(), 'comments'));
 
+      context.wiId = id;
       context.url = workItemUrl;
       context.scope = this.comment.name;
       this.log('debug', context, 'Commenting on work item for analysis issue.');
