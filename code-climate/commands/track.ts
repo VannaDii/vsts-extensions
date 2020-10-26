@@ -53,44 +53,6 @@ function loadAnalysisIssues(analysisPath: string, sourceRoot: string): { [key: s
   return allIssues;
 }
 
-async function getIssueWorkItems(
-  workItemClient: WorkItemClient,
-  areaPath: string,
-  iterationPath: string,
-  ...fingerprints: string[]
-) {
-  const result: WorkItem[] = [];
-  tl.debug(`Searching for work items with ${fingerprints.length} fingerprints.`);
-  do {
-    const batchFingerprints = fingerprints.splice(0, 200);
-    const queryResult = await workItemClient.query(
-      ['System.Id', FieldNameFingerprintQualified],
-      [
-        {
-          fieldName: 'System.AreaPath',
-          operator: '=',
-          value: areaPath,
-        },
-        {
-          fieldName: 'System.IterationPath',
-          operator: '=',
-          value: iterationPath,
-        },
-        {
-          fieldName: FieldNameFingerprintQualified,
-          operator: 'IN',
-          value: `(${batchFingerprints.map((v) => `'${v}'`).join(', ')})`,
-        },
-      ]
-    );
-    const workItemIds = queryResult?.workItems.map((w) => w.id);
-    const workItems = await getWorkItemsById(workItemClient, workItemIds);
-    result.push(...workItems);
-  } while (fingerprints.length > 0);
-
-  return result;
-}
-
 async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: string, iterationPath: string) {
   tl.debug(`Searching for work items in ${areaPath} and ${iterationPath}.`);
   const queryResult = await workItemClient.query(
@@ -99,22 +61,22 @@ async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: stri
       {
         fieldName: 'System.AreaPath',
         operator: '=',
-        value: areaPath,
+        value: `'${areaPath}'`,
       },
       {
         fieldName: 'System.IterationPath',
         operator: '=',
-        value: iterationPath,
+        value: `'${iterationPath}'`,
       },
       {
         fieldName: 'System.State',
         operator: '<>',
-        value: 'Done',
+        value: `'Done'`,
       },
       {
         fieldName: 'CodeClimate.Fingerprint',
         operator: '<>',
-        value: 'Done',
+        value: `'Done'`,
       },
     ]
   );
@@ -194,7 +156,8 @@ export async function trackIssues(config: TaskConfig) {
   );
   const itemsForCreate = fingerprints.filter((fp) => !scopedFingerprints.includes(fp));
 
-  // Setup common properties
+  // Setup common properties, and setup for awaiting
+  let pendingOps: Promise<any>[] = [];
   const allItemProps: WorkItemOptions = {
     areaPath: config.issueAreaPath,
     buildDefName,
@@ -207,16 +170,6 @@ export async function trackIssues(config: TaskConfig) {
     sourceRoot,
     type: 'bug',
   };
-
-  // Get all fingerprinted work items and setup for awaiting
-  let pendingOps: Promise<any>[] = [];
-  const workItems = await getIssueWorkItems(
-    workItemClient,
-    sourceRoot,
-    config.issueAreaPath,
-    config.issueIterationPath,
-    ...fingerprints
-  );
 
   // Create new work item
   tl.debug(`Creating ${itemsForCreate.length} new work items`);
