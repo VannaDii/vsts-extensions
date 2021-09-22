@@ -49,7 +49,7 @@ async function withMany<TIn = any, TOut = any>(sources: TIn[], handler: (source:
               reject(...args);
             })
             .on('end', (...args: any[]) => {
-              resolve(...args);
+              resolve(args);
             });
         });
       }
@@ -315,7 +315,7 @@ async function publishExtensions(...files: string[]) {
       const result = await waitForProcess(spawn(Tools.Tfx, args, { ...spawnOpts }));
       printOutput(path.basename(file), result.stdout);
     } catch (error) {
-      printOutput(path.basename(file), error.stdout);
+      printOutput(path.basename(file), (error as any).stdout);
     }
   });
 }

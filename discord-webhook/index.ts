@@ -59,7 +59,7 @@ function coalesce(...values: (string | undefined)[]): string {
           .replace(/\$\(DiscordStatusColor\)/gi, color.toString());
         JSON.parse(customMessage);
         tl.debug(`Using provided custom message: '${customMessage}'`);
-      } catch (error) {
+      } catch (error: any) {
         tl.error(error);
         tl.error(customMessage);
         tl.setResult(tl.TaskResult.Failed, tl.loc('CustomMessageNotJson'));
@@ -78,7 +78,7 @@ function coalesce(...values: (string | undefined)[]): string {
     }
     tl.setResult(tl.TaskResult.Succeeded, `Posted to Discord channel #${channelId}`);
 
-  } catch (error) {
+  } catch (error: any) {
     tl.error(error);
     tl.setResult(
       tl.TaskResult.Failed,
