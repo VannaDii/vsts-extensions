@@ -1,0 +1,12 @@
+{
+  "name": "aws-s3",
+  "version": "1.0.0",
+  "author": "Gio Palacino",
+  "license": "MIT",
+  "description": "Manage S3 buckets directly.",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "0.21.4",
+    "azure-pipelines-task-lib": "3.1.9"
+  }
+}

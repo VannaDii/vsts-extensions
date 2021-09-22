@@ -1,0 +1,36 @@
+{
+  "manifestVersion": 1,
+  "id": "discord-webhook",
+  "name": "Discord Webhook",
+  "description": "Post a message to a discord channel",
+  "version": "0.2.0",
+  "publisher": "palacino-gio",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "icon.png"
+  },
+  "files": [
+    {
+      "path": "task"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "discord-webhook",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "task"
+      }
+    }
+  ]
+}
