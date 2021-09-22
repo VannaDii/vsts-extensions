@@ -81,7 +81,7 @@ export class WorkItemClient {
     const context: OpContext = { correlationId };
     try {
       return await op(context);
-    } catch (err) {
+    } catch (err: any) {
       const errorKeys = Object.keys(err);
       const response = err.response?.body || 'No response data available';
       const error = !!err.toJSON

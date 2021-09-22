@@ -260,7 +260,7 @@ async function makePullRequest(
       teamMembers
     );
     console.log(`Created pull request @ ${prUrl}`);
-  } catch (error) {
+  } catch (error: any) {
     tl.setResult(tl.TaskResult.Failed, error);
   }
 })();
