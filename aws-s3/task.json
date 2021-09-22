@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-  "id": "44e671d4-4771-4aa1-8f57-5235c0891645",
-  "name": "PostToDiscordWebHook",
-  "friendlyName": "Post To Discord Web Hook",
-  "description": "Posts a custom message to a Discord web hook.",
-  "helpMarkDown": "Posts a custom message to a [Discord](https://www.discord.com) web hook.",
+  "id": "32beaa22-9f07-4561-90a1-434f8df10890",
+  "name": "AwsS3Bucket",
+  "friendlyName": "Manage AWS S3 Bucket",
+  "description": "Manages AWS S3 buckets directly.",
+  "helpMarkDown": "Manages [AWS](https://aws.amazon.com) [S3](https://aws.amazon.com/s3/) buckets directly.",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -17,46 +17,50 @@
   "version": {
     "Major": 0,
     "Minor": 0,
-    "Patch": 128
+    "Patch": 1
   },
   "demands": [],
   "minimumAgentVersion": "2.173.0",
   "inputs": [
     {
-      "name": "DiscordChannelId",
+      "name": "BucketName",
       "type": "string",
-      "label": "Discord Channel Id",
+      "label": "Bucket Name",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "The channel ID of the [Discord webhook](https://discord.com/developers/docs/resources/webhook)."
+      "helpMarkDown": "The name of the target bucket in AWS S3."
     },
     {
-      "name": "DiscordWebhookKey",
-      "type": "string",
-      "label": "Discord Webhook Key",
-      "defaultValue": "",
+      "name": "ActionType",
+      "type": "pickList",
+      "label": "Action",
+      "defaultValue": "Create",
       "required": true,
-      "helpMarkDown": "The webhook key of the [Discord webhook](https://discord.com/developers/docs/resources/webhook)."
+      "helpMarkDown": "The action, or type of action, to be performed.",
+      "options": {
+        "Create": "Create",
+        "Destroy": "Destroy"
+      }
     },
     {
-      "name": "DiscordCustomMessage",
-      "type": "multiLine",
-      "label": "Custom Message JSON",
-      "defaultValue": "",
+      "name": "IfNotExists",
+      "type": "boolean",
+      "label": "If Not Exists",
+      "defaultValue": "true",
       "required": true,
-      "helpMarkDown": "The JSON Payload [custom message](https://discord.com/developers/docs/resources/webhook#execute-webhook) to post to this web hook. An appropriate timestamp value is available in the variable $(DiscordTimeStamp)."
+      "helpMarkDown": "Checked to only create it if it doesn't already exist.",
+      "visibleRule": "ActionType == Create"
     }
   ],
-  "instanceNameFormat": "Post to Discord",
+  "instanceNameFormat": "$(ActionType) Bucket",
   "execution": {
-    "Node10": {
+    "Node": {
       "target": "index.js"
     }
   },
   "messages": {
-    "NoChannelId": "No channel ID to Discord was provided.",
-    "NoWebhookKey": "No webhook key to Discord was provided.",
-    "NoCustomMessage": "No custom message was provided.",
-    "CustomMessageNotJson": "The custom message was not JSON."
+    "NoBucketName": "No bucket name was provided.",
+    "NoActionType": "No action (create || destroy) was provided.",
+    "InvalidActionType": "An invalid action was provided. Please update the configuration."
   }
 }

@@ -1,9 +1,9 @@
 {
   "manifestVersion": 1,
-  "id": "discord-webhook",
-  "name": "Discord Webhook",
-  "description": "Post a message to a discord channel",
-  "version": "0.2.0",
+  "id": "aws-s3",
+  "name": "AWS S3 Buckets",
+  "description": "Manage AWS S3 buckets directly.",
+  "version": "0.1.0",
   "publisher": "palacino-gio",
   "targets": [
     {
@@ -23,7 +23,7 @@
   ],
   "contributions": [
     {
-      "id": "discord-webhook",
+      "id": "aws-s3",
       "type": "ms.vss-distributed-task.task",
       "targets": [
         "ms.vss-distributed-task.tasks"
