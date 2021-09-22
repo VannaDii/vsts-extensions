@@ -154,7 +154,7 @@ export async function trackIssues(config: TaskConfig) {
   try {
     await workItemClient.fieldEnsure(FieldNameCategoryQualified, fieldFactory, false);
     await workItemClient.fieldEnsure(FieldNameFingerprintQualified, fieldFactory, true);
-  } catch (error) {
+  } catch (error: any) {
     return tl.setResult(tl.TaskResult.Failed, `${error.name}: ${error.message}\n${error.stack}`, true);
   }
 
