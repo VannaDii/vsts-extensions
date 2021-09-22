@@ -6,6 +6,6 @@
   "description": "Compares to branches raising an error if one is ahead of the other",
   "main": "index.js",
   "dependencies": {
-    "azure-pipelines-task-lib": "2.11.2"
+    "azure-pipelines-task-lib": "3.1.9"
   }
 }

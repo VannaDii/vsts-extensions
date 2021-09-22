@@ -1,18 +1,19 @@
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 
-const responses: any[] = [];
+const responses: { [key: string]: any[] } = {};
 const original = require('axios');
 
-export function pushResponse(response: any) {
-  responses.push(response);
+export function pushResponse(response: any, url: string) {
+  responses[url] = responses[url] || [];
+  responses[url].push(response);
 }
 
-function nextResponse(): any {
-  return responses.shift();
+function nextResponse(url: string): any {
+  return responses[url].shift();
 }
 
 original.post = <T = any, R = AxiosResponse<T>>(url: string, data?: any, config?: AxiosRequestConfig): Promise<R> => {
-  return Promise.resolve(nextResponse());
+  return Promise.resolve(nextResponse(url));
 };
 
 export default original;
