@@ -249,13 +249,7 @@ async function installExtensionDeps(...folders: string[]) {
 
 async function installExtensionDepsDev(...folders: string[]) {
   await withMany(folders, async (folder) => {
-    const args = [
-      '--cwd',
-      `${folder}`,
-      'install',
-      '--silent',
-      ...yarnArgs,
-    ];
+    const args = ['--cwd', `${folder}`, 'install', '--silent', ...yarnArgs];
     return await waitForProcess(spawn(Tools.Yarn, args, { ...spawnOpts }));
   });
 }
@@ -321,31 +315,47 @@ async function publishExtensions(...files: string[]) {
 }
 
 export async function install() {
-  const taskFolders = await getAllSourceRoots();
-  await installExtensionDepsDev(...taskFolders);
+  try {
+    const taskFolders = await getAllSourceRoots();
+    await installExtensionDepsDev(...taskFolders);
+  } catch (error: any) {
+    handleError(error);
+  }
 }
 
 export async function clean() {
-  await fs.rmdir(PathTo.Built, { recursive: true });
-  await fs.rmdir(PathTo.Bundled, { recursive: true });
-  await fs.rmdir(PathTo.Jest, { recursive: true });
+  try {
+    await fs.rmdir(PathTo.Built, { recursive: true });
+    await fs.rmdir(PathTo.Bundled, { recursive: true });
+    await fs.rmdir(PathTo.Jest, { recursive: true });
+  } catch (error: any) {
+    handleError(error);
+  }
 }
 
 export async function manifest() {
-  const taskFolders = await getAllSourceRoots();
-  await updateExtensions(...taskFolders);
+  try {
+    const taskFolders = await getAllSourceRoots();
+    await updateExtensions(...taskFolders);
+  } catch (error: any) {
+    handleError(error);
+  }
 }
 
 export async function build() {
-  await fs.rmdir(PathTo.Built, { recursive: true });
+  try {
+    await fs.rmdir(PathTo.Built, { recursive: true });
 
-  const taskFolders = await getAllSourceRoots();
+    const taskFolders = await getAllSourceRoots();
 
-  await Promise.all([updateExtensions(...taskFolders), makeExtensionBuildFolders(...taskFolders)]);
-  await Promise.all([compileExtensions(...taskFolders), copyExtensionAssets(...taskFolders)]);
+    await Promise.all([updateExtensions(...taskFolders), makeExtensionBuildFolders(...taskFolders)]);
+    await Promise.all([compileExtensions(...taskFolders), copyExtensionAssets(...taskFolders)]);
 
-  const builtFolders = await getAllBuiltRoots();
-  await installExtensionDeps(...builtFolders);
+    const builtFolders = await getAllBuiltRoots();
+    await installExtensionDeps(...builtFolders);
+  } catch (error: any) {
+    handleError(error);
+  }
 }
 
 function getUserArgs() {
@@ -355,20 +365,39 @@ function getUserArgs() {
 }
 
 export async function test() {
-  await testExtensions();
+  try {
+    await testExtensions();
+  } catch (error: any) {
+    handleError(error);
+  }
 }
 
 export async function bundle() {
-  await fs.rmdir(PathTo.Bundled, { recursive: true });
-  await fs.mkdir(PathTo.Bundled, { recursive: true });
+  try {
+    await fs.rmdir(PathTo.Bundled, { recursive: true });
+    await fs.mkdir(PathTo.Bundled, { recursive: true });
 
-  const builtFolders = await getAllBuiltRoots();
-  await bundleExtensions(...builtFolders);
+    const builtFolders = await getAllBuiltRoots();
+    await bundleExtensions(...builtFolders);
+  } catch (error: any) {
+    handleError(error);
+  }
 }
 
 export async function publish() {
-  const vsixFiles = await getAllBundles();
-  await publishExtensions(...vsixFiles);
+  try {
+    const vsixFiles = await getAllBundles();
+    await publishExtensions(...vsixFiles);
+  } catch (error: any) {
+    handleError(error);
+  }
+}
+
+function handleError(error: any) {
+  if (!error) return;
+  const isError = error instanceof Error;
+  const finalError = isError ? `${error.name} Error: ${error.message} ${error.stack}` : (error as string);
+  console.error(finalError);
 }
 
 type ChildProcessResult = { code: number; stdout: string; stderr: string };
