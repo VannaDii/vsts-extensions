@@ -261,7 +261,7 @@ async function installExtensionDepsDev(...folders: string[]) {
 }
 
 async function testExtensions() {
-  const args: string[] = [];
+  const args: string[] = ['--runInBand'];
   const userArgs = getUserArgs().map((a) => (a.includes(' ') ? `"${a}"` : a));
   await waitForProcess(
     spawn(Tools.Jest, [...args, ...userArgs], { ...spawnOpts, stdio: ['ignore', 'inherit', 'inherit'] })
