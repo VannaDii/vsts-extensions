@@ -11,17 +11,6 @@ variables:
 name: $(Version.Major).$(Version.Minor)$(Rev:.r)
 
 steps:
-  - task: Cache@2
-    inputs:
-      key: yarn | $(Agent.OS) | azure-extensions
-      path: $(YARN_CACHE_FOLDER)
-      cacheHitVar: 'CACHED_DEPS'
-      restoreKeys: |
-        yarn | $(Agent.OS) | azure-extensions
-        yarn | $(Agent.OS)
-        yarn
-    displayName: Dependency Cache
-
   - script: yarn install
     displayName: Install Dependencies
     workingDirectory: $(WorkspacePath)
