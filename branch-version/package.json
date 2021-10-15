@@ -6,6 +6,6 @@
   "description": "Extracts a version number from a branch name",
   "main": "index.js",
   "dependencies": {
-    "azure-pipelines-task-lib": "3.1.9"
+    "azure-pipelines-task-lib": "3.1.10"
   }
 }
