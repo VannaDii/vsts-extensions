@@ -33,8 +33,8 @@ async function getLastCommit(repoName: string, branchName: string): Promise<stri
   const body = response.data;
   tl.debug(`Got commits: ${JSON.stringify(body)}`);
   const isBodyString = typeof body === 'string';
-  const result = isBodyString ? (JSON.parse(body) as { value: { commitId: string }[] }) : body;
-  const commitIds = result.value.map((i: any) => i.commitId) as string[];
+  const result = (isBodyString ? JSON.parse(body) : body) as { value: { commitId: string }[] };
+  const commitIds = result.value.map((i) => i.commitId) as string[];
   tl.debug(`Using parsed commit IDs: ${JSON.stringify(commitIds)}`);
   return commitIds[0];
 }
@@ -74,8 +74,8 @@ async function getRemoteItemsMeta(
   const body = response.data;
   tl.debug(`Got remote paths: ${JSON.stringify(body)}`);
   const isBodyString = typeof body === 'string';
-  const result = isBodyString ? (JSON.parse(body) as { value: { path: string }[] }) : body;
-  const remotePaths = result.value.map((i: any) => {
+  const result = (isBodyString ? JSON.parse(body) : body) as { value: { path: string; commitId: string }[] };
+  const remotePaths = result.value.map((i) => {
     return {
       path: i.path,
       commitId: i.commitId,
