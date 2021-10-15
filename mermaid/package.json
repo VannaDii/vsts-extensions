@@ -1,7 +1,7 @@
 {
   "name": "marked-mermaid-renderer",
   "version": "0.0.1",
-  "description": "Marked Mermaid Renderer",
+  "description": "A Marked and Mermaid Renderer",
   "main": "mermaid-render.html",
   "dependencies": {
     "vss-web-extension-sdk": "^5.141.0"
