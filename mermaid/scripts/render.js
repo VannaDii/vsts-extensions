@@ -5,7 +5,7 @@ const mermaidExtension = {
     return src.match(/^@{3}\s*?mermaid\s*?$/gm)?.index;
   },
   tokenizer(src, tokens) {
-    const rule = /\s*?^@{3}\s*?mermaid\s*?^([\s\S]*)^@{3}\s*?$/gm;
+    const rule = /^@{3}\smermaid\s*?^([\s\S]*?)^@{3}\s*?$/gm;
     const match = rule.exec(src);
     if (match && src.substring(0, match.index).trim() === '') {
       const token = {
