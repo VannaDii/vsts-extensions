@@ -1,3 +1,4 @@
+let graphCounter = 0;
 const mermaidExtension = {
   name: 'mermaid',
   level: 'block',
@@ -13,18 +14,23 @@ const mermaidExtension = {
         raw: match[0], // Text to consume from the source
         text: match[0], // Additional custom properties
         tokens: [...match[1].split('\n')], // Array where child inline tokens will be generated
+        id: graphCounter++,
       };
       return token;
     }
   },
   renderer(token) {
-    return `<div class="mermaid">${token.tokens.filter((t) => !t.startsWith(':')).join('\n')}</div>`;
+    let graphSvg;
+    const grafDef = token.tokens.filter((t) => !t.startsWith('@')).join('\n');
+    mermaid.mermaidAPI.render(`graphDiv_${token.id}`, grafDef, (svg) => (graphSvg = svg));
+    return `<div class="mermaid">${graphSvg}</div>`;
   },
 };
 const markedMermaidRenderer = {
   renderContent: function (rawContent, options) {
     marked.use({ extensions: [mermaidExtension] });
-    document.getElementById('render-content-display').innerHTML = marked(rawContent);
+    const targetElement = document.getElementById('render-content-display');
+    targetElement.innerHTML = marked(rawContent);
   },
 };
 VSS.init({
