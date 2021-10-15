@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "marked-mermaid-renderer",
+  "version": "0.0.1",
+  "name": "Marked Mermaid Renderer",
+  "description": "A Marked and Mermaid Renderer",
+  "public": true,
+  "publisher": "palacino-gio",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "scopes": ["vso.code"],
+  "categories": ["Azure Repos"],
+  "tags": ["mermaid", "diagrams", "render", "preview", "marked"],
+  "icons": {
+    "default": "icon.png"
+  },
+  "contributions": [
+    {
+      "id": "marked-mermaid-renderer",
+      "type": "ms.vss-code-web.content-renderer",
+      "description": "Shows a MD and Mermaid renderer for .md and .mmd files",
+      "targets": ["ms.vss-code-web.content-renderer-collection"],
+      "properties": {
+        "uri": "mermaid-render.html",
+        "fileExtensions": ["md", "mmd"],
+        "mimeTypes": ["text/html"],
+        "defaultBehavior": "showRenderedContent",
+        "registeredObjectId": "marked_mermaid_renderer"
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "mermaid-render.html",
+      "addressable": true
+    },
+    {
+      "path": "scripts",
+      "addressable": true
+    },
+    {
+      "path": "node_modules/vss-web-extension-sdk/lib",
+      "addressable": true,
+      "packagePath": "lib"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "marked-mermaid-renderer",
+  "version": "0.0.1",
+  "description": "Marked Mermaid Renderer",
+  "main": "mermaid-render.html",
+  "dependencies": {
+    "vss-web-extension-sdk": "^5.141.0"
+  },
+  "keywords": [
+    "mermaid",
+    "diagrams",
+    "render",
+    "preview"
+  ],
+  "author": "Gio Palacino <gio@palacino.net>",
+  "license": "MIT"
+}
