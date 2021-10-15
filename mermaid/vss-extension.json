@@ -32,6 +32,11 @@
       }
     }
   ],
+  "content": {
+    "details": {
+      "path": "marketplace/overview.md"
+    }
+  },
   "files": [
     {
       "path": "mermaid-render.html",
