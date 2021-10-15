@@ -4,7 +4,7 @@
   "description": "A Marked and Mermaid Renderer",
   "main": "mermaid-render.html",
   "dependencies": {
-    "vss-web-extension-sdk": "^5.141.0"
+    "vss-web-extension-sdk": "5.141.0"
   },
   "keywords": [
     "mermaid",
