@@ -11,6 +11,7 @@ import {
   WorkItem,
   WorkItemField,
   WorkItemOptions,
+  WorkItemReference,
 } from '../types';
 import { getEvenHash } from '../utils';
 
@@ -89,7 +90,7 @@ async function getScopedWorkItems(workItemClient: WorkItemClient, areaPath: stri
       },
     ]
   );
-  const workItemIds = queryResult?.workItems.map((w) => w.id);
+  const workItemIds = queryResult?.workItems.map((w: WorkItemReference) => w.id);
   const result = await getWorkItemsById(workItemClient, workItemIds);
 
   return result;
@@ -104,7 +105,7 @@ async function getWorkItemsById(workItemClient: WorkItemClient, workItemIds?: nu
       const workItemBatch = await workItemClient.get(['System.Id', FieldNameFingerprintQualified], ...batchIds);
       if (!!workItemBatch) {
         tl.debug(`Got ${workItemBatch.value.length} work items for starting at ${batchIds[0]}.`);
-        const foundIds = workItemBatch.value.map((wi) => wi.id);
+        const foundIds = workItemBatch.value.map((wi: WorkItem) => wi.id);
         const noMatchItems = batchIds.filter((id) => !foundIds.includes(id));
         if (!!noMatchItems && noMatchItems.length > 0) {
           tl.debug(`Missing items for ${noMatchItems.join(', ')}`);
@@ -188,7 +189,7 @@ export async function trackIssues(config: TaskConfig) {
     buildLabel,
     categoryFieldName: FieldNameCategoryQualified,
     fingerprintFieldName: FieldNameFingerprintQualified,
-    issue: (undefined as unknown) as AnalysisIssue,
+    issue: undefined as unknown as AnalysisIssue,
     iterationPath: config.issueIterationPath,
     sourceRoot,
     type: 'bug',
