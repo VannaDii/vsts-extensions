@@ -108,25 +108,13 @@ async function getAllRootsFrom(base: string, filter?: (value: Dirent, index: num
 
 async function getAllSourceRoots() {
   return withCache(KeyTo.SourceRoots, () =>
-    getAllRootsFrom(
-      PathTo.Source,
-      (ent) =>
-        ent.isDirectory() &&
-        existsSync(path.join(ent.name, 'vss-extension.json')) &&
-        existsSync(path.join(ent.name, 'task.json'))
-    )
+    getAllRootsFrom(PathTo.Source, (ent) => ent.isDirectory() && existsSync(path.join(ent.name, 'vss-extension.json')))
   );
 }
 
 async function getAllBuiltRoots() {
   return withCache(KeyTo.BuiltRoots, () =>
-    getAllRootsFrom(
-      PathTo.Built,
-      (ent) =>
-        ent.isDirectory() &&
-        existsSync(path.join(ent.name, 'vss-extension.json')) &&
-        existsSync(path.join(ent.name, 'task.json'))
-    )
+    getAllRootsFrom(PathTo.Built, (ent) => ent.isDirectory() && existsSync(path.join(ent.name, 'vss-extension.json')))
   );
 }
 
@@ -150,9 +138,10 @@ async function updateExtensions(...folders: string[]) {
     const taskFilePath = path.join(folder, 'task.json');
     const packageFilePath = path.join(folder, 'package.json');
     const manifestFilePath = path.join(folder, 'vss-extension.json');
+    const isTask = existsSync(taskFilePath);
 
     const [_task, _package, _manifest] = await Promise.all([
-      readJson<VssTask>(taskFilePath),
+      isTask ? readJson<VssTask>(taskFilePath) : Promise.resolve(undefined),
       readJson<NpmPackage>(packageFilePath),
       readJson<VssManifest>(manifestFilePath),
     ]);
@@ -168,15 +157,17 @@ async function updateExtensions(...folders: string[]) {
         .join('.');
     const finalVersionParts = finalVersion.split('.').map((s) => parseInt(s));
 
-    _task.version.Major = finalVersionParts[0];
-    _task.version.Minor = finalVersionParts[1];
-    _task.version.Patch = finalVersionParts[2];
-    _task.execution = {
-      Node10: {
-        target: _package.main,
-      },
-    };
-    _task.helpMarkDown = _task.description = _package.description;
+    if (_task) {
+      _task.version.Major = finalVersionParts[0];
+      _task.version.Minor = finalVersionParts[1];
+      _task.version.Patch = finalVersionParts[2];
+      _task.execution = {
+        Node10: {
+          target: _package.main,
+        },
+      };
+      _task.helpMarkDown = _task.description = _package.description;
+    }
 
     _manifest.id = _package.name;
     _manifest.name = _package.name
@@ -185,49 +176,58 @@ async function updateExtensions(...folders: string[]) {
       .join(' ');
     _manifest.description = _package.description;
     _manifest.version = finalVersion;
-    _manifest.files = [{ path: 'task' }];
-    _manifest.contributions = [
-      {
-        id: _manifest.id,
-        type: 'ms.vss-distributed-task.task',
-        targets: ['ms.vss-distributed-task.tasks'],
-        properties: { name: 'task' },
-      },
-    ];
+    if (isTask) {
+      _manifest.files = [{ path: 'task' }];
+      _manifest.contributions = [
+        {
+          id: _manifest.id,
+          type: 'ms.vss-distributed-task.task',
+          targets: ['ms.vss-distributed-task.tasks'],
+          properties: { name: 'task' },
+        },
+      ];
+    }
 
-    await Promise.all([writeJson(_task, taskFilePath), writeJson(_manifest, manifestFilePath)]);
+    await Promise.all([
+      isTask ? writeJson(_task, taskFilePath) : Promise.resolve(),
+      writeJson(_manifest, manifestFilePath),
+    ]);
   });
 }
 
 async function compileExtensions(...folders: string[]): Promise<void> {
-  await withMany(folders, (folder) => {
-    const tsProj = gulpTs.createProject(path.join(folder, 'tsconfig.json'));
-    const includes = [`${folder}/**/*.ts`, `${folder}/**/*.d.ts`, `./*.d.ts`];
-    const excludes = [`!${folder}/tests/**/*`];
-    const reporter = gulpTs.reporter.fullReporter();
-    return gulp
-      .src([...includes, ...excludes])
-      .pipe(gulpSm.init())
-      .pipe(tsProj(reporter))
-      .pipe(gulpSm.write())
-      .pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder), 'task')));
-  });
+  await withMany(
+    folders.filter((f) => existsSync(path.join(f, 'tsconfig.json'))),
+    (folder) => {
+      const tsProj = gulpTs.createProject(path.join(folder, 'tsconfig.json'));
+      const includes = [`${folder}/**/*.ts`, `${folder}/**/*.d.ts`, `./*.d.ts`];
+      const excludes = [`!${folder}/tests/**/*`];
+      const reporter = gulpTs.reporter.fullReporter();
+      return gulp
+        .src([...includes, ...excludes])
+        .pipe(gulpSm.init())
+        .pipe(tsProj(reporter))
+        .pipe(gulpSm.write())
+        .pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder), 'task')));
+    }
+  );
 }
 
 async function copyExtensionAssets(...folders: string[]) {
   await withMany(folders, async (folder) => {
     const stageFolder = path.join(PathTo.Built, path.basename(folder));
-    const includes = ['json', 'png'].map((ext) => `${folder}/**/*.${ext}`);
+    const includes = ['json', 'png', 'html', 'js'].map((ext) => `${folder}/**/*.${ext}`);
     const excludes = [
       `!${folder}/node_modules/**/*`,
       `!${folder}/(tsconfig|vss-extension).json`,
       `!${folder}/tests/**/*`,
     ];
+    const isTask = existsSync(path.join(folder, 'task.json'));
     const _manifest = await readJson<VssManifest>(path.join(folder, 'vss-extension.json'));
     const iconPath = path.basename(_manifest.icons.default);
     await fs.copyFile(path.join(folder, 'vss-extension.json'), path.join(stageFolder, 'vss-extension.json'));
     await fs.copyFile(path.join(folder, iconPath), path.join(stageFolder, iconPath));
-    return gulp.src([...includes, ...excludes]).pipe(gulp.dest(path.join(stageFolder, 'task')));
+    return gulp.src([...includes, ...excludes]).pipe(gulp.dest(path.join(stageFolder, isTask ? 'task' : '')));
   });
 }
 
