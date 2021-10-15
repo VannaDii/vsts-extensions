@@ -6,28 +6,28 @@ Here are some examples of diagrams that can be rendered.
 
 ## Flow Chart
 
-::: mermaid
+@@@ mermaid
 graph TD
     A[Christmas] -->|Get money| B(Go shopping)
     B --> C{Let me think}
     C -->|One| D[Laptop]
     C -->|Two| E[iPhone]
     C -->|Three| F[fa:fa-car Car]
-:::
+@@@
 
 ## Sequence
 
-::: mermaid
+@@@ mermaid
 sequenceDiagram
     Alice->>+John: Hello John, how are you?
     Alice->>+John: John, can you hear me?
     John-->>-Alice: Hi Alice, I can hear you!
     John-->>-Alice: I feel great!
-:::
+@@@
 
 ## Class
 
-::: mermaid
+@@@ mermaid
 classDiagram
     Animal <|-- Duck
     Animal <|-- Fish
@@ -49,11 +49,11 @@ classDiagram
       +bool is_wild
       +run()
     }
-:::
+@@@
 
 ## State
 
-::: mermaid
+@@@ mermaid
 stateDiagram-v2
     [*] --> Still
     Still --> [*]
@@ -61,11 +61,11 @@ stateDiagram-v2
     Moving --> Still
     Moving --> Crash
     Crash --> [*]
-:::
+@@@
 
 ## Gantt
 
-::: mermaid
+@@@ mermaid
 gantt
     title A Gantt Diagram
     dateFormat  YYYY-MM-DD
@@ -75,20 +75,20 @@ gantt
     section Another
     Task in sec      :2014-01-12  , 12d
     another task      : 24d
-:::
+@@@
 
 ## Pie
 
-::: mermaid
+@@@ mermaid
 pie title Pets adopted by volunteers
     "Dogs" : 386
     "Cats" : 85
     "Rats" : 15
-:::
+@@@
 
 ## Entity Relationship
 
-::: mermaid
+@@@ mermaid
 erDiagram
     CUSTOMER }|..|{ DELIVERY-ADDRESS : has
     CUSTOMER ||--o{ ORDER : places
@@ -98,11 +98,11 @@ erDiagram
     ORDER ||--|{ ORDER-ITEM : includes
     PRODUCT-CATEGORY ||--|{ PRODUCT : contains
     PRODUCT ||--o{ ORDER-ITEM : "ordered in"
-:::
+@@@
 
 ## Git Graph
 
-::: mermaid
+@@@ mermaid
 gitGraph:
 options
 {
@@ -119,11 +119,11 @@ checkout master
 commit
 commit
 merge newbranch
-:::
+@@@
 
 ## User Journey
 
-::: mermaid
+@@@ mermaid
   journey
     title My working day
     section Go to work
@@ -133,7 +133,7 @@ merge newbranch
     section Go home
       Go downstairs: 5: Me
       Sit down: 3: Me
-:::
+@@@
 
 
 # Summary
