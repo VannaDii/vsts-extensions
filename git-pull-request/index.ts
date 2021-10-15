@@ -105,8 +105,7 @@ async function getTargetBranch(
       tl.debug(JSON.stringify(body));
       const isBodyString = typeof body === 'string';
       tl.debug(`Parsing ${typeof body} body: ${body}`);
-      const result = isBodyString ? (JSON.parse(body) as { value: { name: string }[] }) : body;
-      const refsHeads = result.value as { name: string }[];
+      const refsHeads = ((isBodyString ? JSON.parse(body) : body) as { value: { name: string }[] }).value;
       tl.debug(`Using repository refs: ${JSON.stringify(refsHeads)}`);
       const refNamePattern = RegExp(targetRefPattern);
       const matches = refsHeads.filter((ref) => refNamePattern.test(ref.name));
@@ -162,7 +161,7 @@ async function getTeamMembers(
   tl.debug(JSON.stringify(body));
   const isBodyString = typeof body === 'string';
   tl.debug(`Parsing ${typeof body} body: ${body}`);
-  const result = isBodyString ? (JSON.parse(body) as { value: { id: string }[] }) : body;
+  const result = (isBodyString ? JSON.parse(body) : body) as { value: { id: string }[] };
   const teamMembers = result.value;
   tl.debug(`Using team members: ${JSON.stringify(teamMembers)}`);
   return teamMembers;
@@ -189,7 +188,7 @@ async function makePullRequest(
   tl.debug(`Using pull request: ${JSON.stringify(pullRequest)}`);
 
   const url = `${baseUri}${tpName}/_apis/git/repositories/${projectRepo}/pullrequests`;
-  const response = await axios.post(url, pullRequest, {
+  const response = await axios.post<{ url: string }>(url, pullRequest, {
     params: { 'api-version': '3.0' },
     headers: {
       'cache-control': 'no-cache',
