@@ -38,3 +38,9 @@ steps:
     workingDirectory: $(WorkspacePath)
     env:
       TFX_PUBLISH_TOKEN: $(Tfx.Token)
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(WorkspacePath)/.bundled'
+      ArtifactName: 'bundles'
+      publishLocation: 'Container'
