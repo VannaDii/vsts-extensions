@@ -3,10 +3,10 @@ const mermaidExtension = {
   name: 'mermaid',
   level: 'block',
   start(src) {
-    return src.match(/^@{3}\s*?mermaid\s*?$/gm)?.index;
+    return src.match(/^[@:]{3}\s*?mermaid\s*?$/gm)?.index;
   },
   tokenizer(src, tokens) {
-    const rule = /^@{3}\smermaid\s*?^([\s\S]*?)^@{3}\s*?$/gm;
+    const rule = /^[@:]{3}\smermaid\s*?^([\s\S]*?)^[@:]{3}\s*?$/gm;
     const match = rule.exec(src);
     if (match && src.substring(0, match.index).trim() === '') {
       const token = {
