@@ -325,9 +325,9 @@ export async function install() {
 
 export async function clean() {
   try {
-    await fs.rmdir(PathTo.Built, { recursive: true });
-    await fs.rmdir(PathTo.Bundled, { recursive: true });
-    await fs.rmdir(PathTo.Jest, { recursive: true });
+    await fs.rm(PathTo.Built, { recursive: true });
+    await fs.rm(PathTo.Bundled, { recursive: true });
+    await fs.rm(PathTo.Jest, { recursive: true });
   } catch (error: any) {
     handleError(error);
   }
@@ -344,7 +344,7 @@ export async function manifest() {
 
 export async function build() {
   try {
-    await fs.rmdir(PathTo.Built, { recursive: true });
+    await fs.rm(PathTo.Built, { recursive: true });
 
     const taskFolders = await getAllSourceRoots();
 
@@ -374,7 +374,7 @@ export async function test() {
 
 export async function bundle() {
   try {
-    await fs.rmdir(PathTo.Bundled, { recursive: true });
+    await fs.rm(PathTo.Bundled, { recursive: true });
     await fs.mkdir(PathTo.Bundled, { recursive: true });
 
     const builtFolders = await getAllBuiltRoots();
