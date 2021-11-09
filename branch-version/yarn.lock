@@ -46,10 +46,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-azure-pipelines-task-lib@3.1.9:
-  version "3.1.9"
-  resolved "https://registry.yarnpkg.com/azure-pipelines-task-lib/-/azure-pipelines-task-lib-3.1.9.tgz#eaed75d27d42e3ab24abba1a0bcdb70b74e34d38"
-  integrity sha512-K7gSptgXzQopg4hZ5ABgPKU5WPeSVX4UfiH9T4lSUdmDw/6+3o4/AXkUFcgPVWGXefNLx6GzHcKYRUE1r+KwZQ==
+azure-pipelines-task-lib@3.1.10:
+  version "3.1.10"
+  resolved "https://registry.yarnpkg.com/azure-pipelines-task-lib/-/azure-pipelines-task-lib-3.1.10.tgz#34ba22afca2472fd3a2366ddf574c1cf11fb2f66"
+  integrity sha512-S5iH1mD9G7boOV0kjVsFkqlz/6FOZjQAajshj3ajzQK9Wr3XRq9JK9+grJP4ityG6of28X2XWpieFdJLhnWLoA==
   dependencies:
     minimatch "3.0.4"
     mockery "^1.7.0"

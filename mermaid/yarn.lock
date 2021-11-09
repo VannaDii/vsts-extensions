@@ -46,7 +46,7 @@
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.3.tgz#ff5e2f1902969d305225a047c8a0fd5c915cebef"
   integrity sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ==
 
-vss-web-extension-sdk@^5.141.0:
+vss-web-extension-sdk@5.141.0:
   version "5.141.0"
   resolved "https://registry.yarnpkg.com/vss-web-extension-sdk/-/vss-web-extension-sdk-5.141.0.tgz#368b6fcaf5e7ab849f4fb98689b6694d78224ccf"
   integrity sha512-c/r/HWQh4hljKOSNQMiFoeICckKFfU/1nxDCVFhioDHOE8B0i5aJN9rrihGilgMXugzl8K5hBsZs42eFqd30AQ==

@@ -6,7 +6,7 @@
   "description": "Create a git pull request",
   "main": "index.js",
   "dependencies": {
-    "axios": "0.23.0",
+    "axios": "0.24.0",
     "azure-pipelines-task-lib": "3.1.10"
   }
 }
