@@ -28,9 +28,13 @@ const mermaidExtension = {
 };
 const markedMermaidRenderer = {
   renderContent: function (rawContent, options) {
-    marked.use({ extensions: [mermaidExtension] });
     const targetElement = document.getElementById('render-content-display');
-    targetElement.innerHTML = marked(rawContent);
+    if (marked && marked.parse) {
+      marked.use({ extensions: [mermaidExtension] });
+      targetElement.innerHTML = marked.parse(rawContent);
+    } else {
+      targetElement.innerHTML = `Looks like there's a problem with how we're using marked. Please drop us a line and let us know. 🙏`;
+    }
   },
 };
 VSS.init({
