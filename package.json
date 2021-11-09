@@ -7,6 +7,7 @@
   "scripts": {
     "postinstall": "gulp install",
     "test": "gulp test",
+    "clean": "gulp clean",
     "build": "gulp build",
     "bundle": "gulp bundle",
     "publish": "gulp publish",

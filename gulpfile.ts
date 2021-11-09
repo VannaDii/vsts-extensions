@@ -1,5 +1,14 @@
 import path from 'path';
-import { promises as fs, existsSync, mkdirSync, Dirent } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  rmdirSync as rmSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+  copyFileSync,
+  Dirent,
+} from 'fs';
 import { ChildProcess, execSync, spawn, SpawnOptions } from 'child_process';
 
 import gulp from 'gulp';
@@ -28,11 +37,6 @@ const Tools = {
   Yarn: which('yarn'),
   Jest: which('jest'),
 };
-
-// Pre-make the paths
-Object.values(PathTo)
-  .filter((p) => !existsSync(p))
-  .forEach((p) => mkdirSync(p, { recursive: true }));
 
 // These control that arch and platform of the target system for yarn dependency installation
 const yarnArgs = ['--target_arch=x64', '--target_platform=linux'];
@@ -106,36 +110,53 @@ function printOutput(tag: string, output: string) {
   );
 }
 
+function createPathTos() {
+  // Pre-make the paths
+  Object.values(PathTo)
+    .filter((p) => !existsSync(p))
+    .forEach((p) => mkdirSync(p, { recursive: true }));
+}
+
 async function getAllRootsFrom(base: string, filter?: (value: Dirent, index: number, array: Dirent[]) => boolean) {
-  const entries = await fs.readdir(base, { withFileTypes: true });
-  return entries.filter((v, i, a) => (!!filter ? filter(v, i, a) : true)).map((ent) => path.resolve(base, ent.name));
+  const entries = readdirSync(base, { withFileTypes: true });
+  return Promise.resolve(
+    entries.filter((v, i, a) => (!!filter ? filter(v, i, a) : true)).map((ent) => path.resolve(base, ent.name))
+  );
 }
 
 async function getAllSourceRoots() {
-  return withCache(KeyTo.SourceRoots, () =>
-    getAllRootsFrom(PathTo.Source, (ent) => ent.isDirectory() && existsSync(path.join(ent.name, 'vss-extension.json')))
+  return withCache(KeyTo.SourceRoots, async () =>
+    Promise.resolve(
+      getAllRootsFrom(
+        PathTo.Source,
+        (ent) => ent.isDirectory() && existsSync(path.join(ent.name, 'vss-extension.json'))
+      )
+    )
   );
 }
 
 async function getAllBuiltRoots() {
-  return withCache(KeyTo.BuiltRoots, () =>
-    getAllRootsFrom(PathTo.Built, (ent) => ent.isDirectory() && existsSync(path.join(ent.name, 'vss-extension.json')))
+  return withCache(KeyTo.BuiltRoots, async () =>
+    Promise.resolve(
+      getAllRootsFrom(PathTo.Built, (ent) => ent.isDirectory() && existsSync(path.join(ent.name, 'vss-extension.json')))
+    )
   );
 }
 
 async function getAllBundles() {
   return withCache(KeyTo.Bundles, async () => {
-    const files = await fs.readdir(PathTo.Bundled);
-    return files.filter((f) => f.endsWith('vsix')).map((f) => path.join(PathTo.Bundled, f));
+    const files = readdirSync(PathTo.Bundled);
+    return Promise.resolve(files.filter((f) => f.endsWith('vsix')).map((f) => path.join(PathTo.Bundled, f)));
   });
 }
 
 async function readJson<T = any>(fromFile: string) {
-  return JSON.parse((await fs.readFile(fromFile)).toString()) as T;
+  return Promise.resolve(JSON.parse(readFileSync(fromFile).toString()) as T);
 }
 
 async function writeJson<T = any>(data: T, toFile: string) {
-  await fs.writeFile(toFile, JSON.stringify(data, undefined, 2));
+  writeFileSync(toFile, JSON.stringify(data, undefined, 2));
+  return Promise.resolve();
 }
 
 async function updateExtensions(...folders: string[]) {
@@ -230,8 +251,8 @@ async function copyExtensionAssets(...folders: string[]) {
     const isTask = existsSync(path.join(folder, 'task.json'));
     const _manifest = await readJson<VssManifest>(path.join(folder, 'vss-extension.json'));
     const iconPath = path.basename(_manifest.icons.default);
-    await fs.copyFile(path.join(folder, 'vss-extension.json'), path.join(stageFolder, 'vss-extension.json'));
-    await fs.copyFile(path.join(folder, iconPath), path.join(stageFolder, iconPath));
+    copyFileSync(path.join(folder, 'vss-extension.json'), path.join(stageFolder, 'vss-extension.json'));
+    copyFileSync(path.join(folder, iconPath), path.join(stageFolder, iconPath));
     return gulp.src([...includes, ...excludes]).pipe(gulp.dest(path.join(stageFolder, isTask ? 'task' : '')));
   });
 }
@@ -269,7 +290,7 @@ async function testExtensions() {
 
 async function makeExtensionBuildFolders(...folders: string[]) {
   await withMany(folders, async (folder) => {
-    await fs.mkdir(path.join(PathTo.Built, path.basename(folder)), { recursive: true });
+    mkdirSync(path.join(PathTo.Built, path.basename(folder)), { recursive: true });
   });
 }
 
@@ -330,9 +351,10 @@ export async function install() {
 
 export async function clean() {
   try {
-    await fs.rm(PathTo.Built, { recursive: true });
-    await fs.rm(PathTo.Bundled, { recursive: true });
-    await fs.rm(PathTo.Jest, { recursive: true });
+    rmSync(PathTo.Built, { recursive: true });
+    rmSync(PathTo.Bundled, { recursive: true });
+    rmSync(PathTo.Jest, { recursive: true });
+    createPathTos();
   } catch (error: any) {
     handleError(error);
   }
@@ -349,7 +371,8 @@ export async function manifest() {
 
 export async function build() {
   try {
-    await fs.rm(PathTo.Built, { recursive: true });
+    rmSync(PathTo.Built, { recursive: true });
+    createPathTos();
 
     const taskFolders = await getAllSourceRoots();
 
@@ -379,8 +402,8 @@ export async function test() {
 
 export async function bundle() {
   try {
-    await fs.rm(PathTo.Bundled, { recursive: true });
-    await fs.mkdir(PathTo.Bundled, { recursive: true });
+    rmSync(PathTo.Bundled, { recursive: true });
+    createPathTos();
 
     const builtFolders = await getAllBuiltRoots();
     await bundleExtensions(...builtFolders);
