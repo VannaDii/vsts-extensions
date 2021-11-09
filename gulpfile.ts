@@ -1,5 +1,5 @@
 import path from 'path';
-import { promises as fs, existsSync, Dirent } from 'fs';
+import { promises as fs, existsSync, mkdirSync, Dirent } from 'fs';
 import { ChildProcess, execSync, spawn, SpawnOptions } from 'child_process';
 
 import gulp from 'gulp';
@@ -28,6 +28,11 @@ const Tools = {
   Yarn: which('yarn'),
   Jest: which('jest'),
 };
+
+// Pre-make the paths
+Object.values(PathTo)
+  .filter((p) => !existsSync(p))
+  .forEach((p) => mkdirSync(p, { recursive: true }));
 
 // These control that arch and platform of the target system for yarn dependency installation
 const yarnArgs = ['--target_arch=x64', '--target_platform=linux'];
