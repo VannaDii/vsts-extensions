@@ -1,15 +1,7 @@
 import path from 'path';
-import {
-  existsSync,
-  mkdirSync,
-  rmdirSync as rmSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-  copyFileSync,
-  Dirent,
-} from 'fs';
+import rmrf from 'rmrf';
 import { ChildProcess, execSync, spawn, SpawnOptions } from 'child_process';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, copyFileSync, Dirent } from 'fs';
 
 import gulp from 'gulp';
 import gulpSm from 'gulp-sourcemaps';
@@ -351,9 +343,9 @@ export async function install() {
 
 export async function clean() {
   try {
-    rmSync(PathTo.Built, { recursive: true });
-    rmSync(PathTo.Bundled, { recursive: true });
-    rmSync(PathTo.Jest, { recursive: true });
+    rmrf(PathTo.Built);
+    rmrf(PathTo.Bundled);
+    rmrf(PathTo.Jest);
     createPathTos();
   } catch (error: any) {
     handleError(error);
@@ -371,7 +363,7 @@ export async function manifest() {
 
 export async function build() {
   try {
-    rmSync(PathTo.Built, { recursive: true });
+    rmrf(PathTo.Built);
     createPathTos();
 
     const taskFolders = await getAllSourceRoots();
@@ -402,7 +394,7 @@ export async function test() {
 
 export async function bundle() {
   try {
-    rmSync(PathTo.Bundled, { recursive: true });
+    rmrf(PathTo.Bundled);
     createPathTos();
 
     const builtFolders = await getAllBuiltRoots();
