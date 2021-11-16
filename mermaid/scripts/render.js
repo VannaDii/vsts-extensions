@@ -44,16 +44,10 @@ VSS.init({
 VSS.require(
   'TFS/Dashboards/WidgetHelpers',
   'VSS/Features/Markdown',
-  'Wiki/ViewCommon',
-  'Wiki/Renderer',
-  function (WidgetHelpers, Markdown, WikiCommon, WikiRenderer) {
+  function (WidgetHelpers, Markdown) {
     WidgetHelpers.IncludeWidgetStyles();
 
     console.log(`Markdown: ${JSON.stringify(Object.keys(Markdown).map((k) => describeThing(Markdown[k])))}`);
-    console.log(`WikiCommon: ${JSON.stringify(Object.keys(WikiCommon).map((k) => describeThing(WikiCommon[k])))}`);
-    console.log(
-      `WikiRenderer: ${JSON.stringify(Object.keys(WikiRenderer).map((k) => describeThing(WikiRenderer[k])))}`
-    );
 
     VSS.register('marked_mermaid_renderer', (_) => markedMermaidRenderer);
     VSS.notifyLoadSucceeded();
