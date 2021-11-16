@@ -17,6 +17,23 @@ const markedMermaidRenderer = {
   },
 };
 
+function describeThing(thing) {
+  if (typeof thing === 'function') {
+    return thing
+      .toString()
+      .replace(/[\r\n\s]+/g, ' ')
+      .match(/(?:function\s*\w*)?\s*(?:\((.*?)\)|([^\s]+))/)
+      .slice(1, 3)
+      .join('');
+  } else {
+    try {
+      return JSON.stringify(thing);
+    } catch {
+      return (thing.toJSON && thing.toJSON()) || (thing.toJson && thing.toJson()) || thing.toString();
+    }
+  }
+}
+
 VSS.init({
   usePlatformScripts: true,
   usePlatformStyles: true,
@@ -24,12 +41,24 @@ VSS.init({
   applyTheme: true,
 });
 
-VSS.require('TFS/Dashboards/WidgetHelpers', function (WidgetHelpers) {
-  WidgetHelpers.IncludeWidgetStyles();
+VSS.require(
+  'TFS/Dashboards/WidgetHelpers',
+  'VSS/Features/Markdown',
+  'Wiki/ViewCommon',
+  'Wiki/Renderer',
+  function (WidgetHelpers, Markdown, WikiCommon, WikiRenderer) {
+    WidgetHelpers.IncludeWidgetStyles();
 
-  VSS.register('marked_mermaid_renderer', (_) => markedMermaidRenderer);
-  VSS.notifyLoadSucceeded();
-});
+    console.log(`Markdown: ${JSON.stringify(Object.keys(Markdown).map((k) => describeThing(Markdown[k])))}`);
+    console.log(`WikiCommon: ${JSON.stringify(Object.keys(WikiCommon).map((k) => describeThing(WikiCommon[k])))}`);
+    console.log(
+      `WikiRenderer: ${JSON.stringify(Object.keys(WikiRenderer).map((k) => describeThing(WikiRenderer[k])))}`
+    );
+
+    VSS.register('marked_mermaid_renderer', (_) => markedMermaidRenderer);
+    VSS.notifyLoadSucceeded();
+  }
+);
 
 /* function renderTestContent() {
   console.log('Rendering content');
