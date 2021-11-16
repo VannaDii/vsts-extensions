@@ -15,7 +15,7 @@ const markedMermaidRenderer = {
   },
 };
 
-/* VSS.init({
+VSS.init({
   usePlatformScripts: true,
   usePlatformStyles: true,
   explicitNotifyLoaded: true,
@@ -24,9 +24,9 @@ const markedMermaidRenderer = {
 VSS.ready(function () {
   VSS.register('marked_mermaid_renderer', (_) => markedMermaidRenderer);
   VSS.notifyLoadSucceeded();
-}); */
+});
 
-function renderTestContent() {
+/* function renderTestContent() {
   console.log('Rendering content');
   markedMermaidRenderer.renderContent(`
 # Testing Content Rendering
@@ -54,5 +54,5 @@ The above renders fine, but, the below does not render the grid lines:
 | 2 | B |
 
 `);
-}
+} */
 
