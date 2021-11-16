@@ -1,5 +1,5 @@
 import path from 'path';
-import S3 from 'aws-sdk/clients/s3';
+import { S3 } from 'aws-sdk';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 tl.setResourcePath(path.join(__dirname, 'task.json'));
