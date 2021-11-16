@@ -31,7 +31,7 @@ const Tools = {
 };
 
 // These control that arch and platform of the target system for yarn dependency installation
-const yarnArgs = ['--target_arch=x64', '--target_platform=linux'];
+const yarnArgs = ['--ignore-optional'];
 
 const memCache: { [key: string]: any } = {};
 async function withCache<T = any>(key: string, factory: () => Promise<T>): Promise<T> {
