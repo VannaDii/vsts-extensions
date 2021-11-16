@@ -1,0 +1,15 @@
+html,
+body {
+  font-family: 'Segoe UI VSS (Regular)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue',
+    Helvetica, Ubuntu, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+table > thead > tr > th {
+  border-bottom-color: black;
+  border-bottom-width: 2px;
+}
+
+table > tbody > tr > td {
+  border-bottom-color: dimgray;
+  border-bottom-width: 1px;
+}
