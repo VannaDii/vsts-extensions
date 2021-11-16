@@ -3,8 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Marked Mermaid Rendering</title>
-
-    <!-- <script src="node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"></script> -->
+    <script src="lib/VSS.SDK.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({ startOnLoad: false });</script>
@@ -13,12 +12,6 @@
     <link rel="stylesheet" href="styles/render.css" />
   </head>
   <body style="overflow-y: scroll; overflow-x: scroll" onload="renderTestContent()">
-    <div id="render-content-display" class="markdown-content markdown-render-area body-m">
-      <div id="container" class="container container-main">
-        <div class="col-sm-2">
-          <div id="spinner"></div>
-        </div>
-      </div>
-    </div>
+    <div id="render-content-display" class="markdown-content markdown-render-area body-m"></div>
   </body>
 </html>

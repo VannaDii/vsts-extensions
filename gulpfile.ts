@@ -234,7 +234,7 @@ async function compileExtensions(...folders: string[]): Promise<void> {
 async function copyExtensionAssets(...folders: string[]) {
   await withMany(folders, async (folder) => {
     const stageFolder = path.join(PathTo.Built, path.basename(folder));
-    const includes = ['json', 'png', 'html', 'js', 'md'].map((ext) => `${folder}/**/*.${ext}`);
+    const includes = ['json', 'png', 'html', 'js', 'md', 'css'].map((ext) => `${folder}/**/*.${ext}`);
     const excludes = [
       `!${folder}/node_modules/**/*`,
       `!${folder}/(tsconfig|vss-extension).json`,
