@@ -13,3 +13,14 @@ table > tbody > tr > td {
   border-bottom-color: dimgray;
   border-bottom-width: 1px;
 }
+
+.markdown-content table:not(.bolt-table) {
+  margin: 0 0 16px 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: rgba(0, 0, 0, 0.9);
+  color: var(--text-primary-color, rgba(0, 0, 0, 0.9));
+  cursor: default;
+  display: block;
+  overflow-x: auto;
+}

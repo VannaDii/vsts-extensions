@@ -1,3 +1,5 @@
+/// <reference path="../node_modules/vss-web-extension-sdk/typings/VSS.SDK.d.ts" />
+
 const markedMermaidRenderer = {
   renderContent: function (rawContent, options) {
     const targetElement = document.getElementById('render-content-display');
@@ -19,9 +21,12 @@ VSS.init({
   usePlatformScripts: true,
   usePlatformStyles: true,
   explicitNotifyLoaded: true,
+  applyTheme: true,
 });
 
-VSS.ready(function () {
+VSS.require('TFS/Dashboards/WidgetHelpers', function (WidgetHelpers) {
+  WidgetHelpers.IncludeWidgetStyles();
+
   VSS.register('marked_mermaid_renderer', (_) => markedMermaidRenderer);
   VSS.notifyLoadSucceeded();
 });
@@ -54,5 +59,5 @@ The above renders fine, but, the below does not render the grid lines:
 | 2 | B |
 
 `);
-} */
-
+}
+ */
