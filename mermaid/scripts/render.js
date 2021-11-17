@@ -17,23 +17,6 @@ const markedMermaidRenderer = {
   },
 };
 
-function describeThing(thing) {
-  if (typeof thing === 'function') {
-    return thing
-      .toString()
-      .replace(/[\r\n\s]+/g, ' ')
-      .match(/(?:function\s*\w*)?\s*(?:\((.*?)\)|([^\s]+))/)
-      .slice(1, 3)
-      .join('');
-  } else {
-    try {
-      return JSON.stringify(thing);
-    } catch {
-      return (thing.toJSON && thing.toJSON()) || (thing.toJson && thing.toJson()) || thing.toString();
-    }
-  }
-}
-
 VSS.init({
   applyTheme: true,
   usePlatformStyles: true,
