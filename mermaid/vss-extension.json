@@ -13,7 +13,7 @@
   ],
   "scopes": ["vso.code"],
   "categories": ["Azure Repos"],
-  "tags": ["mermaid", "diagrams", "render", "preview", "marked"],
+  "tags": ["mermaid", "diagrams", "render", "preview", "marked", "markdown"],
   "icons": {
     "default": "icon.png"
   },
