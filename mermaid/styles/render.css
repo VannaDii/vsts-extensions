@@ -3,6 +3,11 @@ body {
   font-family: 'Segoe UI VSS (Regular)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue',
     Helvetica, Ubuntu, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
+
+div.mermaid {
+  font-family: 'trebuchet ms', verdana, arial;
+}
+
 .markdown-content {
   color: rgba(0, 0, 0, 0.9);
   color: var(--text-primary-color, rgba(0, 0, 0, 0.9));

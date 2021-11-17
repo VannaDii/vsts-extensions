@@ -1,0 +1,26 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2017",
+    "lib": [
+      "ES2017",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "outDir": "./.dist",
+    "types": [
+      "@types/node",
+      "@types/marked",
+      "@types/mermaid",
+      "@types/webpack",
+      "vss-web-extension-sdk",
+    ],
+    "skipLibCheck": true,
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "./.dist",
+    "node_modules",
+  ]
+}
