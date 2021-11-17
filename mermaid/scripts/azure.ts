@@ -33,21 +33,23 @@ export function populateToc(retriever: TocRetriever) {
 }
 
 export function makeAzureExtension() {
-  const rule = /^\[{2}_TOC_\]{2}\s*?$/gm;
+  const rules: { [key: string]: RegExp } = { toc: /^\[{2}_TOC_\]{2}\s*?$/m, workItem: /^#(\d+)[^\w]?/m };
   const azureTokenizer: marked.TokenizerExtension & marked.RendererExtension = {
     name: 'azure',
     level: 'block',
-    start(src) {
-      return src.match(rule)?.index ?? Number.NaN;
-    },
     tokenizer(src, tokens) {
-      const match = rule.exec(src);
+      const ruleIndex = Object.values(rules).findIndex((rule) => rule.test(src));
+      if (ruleIndex < 0) return;
+
+      const ruleKey = Object.keys(rules)[ruleIndex];
+
+      const match = rules[ruleKey].exec(src);
       if (match && src.substring(0, match.index).trim() === '') {
         return {
           type: 'azure',
-          case: 'toc',
+          case: ruleKey,
           raw: match[0], // Text to consume from the source
-          text: match[0], // Additional custom properties
+          matches: match.map((m) => m), // Additional custom properties
           tokens: [], // Array where child inline tokens will be generated
         };
       }
@@ -57,6 +59,17 @@ export function makeAzureExtension() {
       switch (token.case) {
         case 'toc': {
           return `<div id="${TOC_CONTAINER_ID}" class="toc-container"></div>`;
+        }
+        case 'workItem': {
+          // This is a work item reference
+          // TODO: Fill this in from the work items service in context.
+          const workItemId = parseInt(token.matches[1]);
+          const workItemUrl = `https://someurl/${workItemId}`;
+          const workItemType = 'Feature';
+          const workItemTitle = 'Some new feature';
+          const workItemState = 'New';
+          const workItemJson = JSON.stringify({ workItemId, workItemState, workItemTitle, workItemType, workItemUrl });
+          return `<span data-rendered-mention="work-item" class="mention-widget-workitem body-m" style="border-left-color: rgb(119, 59, 147)"><a class="mention-link mention-wi-link mention-click-handled" href="${workItemUrl}" data-wi='[${workItemJson}]'aria-label="${workItemType} ${workItemId}: ${workItemTitle}: State of the work item is ${workItemState}"><span class="work-item-type-icon-host"><i aria-label="${workItemType}" class="work-item-type-icon bowtie-icon bowtie-symbol-trophy work-item-type-icon-no-tooltip" role="figure" style="color: rgb(119, 59, 147)"></i></span><span class="secondary-text">${workItemId}</span><span class="mention-widget-workitem-title fontWeightSemiBold">${workItemTitle}</span></a><span class="mention-widget-workitem-state"><span class="workitem-state-color" style="background-color: rgb(178, 178, 178)"></span><span>${workItemState}</span></span></span>`;
         }
       }
       return JSON.stringify(token);

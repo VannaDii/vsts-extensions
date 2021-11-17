@@ -9,6 +9,10 @@ function renderTestContent() {
 
 This is a simple sample to test various markdowns
 
+## Regarding Work Items
+
+#1
+
 ## Below is a Mermaid graph
 
 @@@ mermaid
