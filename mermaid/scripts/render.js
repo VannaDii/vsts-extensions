@@ -43,11 +43,8 @@ VSS.init({
 
 VSS.require(
   'TFS/Dashboards/WidgetHelpers',
-  'VSS/Features/Markdown',
-  function (WidgetHelpers, Markdown) {
+  function (WidgetHelpers) {
     WidgetHelpers.IncludeWidgetStyles();
-
-    console.log(`Markdown: ${JSON.stringify(Object.keys(Markdown).map((k) => describeThing(Markdown[k])))}`);
 
     VSS.register('marked_mermaid_renderer', (_) => markedMermaidRenderer);
     VSS.notifyLoadSucceeded();
