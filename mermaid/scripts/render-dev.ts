@@ -3,6 +3,8 @@ import markedMermaidRenderer from './marked';
 function renderTestContent() {
   console.log('Rendering content');
   markedMermaidRenderer.renderContent(`
+[[_TOC_]]
+
 # Testing Content Rendering
 
 This is a simple sample to test various markdowns
