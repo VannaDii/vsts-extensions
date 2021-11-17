@@ -1,5 +1,6 @@
 import path from 'path';
 import rmrf from 'rmrf';
+import fse from 'fs-extra';
 import { ChildProcess, execSync, spawn, SpawnOptions } from 'child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, copyFileSync, Dirent } from 'fs';
 
@@ -216,17 +217,25 @@ async function updateExtensions(...folders: string[]) {
 async function compileExtensions(...folders: string[]): Promise<void> {
   await withMany(
     folders.filter((f) => existsSync(path.join(f, 'tsconfig.json'))),
-    (folder) => {
-      const tsProj = gulpTs.createProject(path.join(folder, 'tsconfig.json'));
-      const includes = [`${folder}/**/*.ts`, `${folder}/**/*.d.ts`, `./*.d.ts`];
-      const excludes = [`!${folder}/tests/**/*`];
-      const reporter = gulpTs.reporter.fullReporter();
-      return gulp
-        .src([...includes, ...excludes])
-        .pipe(gulpSm.init())
-        .pipe(tsProj(reporter))
-        .pipe(gulpSm.write())
-        .pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder), 'task')));
+    async (folder) => {
+      const useWebpack = existsSync(path.join(folder, 'webpack.config.ts'));
+      if (useWebpack) {
+        await waitForProcess(spawn(Tools.Yarn, ['build'], { ...spawnOpts, cwd: folder }));
+        const source = path.join(folder, '.dist');
+        const destination = path.join(PathTo.Built, path.basename(folder));
+        fse.copySync(source, destination);
+      } else {
+        const tsProj = gulpTs.createProject(path.join(folder, 'tsconfig.json'));
+        const includes = [`${folder}/**/*.ts`, `${folder}/**/*.d.ts`, `./*.d.ts`];
+        const excludes = [`!${folder}/tests/**/*`];
+        const reporter = gulpTs.reporter.fullReporter();
+        return gulp
+          .src([...includes, ...excludes])
+          .pipe(gulpSm.init())
+          .pipe(tsProj(reporter))
+          .pipe(gulpSm.write())
+          .pipe(gulp.dest(path.join(PathTo.Built, path.basename(folder), 'task')));
+      }
     }
   );
 }
@@ -245,6 +254,10 @@ async function copyExtensionAssets(...folders: string[]) {
     const iconPath = path.basename(_manifest.icons.default);
     copyFileSync(path.join(folder, 'vss-extension.json'), path.join(stageFolder, 'vss-extension.json'));
     copyFileSync(path.join(folder, iconPath), path.join(stageFolder, iconPath));
+
+    const useWebpack = existsSync(path.join(folder, 'webpack.config.ts'));
+    if (useWebpack) return Promise.resolve();
+
     return gulp.src([...includes, ...excludes]).pipe(gulp.dest(path.join(stageFolder, isTask ? 'task' : '')));
   });
 }

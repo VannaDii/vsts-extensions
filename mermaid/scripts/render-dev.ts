@@ -1,3 +1,5 @@
+import markedMermaidRenderer from './marked';
+
 function renderTestContent() {
   console.log('Rendering content');
   markedMermaidRenderer.renderContent(`
@@ -29,3 +31,9 @@ The above renders fine, but, the below does not render the grid lines:
 
 `);
 }
+
+document.addEventListener('readystatechange', (e) => {
+  if (document.readyState === 'complete') {
+    renderTestContent();
+  }
+});

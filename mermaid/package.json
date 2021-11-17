@@ -1,10 +1,12 @@
 {
   "name": "marked-mermaid-renderer",
-  "version": "0.0.1",
   "description": "A Marked and Mermaid Renderer",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Gio Palacino <gio@palacino.net>",
   "main": "mermaid-render.html",
-  "dependencies": {
-    "vss-web-extension-sdk": "5.141.0"
+  "scripts": {
+    "build": "webpack"
   },
   "keywords": [
     "mermaid",
@@ -12,6 +14,20 @@
     "render",
     "preview"
   ],
-  "author": "Gio Palacino <gio@palacino.net>",
-  "license": "MIT"
+  "dependencies": {
+    "vss-web-extension-sdk": "5.141.0"
+  },
+  "devDependencies": {
+    "@types/copy-webpack-plugin": "8.0.1",
+    "@types/marked": "4.0.0",
+    "@types/mermaid": "8.2.7",
+    "@types/node": "16.11.7",
+    "@types/webpack": "5.28.0",
+    "copy-webpack-plugin": "10.0.0",
+    "ts-loader": "9.2.6",
+    "ts-node": "10.4.0",
+    "typescript": "4.4.4",
+    "webpack": "5.64.1",
+    "webpack-cli": "4.9.1"
+  }
 }

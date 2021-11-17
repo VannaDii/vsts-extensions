@@ -29,6 +29,8 @@ steps:
       testResultsFiles: '**/junit.xml'
 
   - script: yarn build --cli-version $(Build.BuildNumber)
+    env:
+      NODE_ENV: 'production'
     displayName: Build Sources
     workingDirectory: $(WorkspacePath)
 
