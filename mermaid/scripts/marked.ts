@@ -1,7 +1,19 @@
 import { marked } from 'marked';
 import { mermaidExtension } from './mermaid';
+import { makeAzureExtension, makeAzureRenderer, populateToc, TocItem } from './azure';
 
 function buildMarkedMermaidRenderer() {
+  const toc: TocItem[] = [];
+  const azureRenderer = makeAzureRenderer((i) => {
+    const last = toc.length - 1;
+    if (last >= 0 && i.level > toc[last].level) {
+      toc[last].children = toc[last].children || [];
+      toc[last].children?.push(i);
+    } else {
+      toc.push(i);
+    }
+  });
+  const azureExtension = makeAzureExtension();
   return {
     renderContent: function (rawContent: string, options?: any) {
       const targetElement = document.getElementById('render-content-display');
@@ -12,12 +24,13 @@ function buildMarkedMermaidRenderer() {
           xhtml: true,
           headerIds: true,
         });
-        marked.use({ extensions: [mermaidExtension] });
+        marked.use({ extensions: [azureExtension, mermaidExtension], renderer: azureRenderer });
         marked.parse(rawContent, { silent: true }, (error, result) => {
           if (error) {
             targetElement.innerHTML = `<code>${error.message}${error.stackTrace}</code>`;
           } else {
             targetElement.innerHTML = result;
+            populateToc(() => toc);
           }
         });
       } else {
